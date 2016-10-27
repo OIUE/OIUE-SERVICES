@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.oiue.service.action.filter.auth.debug</artifactId>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for action auth filter imp debug </name>
+	<description>A bundle that registers an action auth filter serivce impl debug </description>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.online</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.res.api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+</project>

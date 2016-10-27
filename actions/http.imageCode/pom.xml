@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<artifactId>org.oiue.service.action.http.imageCode</artifactId>
+
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for http image code action(/check) </name>
+	<description>A bundle that registers a http image code action service</description>
+	<!-- <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			打包bundle文件为bundle.jar文件
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<X-bundle-Version>${version}</X-bundle-Version>
+						<Bundle-Activator>${artifactId}.Activator</Bundle-Activator>
+						<Import-Package>com.sun.image.codec.jpeg,org.oiue.service.log,org.oiue.service.action.api,org.oiue.service.osgi,org.osgi.service.http</Import-Package>
+						<Bundle-Name>${name}</Bundle-Name>
+						<Bundle-Description>${description}</Bundle-Description>
+						<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			打包source文件为jar文件
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<attach>true</attach>
+					<encoding>UTF-8</encoding>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			将打包的bundle文件拷贝到项目的bundle目录
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-lib-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy todir="/workspace/git/platform/leauto/bundle">
+									<fileset dir="${basedir}/target">
+										<include name="*.?.jar" />
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<defaultGoal>package</defaultGoal>
+
+		<pluginManagement>
+			<plugins>
+				This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											build-helper-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.9.1,)
+										</versionRange>
+										<goals>
+											<goal>add-source</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build> -->
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+	</dependencies>
+</project>

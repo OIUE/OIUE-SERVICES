@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.oiue.service.action.tcp.action</artifactId>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0</version>
+        <relativePath>../parent/pom.xml</relativePath>
+	</parent>
+	<packaging>bundle</packaging>
+
+	<name>OIUE TCP service for action </name>
+	<description>A bundle that tcp action service </description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.tcp</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.online</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+</project>

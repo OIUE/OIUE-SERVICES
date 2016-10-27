@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.oiue</groupId>
+		<artifactId>oiue</artifactId>
+		<version>1.0.0</version>
+		<relativePath>/work/github/oiue/pom.xml</relativePath>
+	</parent>
+	<groupId>org.oiue.services</groupId>
+	<artifactId>reactor</artifactId>
+	<packaging>pom</packaging>
+	<version>1.0.0</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<modules>
+		<module>buffer</module>
+		<module>online</module>
+		<module>message</module>
+		<module>permission</module>
+		<module>auth</module>
+		<module>file.upload</module>
+		<module>http.client</module>
+		<module>event.system.time</module>
+		<module>event.execute</module>
+		<module>task</module>
+		<module>tcp</module>
+		<module>socketio</module>
+		<module>threadpool</module>
+
+		<module>buffer.impl</module>
+		<module>buffer.synchronization.db</module>
+		<module>cache.buffer</module>
+		<module>cache.jedis</module>
+		<module>cache.script</module>
+		<module>cache.tree.script</module>
+		<module>file.upload.impl</module>
+		<module>actions</module>
+		<module>bytes</module>
+
+		<module>auth.impl</module>
+		<module>auth.local</module>
+		<module>drivers</module>
+
+		<module>event.execute.impl</module>
+		<module>event.system.time.impl</module>
+
+		<module>http.client.apache</module>
+
+		<module>online.impl</module>
+		<module>message.impl</module>
+		<module>permission.impl</module>
+		<module>permission.verify</module>
+		<module>task.quartz</module>
+		<module>tcp.mina</module>
+
+		<module>threadpool.impl</module>
+
+		<module>debug.httpclient</module>
+		<module>debug.insertmodule</module>
+		<module>debug.res</module>
+		<module>debug.cache</module>
+		<module>debug.treecache</module>
+
+		<module>template</module>
+	</modules>
+</project>

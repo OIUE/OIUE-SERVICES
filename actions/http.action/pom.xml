@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.oiue.service.action.http.action</artifactId>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0</version>
+        <relativePath>../parent/pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for http action(/action) </name>
+	<description>A bundle that registers a http action service</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+	</dependencies>
+</project>

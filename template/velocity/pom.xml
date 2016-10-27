@@ -1,0 +1,160 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.oiue.service.template.velocity</artifactId>
+	<parent>
+		<groupId>org.oiue.services.templates</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for template by velocity </name>
+	<description>a bundle that template service by velocity </description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+										<versionRange>[2.0,)</versionRange>
+										<goals>
+											<goal>copy-dependencies</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<!-- 把依赖的jar包拷到lib目录下 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- 打包bundle文件为bundle.jar文件 -->
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<X-bundle-Version>${version}</X-bundle-Version>
+						<Bundle-Activator>${artifactId}.Activator</Bundle-Activator>
+						<Export-Package></Export-Package>
+						<Import-Package>
+							org.oiue.service.template,
+							org.oiue.service.osgi,
+							org.osgi.service.http,
+							org.oiue.tools,
+							org.oiue.service.log
+						</Import-Package>
+						<Bundle-Name>${name}</Bundle-Name>
+						<Bundle-Description>${description}</Bundle-Description>
+						<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+						<Bundle-Vendor></Bundle-Vendor>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Dependency>velocity,commons-collections,commons-lang;scope=compile|runtime</Embed-Dependency>
+						<Embed-Directory>lib</Embed-Directory>
+						<Embed-StripGroup>true</Embed-StripGroup>
+					</instructions>
+				</configuration>
+			</plugin>
+			<!-- 打包source文件为jar文件 -->
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<attach>true</attach>
+					<encoding>UTF-8</encoding>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- 将打包的bundle文件拷贝到项目的bundle目录 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-lib-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy todir="/workspace/git/platform/leauto/bundle">
+									<fileset dir="${basedir}/target">
+										<include name="*.?.jar" />
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

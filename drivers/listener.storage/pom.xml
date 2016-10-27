@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.oiue.service.driver.listener.storage</artifactId>
+	<parent>
+		<groupId>org.oiue.services.drivers</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<packaging>bundle</packaging>
+
+	<name>OIUE DRIVER service for listener storage </name>
+	<description>A bundle that Driver listener storage service </description>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.res.api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+</project>

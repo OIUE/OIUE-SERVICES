@@ -1,0 +1,44 @@
+package org.oiue.service.bytes.bytes;
+
+
+import java.util.Dictionary;
+
+import org.oiue.service.bytes.api.BytesDecodeEncoded;
+import org.oiue.service.bytes.api.BytesService;
+import org.oiue.service.log.LogService;
+import org.oiue.service.osgi.FrameActivator;
+import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
+
+public class Activator extends FrameActivator {
+
+    @Override
+    public void start() throws Exception {
+        this.start(new MulitServiceTrackerCustomizer() {
+            private final static String type = "byte";
+            private BytesDecodeEncoded intService;
+            private BytesService bytesService;
+
+            @Override
+            public void removedService() {
+                bytesService.unRregisterDecodeEncoded(type);
+            }
+
+            @Override
+            public void addingService() {
+                LogService logService = getService(LogService.class);
+                bytesService = getService(BytesService.class);
+                intService = new ByteDecodeEncoded(logService);
+
+                bytesService.registerDecodeEncoded(type, intService);
+            }
+
+            @Override
+            public void updated(Dictionary<String, ?> props) {
+
+            }
+        }, LogService.class, BytesService.class);
+    }
+
+    @Override
+    public void stop() throws Exception {}
+}
