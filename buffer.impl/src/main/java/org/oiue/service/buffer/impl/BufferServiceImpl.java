@@ -11,8 +11,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
-
-import org.oiue.service.buffer.*;
+import org.oiue.service.buffer.BufferService;
+import org.oiue.service.buffer.KeyToMany;
+import org.oiue.service.buffer.KeyToOne;
+import org.oiue.service.buffer.KeyToSpatial;
+import org.oiue.service.buffer.KeyToSpatialMerge;
+import org.oiue.service.buffer.KeyToSpatialObject;
+import org.oiue.service.buffer.KeyToTree;
+import org.oiue.service.buffer.Type;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 
@@ -26,6 +32,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		hmBuffer =new ConcurrentHashMap<String, Object>();
 	}
 
+	@Override
 	public Map<String, Object> getHashMap() {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get buffer hashmap");
@@ -34,6 +41,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return hmBuffer;
 	}
 
+	@Override
 	public Object put(String name, Type bufferType) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("put buffer name = " + name + " ,type = " + bufferType);
@@ -63,6 +71,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return obj;
 	}
 
+	@Override
 	public Object get(String name) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get buffer name = " + name + ", result = " + hmBuffer.containsKey(name));
@@ -70,6 +79,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return hmBuffer.get(name);
 	}
 
+	@Override
 	public Object remove(String name) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("remove buffer name = " + name);
@@ -77,6 +87,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return hmBuffer.remove(name);
 	}
 
+	@Override
 	public void put(String name, String key, Object value) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("put name = " + name + ", key = " + key + ", value = " + value);
@@ -91,6 +102,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void put(String name, String key, Object value, Type bufferType) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("put name = " + name + ", key = " + key + ", value = " + value + ", type = " + bufferType);
@@ -106,6 +118,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void put(String name, String key, double x, double y, Object value) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("put name = " + name + ", key = " + key + ", x = " + x + ", y = " + y + ", value = " + value);
@@ -119,6 +132,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void put(String name, String key, String parentKey, Object value) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("put name = " + name + ", key = " + key + ", parentKey = " + parentKey + ", value = " + value);
@@ -132,19 +146,20 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
-//	public Object get(String name, String key,String parentKey) {
-//		/*
-//		 * if (System.currentTimeMillis() > 1317398400000L) { return null; }
-//		 */
-//		if (logger.isDebugEnabled()) {
-//			logger.debug("get name = " + name + ", key = " + key);
-//		}
-//		Object obj = hmBuffer.get(name);
-//		if (obj instanceof KeyToTree) {
-//			return ((KeyToTree) obj).get(key);
-//		}
-//		return null;
-//	}
+	//	public Object get(String name, String key,String parentKey) {
+	//		/*
+	//		 * if (System.currentTimeMillis() > 1317398400000L) { return null; }
+	//		 */
+	//		if (logger.isDebugEnabled()) {
+	//			logger.debug("get name = " + name + ", key = " + key);
+	//		}
+	//		Object obj = hmBuffer.get(name);
+	//		if (obj instanceof KeyToTree) {
+	//			return ((KeyToTree) obj).get(key);
+	//		}
+	//		return null;
+	//	}
+	@Override
 	public Object get(String name, String key) {
 		/*
 		 * if (System.currentTimeMillis() > 1317398400000L) { return null; }
@@ -165,6 +180,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> get(String name, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", match count = " + matchSet.size());
@@ -182,6 +198,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> get(String name, double x1, double x2, double y1, double y2, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2 + ", match count = " + matchSet.size());
@@ -194,10 +211,11 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> get(String name, double[] x1, double[] x2, double[] y1, double[] y2, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + doubleArrayToString(x1) + ", x2 = " + doubleArrayToString(x2) + ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2)
-					+ ", match count = " + matchSet.size());
+			+ ", match count = " + matchSet.size());
 		}
 
 		Object obj = hmBuffer.get(name);
@@ -207,6 +225,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<KeyToSpatialMerge> get(String name, double x1, double x2, double y1, double y2, double dx, double dy, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2 + ", dx = " + dx + ", dy = " + dy + ", match count = " + matchSet.size());
@@ -218,10 +237,11 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<KeyToSpatialMerge> get(String name, double[] x1, double[] x2, double[] y1, double[] y2, double dx, double dy, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + doubleArrayToString(x1) + ", x2 = " + doubleArrayToString(x2) + ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2)
-					+ ", dx = " + dx + ", dy = " + dy + ", match count = " + matchSet.size());
+			+ ", dx = " + dx + ", dy = " + dy + ", match count = " + matchSet.size());
 		}
 
 		Object obj = hmBuffer.get(name);
@@ -231,6 +251,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> get(String name, double x1, double x2, double y1, double y2) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2);
@@ -243,6 +264,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> get(String name, double[] x1, double[] x2, double[] y1, double[] y2) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + doubleArrayToString(x1) + ", x2 = " + doubleArrayToString(x2) + ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2));
@@ -255,6 +277,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<KeyToSpatialMerge> get(String name, double x1, double x2, double y1, double y2, double dx, double dy) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2 + ", dx = " + dx + ", dy = " + dy);
@@ -267,10 +290,11 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<KeyToSpatialMerge> get(String name, double[] x1, double[] x2, double[] y1, double[] y2, double dx, double dy) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get name = " + name + ", x1 = " + doubleArrayToString(x1) + ", x2 = " + doubleArrayToString(x2) + ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2)
-					+ ", dx = " + dx + ", dy = " + dy);
+			+ ", dx = " + dx + ", dy = " + dy);
 		}
 		Object obj = hmBuffer.get(name);
 		if (obj instanceof KeyToSpatial) {
@@ -279,6 +303,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public boolean contains(String name, String key) {
 		Object obj = hmBuffer.get(name);
 		if (obj instanceof KeyToOne) {
@@ -293,6 +318,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return false;
 	}
 
+	@Override
 	public boolean contains(String nameKeyToMany, String key, String value) {
 		Object obj = hmBuffer.get(nameKeyToMany);
 		if (obj instanceof KeyToMany) {
@@ -301,6 +327,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return false;
 	}
 
+	@Override
 	public List<Object> getRelation(String nameKeyToManyOrTree, String key, String name) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get relation key to many or tree name = " + nameKeyToManyOrTree + ", key = " + key + ", name = " + name);
@@ -325,6 +352,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> getRelation(String nameKeyToMany, String key, String name, double x1, double x2, double y1, double y2) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get relation key to many name = " + nameKeyToMany + ", key = " + key + ", name = " + name + ", x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2);
@@ -341,10 +369,11 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<Object> getRelation(String nameKeyToMany, String key, String name, double[] x1, double[] x2, double[] y1, double[] y2) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get relation key to many name = " + nameKeyToMany + ", key = " + key + ", name = " + name + ", x1 = " + doubleArrayToString(x1) + ", x2 = " + doubleArrayToString(x2)
-					+ ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2));
+			+ ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2));
 		}
 
 		Object obj = hmBuffer.get(nameKeyToMany);
@@ -358,6 +387,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<KeyToSpatialMerge> getRelation(String nameKeyToMany, String key, String name, double x1, double x2, double y1, double y2, double dx, double dy) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get relation key to many name = " + nameKeyToMany + ", key = " + key + ", name = " + name + ", x1 = " + x1 + ", x2 = " + x2 + ", y1 = " + y1 + ", y2 = " + y2 + ", dx = "
@@ -375,10 +405,11 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public List<KeyToSpatialMerge> getRelation(String nameKeyToMany, String key, String name, double[] x1, double[] x2, double[] y1, double[] y2, double dx, double dy) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("get relation key to many name = " + nameKeyToMany + ", key = " + key + ", name = " + name + ", x1 = " + doubleArrayToString(x1) + ", x2 = " + doubleArrayToString(x2)
-					+ ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2) + ", dx = " + dx + ", dy = " + dy);
+			+ ", y1 = " + doubleArrayToString(y1) + ", y2 = " + doubleArrayToString(y2) + ", dx = " + dx + ", dy = " + dy);
 		}
 
 		Object obj = hmBuffer.get(nameKeyToMany);
@@ -392,6 +423,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		return null;
 	}
 
+	@Override
 	public void remove(String name, String key) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("remove name = " + name + ", key = " + key);
@@ -409,6 +441,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void remove(String name, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("remove name = " + name + ", match count = " + matchSet.size());
@@ -426,6 +459,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void remove(String name, String key, Object value) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("remove name = " + name + ", key = " + key + ", value = " + value);
@@ -437,6 +471,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void remove(String name, String key, Set<Object> matchSet) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("remove name = " + name + ", key = " + key + ", match count = " + matchSet.size());
@@ -448,6 +483,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void removeRelation(String nameKeyToMany, String key, String name) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("reomve relation key to many name = " + nameKeyToMany + ", key = " + key + ", name = " + name);
@@ -472,6 +508,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		}
 	}
 
+	@Override
 	public void removeRelation(String nameKeyToMany, String key, String removeNameKeyToMany, String removeKey) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("reomve relation key to many name = " + nameKeyToMany + ", key = " + key + ", remove name = " + removeNameKeyToMany + ", remove key = " + removeKey);
@@ -639,14 +676,14 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		if (object instanceof Iterable<?>) {
 			List rtnL=new ArrayList();
 			for (Iterator iterator = ((Iterable)object).iterator(); iterator.hasNext();) {
-				Object type = (Object) iterator.next();
+				Object type = iterator.next();
 				rtnL.add(toObj(type));
 			}
 			return rtnL;
 		} else if (object instanceof Map<?, ?>) {
 			Map rtnM=new HashMap();
 			for (Iterator iterator = ((Map)object).keySet().iterator(); iterator.hasNext();) {
-				Object key = (Object) iterator.next();
+				Object key = iterator.next();
 				rtnM.put(key, toObj(((Map) object).get(key)));
 			}
 			return rtnM;
@@ -659,7 +696,7 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		} else {
 			return object;
 		}
-		
+
 	}
 	private String doubleArrayToString(double[] array) {
 		StringBuffer sb = new StringBuffer();
@@ -672,15 +709,15 @@ public class BufferServiceImpl implements BufferService,Serializable {
 		sb.append("]");
 		return sb.toString();
 	}
-	
-    @Override
-    public void swap(String nameA, String nameB) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("swap buffer, a name = " + nameA + ", b name = " + nameB);
-        }
-        Object a = hmBuffer.get(nameA);
-        Object b = hmBuffer.get(nameB);
- 
+
+	@Override
+	public void swap(String nameA, String nameB) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("swap buffer, a name = " + nameA + ", b name = " + nameB);
+		}
+		Object a = hmBuffer.get(nameA);
+		Object b = hmBuffer.get(nameB);
+
 		if (b != null) {
 			hmBuffer.put(nameA, b);
 		} else {

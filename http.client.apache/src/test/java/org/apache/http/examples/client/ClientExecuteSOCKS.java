@@ -50,7 +50,7 @@ import org.apache.http.util.EntityUtils;
 /**
  * How to send a request via SOCKS proxy.
  *
- * @since 4.1
+ *  4.1
  */
 public class ClientExecuteSOCKS {
 

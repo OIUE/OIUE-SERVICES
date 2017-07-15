@@ -236,57 +236,57 @@ public class PostTest {
         }
         return returnMap;
     }
-
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        // TODO Auto-generated method stub
-        // String url = "http://127.0.0.1:8080/upload";
-        // String url = "http://127.0.0.1:8080/services/version/modulename/operation?parameters={}";
-        String url = "http://124.207.141.82:9999/wap/portalChuxin.do";
-
-        String key = "test123";
-        String vehicleCity = "110100";
-        String mobile = "12345678901";
-        String licenseNo = "京PY7V99";
-        // String licenseNo = URLEncoder.encode("京A123456", "utf-8");
-        String customerID = URLEncoder.encode("03364c9a-24dc-4d4b-8c2b-6a0e857291b5", "utf-8");
-        String businessID = URLEncoder.encode("0348aac4-6f21-4ffa-9e8a-64a0100281fd", "utf-8");
-        String uuid = URLEncoder.encode("0348aac4-6f21-4ffa-9e8a-64a0100281fs", "utf-8");
-        String channelCode = "120002";
-        String platformType = "APP";
-        String mediaCode = "";
-        String bj = "vehicleCity=" + vehicleCity + "&mobile=" + mobile + "&licenseNo=" + licenseNo + "&customerID=" + customerID + "&businessID=" + businessID + "&uuid=" + uuid + "&channelCode=" + channelCode + "&platformType=" + platformType + "&mediaCode=" + mediaCode;
-        // String bjs = "vehicleCity="+ vehicleCity+"&mobile="+ mobile+"&licenseNo="+
-        // URLEncoder.encode(licenseNo, "utf-8")+"&customerID="+customerID
-        // +"&businessID="+businessID+"&uuid="+uuid+"&channelCode="+channelCode+"&platformType="+platformType
-        // +"&mediaCode="+mediaCode;
-
-        Map data = new HashMap<>();
-        data.put("vehicleCity", vehicleCity);
-        data.put("mobile", mobile);
-        data.put("licenseNo", licenseNo);
-        data.put("customerID", customerID);
-        data.put("businessID", businessID);
-        data.put("uuid", uuid);
-        data.put("channelCode", channelCode);
-        data.put("platformType", platformType);
-        data.put("mediaCode", mediaCode);
-        try {
-            Md5 md5 = new Md5((key + bj).getBytes("utf-8"));
-            byte b[] = md5.getDigest();
-            System.out.println("key:" + key);
-            System.out.println("bj:" + bj);
-            System.out.println("md5:" + md5.getStringDigest().toLowerCase());
-
-            PostTest ac = new PostTest();
-            // System.out.println(ac.getPostData(url, data));
-            String pser = bj + "&bjMd5=" + md5.getStringDigest().toLowerCase();
-            // String pser=bj+"&bjMd5=ca13fd460f53af44a55ae9ebf57c22fc";
-            System.out.println(url + "?" +pser);
-            // System.out.println(ac.post(url,pser));
-//            System.out.println(ac.getGetData(url + "?" + pser));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
+//
+//    public static void main(String[] args) throws UnsupportedEncodingException {
+//        // TODO Auto-generated method stub
+//        // String url = "http://127.0.0.1:8080/upload";
+//        // String url = "http://127.0.0.1:8080/services/version/modulename/operation?parameters={}";
+//        String url = "http://124.207.141.82:9999/wap/portalChuxin.do";
+//
+//        String key = "test123";
+//        String vehicleCity = "110100";
+//        String mobile = "12345678901";
+//        String licenseNo = "京PY7V99";
+//        // String licenseNo = URLEncoder.encode("京A123456", "utf-8");
+//        String customerID = URLEncoder.encode("03364c9a-24dc-4d4b-8c2b-6a0e857291b5", "utf-8");
+//        String businessID = URLEncoder.encode("0348aac4-6f21-4ffa-9e8a-64a0100281fd", "utf-8");
+//        String uuid = URLEncoder.encode("0348aac4-6f21-4ffa-9e8a-64a0100281fs", "utf-8");
+//        String channelCode = "120002";
+//        String platformType = "APP";
+//        String mediaCode = "";
+//        String bj = "vehicleCity=" + vehicleCity + "&mobile=" + mobile + "&licenseNo=" + licenseNo + "&customerID=" + customerID + "&businessID=" + businessID + "&uuid=" + uuid + "&channelCode=" + channelCode + "&platformType=" + platformType + "&mediaCode=" + mediaCode;
+//        // String bjs = "vehicleCity="+ vehicleCity+"&mobile="+ mobile+"&licenseNo="+
+//        // URLEncoder.encode(licenseNo, "utf-8")+"&customerID="+customerID
+//        // +"&businessID="+businessID+"&uuid="+uuid+"&channelCode="+channelCode+"&platformType="+platformType
+//        // +"&mediaCode="+mediaCode;
+//
+//        Map data = new HashMap<>();
+//        data.put("vehicleCity", vehicleCity);
+//        data.put("mobile", mobile);
+//        data.put("licenseNo", licenseNo);
+//        data.put("customerID", customerID);
+//        data.put("businessID", businessID);
+//        data.put("uuid", uuid);
+//        data.put("channelCode", channelCode);
+//        data.put("platformType", platformType);
+//        data.put("mediaCode", mediaCode);
+//        try {
+//            Md5 md5 = new Md5((key + bj).getBytes("utf-8"));
+//            byte b[] = md5.getDigest();
+//            System.out.println("key:" + key);
+//            System.out.println("bj:" + bj);
+//            System.out.println("md5:" + md5.getStringDigest().toLowerCase());
+//
+//            PostTest ac = new PostTest();
+//            // System.out.println(ac.getPostData(url, data));
+//            String pser = bj + "&bjMd5=" + md5.getStringDigest().toLowerCase();
+//            // String pser=bj+"&bjMd5=ca13fd460f53af44a55ae9ebf57c22fc";
+//            System.out.println(url + "?" +pser);
+//            // System.out.println(ac.post(url,pser));
+////            System.out.println(ac.getGetData(url + "?" + pser));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 }

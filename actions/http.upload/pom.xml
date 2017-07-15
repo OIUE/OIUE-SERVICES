@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<properties>
 		<project.activator>${artifactId}.Activator</project.activator>
@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>org.oiue.services.actions</groupId>
 			<artifactId>org.oiue.service.action.api</artifactId>
-			<version>1.0.0</version>
+			<version>${action.api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.file.upload</artifactId>
-			<version>1.0.0</version>
+			<version>${file.upload.version}</version>
 		</dependency>
 	</dependencies>
 </project>

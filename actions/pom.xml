@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<artifactId>actions</artifactId>
   <packaging>pom</packaging>
@@ -15,11 +15,14 @@
     <module>api</module>
     <module>parent</module>
     <module>base</module>
+    <module>http.filter.auth</module>
     <module>http.action</module>
     <module>http.services</module>
+    <module>http.resource</module>
     <module>tcp.action</module>
     <module>tcp.bytes</module>
     <module>filter.auth</module>
+    <module>filter.module2domain</module>
     <module>filter.auth.debug</module>
     <module>http.upload</module>
     <module>http.imageCode</module>

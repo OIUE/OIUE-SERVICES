@@ -19,6 +19,7 @@ public class Activator extends FrameActivator {
 
             @Override
             public void removedService() {
+            	if(refreshDb!=null)
                 refreshDb.shutdown();
             }
 
@@ -32,7 +33,6 @@ public class Activator extends FrameActivator {
                 IResource iResource = getService(IResource.class);
                 
                 refreshDb = new SynchronizationDbRefresh(bufferService, taskService, factoryService, logService);
-
             }
 
             @Override

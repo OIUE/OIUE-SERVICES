@@ -60,6 +60,9 @@ public class QuartzServiceImpl implements TaskService {
         if (logger.isDebugEnabled()) {
             logger.debug("register cron name = " + name + ", cron = " + cron + ", quartzJob = " + job + ", context = " + context);
         }
+        if (StringUtil.isEmptys(group)) {
+            group = QUARTZ_TRIGGER_GROUP;
+        }
         JobDataMap newJobDataMap = new JobDataMap(context);
         newJobDataMap.put(QUARTZ_JOB, job);
 

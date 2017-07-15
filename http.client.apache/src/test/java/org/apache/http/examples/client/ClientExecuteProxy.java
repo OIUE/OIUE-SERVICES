@@ -38,7 +38,7 @@ import org.apache.http.util.EntityUtils;
 /**
  * How to send a request via proxy.
  *
- * @since 4.0
+ *  4.0
  */
 public class ClientExecuteProxy {
 

@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<properties>
 		<project.activator>${artifactId}.Activator</project.activator>
@@ -30,7 +30,7 @@ org.slf4j</project.import>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.tcp</artifactId>
-			<version>1.0.0</version>
+			<version>${tcp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.mina</groupId>

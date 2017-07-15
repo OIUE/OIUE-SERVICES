@@ -11,39 +11,42 @@ import org.osgi.service.http.HttpService;
 
 public class Activator extends FrameActivator {
 
-    @Override
-    public void start() throws Exception {
-        this.start(new MulitServiceTrackerCustomizer() {
-            private String url = getProperty("org.oiue.service.action.http.root") + "/services";
-            private HttpService httpService;
-            private PostServlet posServlet;
-            @Override
-            public void removedService() {
-                httpService.unregister(url);
-            }
+	@Override
+	public void start() throws Exception {
+		this.start(new MulitServiceTrackerCustomizer() {
+			private String url = getProperty("org.oiue.service.action.http.root") + "/services";
+			private HttpService httpService;
+			private PostServlet posServlet;
 
-            @Override
-            public void addingService() {
-                httpService = getService(HttpService.class);
-                LogService logService = getService(LogService.class);
-                ActionService actionService = getService(ActionService.class);
+			@Override
+			public void removedService() {
+				httpService.unregister(url);
+			}
 
-                posServlet = new PostServlet(actionService, logService);
-                Logger log = logService.getLogger(this.getClass());
-                log.debug("绑定url：" + url);
-                try {
-                    httpService.registerServlet(url, posServlet, null, null);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
+			@Override
+			public void addingService() {
+				httpService = getService(HttpService.class);
+				LogService logService = getService(LogService.class);
+				ActionService actionService = getService(ActionService.class);
 
-            @Override
-            public void updated(Dictionary<String, ?> props) {
-                posServlet.updated(props);}
-        }, HttpService.class, ActionService.class, LogService.class);
-    }
+				posServlet = new PostServlet(actionService, logService);
+				Logger log = logService.getLogger(this.getClass());
+				log.debug("绑定url：" + url);
+				try {
+					httpService.registerServlet(url, posServlet, null, null);
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			}
 
-    @Override
-    public void stop() throws Exception {}
+			@Override
+			public void updated(Dictionary<String, ?> props) {
+				posServlet.updated(props);
+			}
+		}, HttpService.class, ActionService.class, LogService.class);
+	}
+
+	@Override
+	public void stop() throws Exception {
+	}
 }

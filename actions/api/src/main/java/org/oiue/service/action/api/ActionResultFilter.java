@@ -8,5 +8,5 @@ import org.oiue.tools.StatusResult;
 
 @SuppressWarnings("rawtypes")
 public interface ActionResultFilter extends Serializable {
-	StatusResult doFilter(Map per);
+	StatusResult doFilter(Map per,Object source_data);
 }

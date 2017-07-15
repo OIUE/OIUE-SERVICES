@@ -8,18 +8,18 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.cache.tree.script</artifactId>
-			<version>1.0.0</version>
+			<version>${cache.tree.script.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.tcp</artifactId>
-			<version>1.0.0</version>
+			<version>${tcp.version}</version>
 		</dependency>
 	</dependencies>
 	<properties>

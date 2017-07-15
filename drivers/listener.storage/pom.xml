@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.oiue.services.drivers</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<packaging>bundle</packaging>
@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>org.oiue.services.odps</groupId>
 			<artifactId>org.oiue.service.odp.res.api</artifactId>
-			<version>1.0.0</version>
+			<version>${odp.res.api.version}</version>
 		</dependency>
 	</dependencies>
 	<properties>

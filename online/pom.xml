@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.oiue.service.online</artifactId>
 	<packaging>bundle</packaging>
@@ -8,7 +9,44 @@
 
 	<parent>
 		<groupId>org.oiue.services</groupId>
-		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<artifactId>imports</artifactId>
+		<version>1.0.1</version>
 	</parent>
+	<properties>
+		<project.dependency>java-jwt,jackson-core,jackson-databind,jackson-annotations,commons-codec</project.dependency>
+		<project.export>org.oiue.service.online</project.export>
+		<project.import>
+			org.oiue.service.log,
+			org.oiue.service.osgi,
+			org.oiue.tools.json,
+			javax.crypto,
+			javax.crypto.spec</project.import>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
+		</dependency>
+	</dependencies>
 </project>

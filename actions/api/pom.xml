@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>interfaces</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<packaging>bundle</packaging>
 
@@ -14,9 +14,9 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.oiue.tools</groupId>
-			<artifactId>org.oiue.tools</artifactId>
-			<version>1.0.0</version>
+			<groupId>org.oiue</groupId>
+			<artifactId>tools</artifactId>
+			<version>${tools.version}</version>
 		</dependency>
 	</dependencies>
 </project>

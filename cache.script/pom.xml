@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	
 	<properties>
@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.cache</artifactId>
-			<version>1.0.0</version>
+			<version>${cache.version}</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -4,18 +4,17 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<groupId>org.oiue.services.actions</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services.actions</groupId>
 			<artifactId>org.oiue.service.action.api</artifactId>
-			<version>1.0.0</version>
+			<version>${action.api.version}</version>
 		</dependency>
 	</dependencies>
 </project>

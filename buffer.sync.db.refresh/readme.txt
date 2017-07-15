@@ -1,0 +1,10 @@
+service.pid="com.mapprsoft.zion.buffer.sync.db.refresh.Activator"
+refresh="xique_gps"
+refresh.xique_gps.quartz="0/5 * * * * ?"
+refresh.xique_gps.sql="target_track,p,s,xique,select vehicletag as k,vehicletag as target_name,vehicletag as target, tbl_userinfonew.speeding as speed,Tbl_UserStat.fx as heading, datediff(s,'1970-01-01 08:00:00',tbl_userstat.comtime) as gps_time, tbl_userstat.x as longitude, tbl_userstat.y as latitude, carstat as terminal_status,  rtrim(tbl_userstat.stat0str) + ',' + rtrim(tbl_userstat.stat1str) + ',' + rtrim(tbl_userstat.stat2str) + ',' + rtrim(tbl_userstat.stat3str) + ',' + rtrim(tbl_userstat.stat4str) + ',' + rtrim(tbl_userstat.stat5str) + ',' + rtrim(tbl_userstat.stat6str) + ',' + rtrim(tbl_userstat.stat7str) as terminal_status_desc from tbl_userinfonew inner join tbl_userstat on tbl_userinfonew.xh = tbl_userstat.xh where (eid = 2) and (tbl_userstat.accstat = 2)"
+refresh.xique_gps.increment.reference="gps_time"
+refresh.xique_gps.increment.sql="target_track,p,s,xique,select vehicletag as k,vehicletag as target_name,vehicletag as target, tbl_userinfonew.speeding as speed,Tbl_UserStat.fx as heading, datediff(s,'1970-01-01 08:00:00',tbl_userstat.comtime) as gps_time, tbl_userstat.x as longitude, tbl_userstat.y as latitude, carstat as terminal_status,  rtrim(tbl_userstat.stat0str) + ',' + rtrim(tbl_userstat.stat1str) + ',' + rtrim(tbl_userstat.stat2str) + ',' + rtrim(tbl_userstat.stat3str) + ',' + rtrim(tbl_userstat.stat4str) + ',' + rtrim(tbl_userstat.stat5str) + ',' + rtrim(tbl_userstat.stat6str) + ',' + rtrim(tbl_userstat.stat7str) as terminal_status_desc from tbl_userinfonew inner join tbl_userstat on tbl_userinfonew.xh = tbl_userstat.xh where (eid = 2) and (tbl_userstat.accstat = 2) and tbl_userstat.comtime > dateadd(s, ?, '1970-01-01 08:00:00')"
+
+
+
+sql = buffer_name,[p,r],[o,m,s][v],[data_source],[sql]

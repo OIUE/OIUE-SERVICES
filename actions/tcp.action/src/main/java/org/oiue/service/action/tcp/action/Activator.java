@@ -16,54 +16,54 @@ import org.oiue.service.tcp.TcpService;
 
 public class Activator extends FrameActivator {
 
-    @Override
-    public void start() throws Exception {
-        this.start(new MulitServiceTrackerCustomizer() {
-            private TcpService tcpService;
-            private SocketAddress address;
-            private Handler handler;
-            private Logger logger;
+	@Override
+	public void start() throws Exception {
+		this.start(new MulitServiceTrackerCustomizer() {
+			private TcpService tcpService;
+			private SocketAddress address;
+			private Handler handler;
+			private Logger logger;
 
-            @Override
-            public void removedService() {
-                if (tcpService != null && address != null) {
-                    tcpService.unregister(address);
-                }
-                address = null;
-                tcpService = null;
-            }
+			@Override
+			public void removedService() {
+				if (tcpService != null && address != null) {
+					tcpService.unregister(address);
+				}
+				address = null;
+				tcpService = null;
+			}
 
-            @Override
-            public void addingService() {
-                LogService logService = getService(LogService.class);
-                ActionService actionService = getService(ActionService.class);
-                OnlineService onlineService = getService(OnlineService.class);
-                tcpService = getService(TcpService.class);
-                logger = logService.getLogger(getClass());
+			@Override
+			public void addingService() {
+				LogService logService = getService(LogService.class);
+				ActionService actionService = getService(ActionService.class);
+				OnlineService onlineService = getService(OnlineService.class);
+				tcpService = getService(TcpService.class);
+				logger = logService.getLogger(getClass());
 
-                handler = new ServerHandler(logService, actionService, onlineService);
-            }
+				handler = new ServerHandler(logService, actionService, onlineService);
+			}
 
-            @Override
-            public void updated(Dictionary<String, ?> props) {
-                try {
-                    if (address != null) {
-                        tcpService.unregister(address);
-                    }
-                    int listenPort = Integer.parseInt(props.get("listenPort").toString());
-                    String listenAddress = props.get("listenAddress").toString();
-                    int idleTime = Integer.parseInt(props.get("receiveTimeOut").toString());
-                    String charset = props.get("charset").toString();
+			@Override
+			public void updated(Dictionary<String, ?> props) {
+				try {
+					if (address != null) {
+						tcpService.unregister(address);
+					}
+					int listenPort = Integer.parseInt(props.get("listenPort").toString());
+					String listenAddress = props.get("listenAddress").toString();
+					int idleTime = Integer.parseInt(props.get("receiveTimeOut").toString());
+					String charset = props.get("charset").toString();
 
-                    address = new InetSocketAddress(listenAddress, listenPort);
-                    tcpService.register(address, handler, false, idleTime, charset);
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            }
-        }, TcpService.class, ActionService.class, LogService.class, OnlineService.class);
-    }
+					address = new InetSocketAddress(listenAddress, listenPort);
+					tcpService.register(address, handler, false, idleTime, charset);
+				} catch (Exception ex) {
+					logger.error(ex.getMessage(), ex);
+				}
+			}
+		}, TcpService.class, ActionService.class, LogService.class, OnlineService.class);
+	}
 
-    @Override
-    public void stop() throws Exception {}
+	@Override
+	public void stop() throws Exception {}
 }

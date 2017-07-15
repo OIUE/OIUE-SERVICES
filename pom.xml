@@ -5,13 +5,12 @@
 	<parent>
 		<groupId>org.oiue</groupId>
 		<artifactId>oiue</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 		<relativePath>/work/github/oiue/pom.xml</relativePath>
 	</parent>
 	<groupId>org.oiue.services</groupId>
-	<artifactId>reactor</artifactId>
+	<artifactId>reactor.services</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0.0</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -64,6 +63,5 @@
 		<module>debug.cache</module>
 		<module>debug.treecache</module>
 
-		<module>template</module>
 	</modules>
 </project>

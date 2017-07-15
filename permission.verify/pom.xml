@@ -8,24 +8,24 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.online</artifactId>
-			<version>1.0.0</version>
+			<version>${online.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.permission</artifactId>
-			<version>1.0.0</version>
+			<version>${permission.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services.odps</groupId>
 			<artifactId>org.oiue.service.odp.res.api</artifactId>
-			<version>1.0.0</version>
+			<version>${odp.res.api.version}</version>
 		</dependency>
 	</dependencies>
 	<properties>

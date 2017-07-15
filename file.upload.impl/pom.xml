@@ -14,13 +14,13 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.file.upload</artifactId>
-			<version>1.0.0</version>
+			<version>${file.upload.version}</version>
 		</dependency>
 	</dependencies>
 </project>

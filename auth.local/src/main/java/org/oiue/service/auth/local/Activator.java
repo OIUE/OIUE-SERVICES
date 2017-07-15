@@ -18,14 +18,16 @@ public class Activator extends FrameActivator {
             AuthLocalServiceImpl authService;
 
             @Override
-            public void removedService() {}
+            public void removedService() {
+            	authService.unregister();
+            }
 
             @SuppressWarnings("unused")
             @Override
             public void addingService() {
                 LogService logService = getService(LogService.class);
-                AuthServiceManager authServiceManager = getService(AuthServiceManager.class);
                 FactoryService factoryService = getService(FactoryService.class);
+                AuthServiceManager authServiceManager = getService(AuthServiceManager.class);
                 IResource iResource = getService(IResource.class);
 
                 authService = new AuthLocalServiceImpl(logService, factoryService, authServiceManager);

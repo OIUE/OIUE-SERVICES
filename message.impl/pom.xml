@@ -8,33 +8,33 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.tcp</artifactId>
-			<version>1.0.0</version>
+			<version>${tcp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.cache</artifactId>
-			<version>1.0.0</version>
+			<version>${cache.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.online</artifactId>
-			<version>1.0.0</version>
+			<version>${online.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services.bytes</groupId>
 			<artifactId>org.oiue.service.bytes.api</artifactId>
-			<version>1.0.0</version>
+			<version>${bytes.api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
 			<artifactId>org.oiue.service.message</artifactId>
-			<version>1.0.0</version>
+			<version>${message.version}</version>
 		</dependency>
 	</dependencies>
 	<properties>

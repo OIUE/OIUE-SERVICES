@@ -1,11 +1,13 @@
 /**
- * 
+ *
  */
 package org.oiue.service.action.filter.auth;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.online.Online;
 import org.oiue.service.online.OnlineService;
+import org.oiue.service.permission.PermissionConstant;
 import org.oiue.service.permission.PermissionServiceManager;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.map.MapUtil;
@@ -26,107 +29,136 @@ import org.oiue.tools.string.StringUtil;
  */
 @SuppressWarnings({ "serial", "rawtypes", "unchecked" })
 public class AuthFilterServiceImpl implements ActionFilter, Serializable {
-    private Logger logger;
-    private List<String> unFilter_modulename = null;
-    private OnlineService onlineService = null;
-    private AuthServiceManager authService = null;
-    private PermissionServiceManager permissionService = null;
-    private ActionService actionService = null;
+	private Logger logger;
+	private List<String> unFilter_modulename = null;
+	private Map<String, List<String>> unFilter_module_operation = new HashMap<>();
+	private OnlineService onlineService = null;
+	private AuthServiceManager authService = null;
+	private PermissionServiceManager permissionService = null;
+	private ActionService actionService = null;
 
-    public AuthFilterServiceImpl(LogService logService, OnlineService onlineService, PermissionServiceManager permissionService, AuthServiceManager authService, ActionService actionService) {
-        logger = logService.getLogger(this.getClass());
-        this.authService = authService;
-        this.permissionService = permissionService;
-        this.actionService = actionService;
-        this.onlineService = onlineService;
-    }
+	public AuthFilterServiceImpl(LogService logService, OnlineService onlineService, PermissionServiceManager permissionService, AuthServiceManager authService, ActionService actionService) {
+		logger = logService.getLogger(this.getClass());
+		this.authService = authService;
+		this.permissionService = permissionService;
+		this.actionService = actionService;
+		this.onlineService = onlineService;
+	}
 
-    public void updated(Dictionary dict) {
-        unFilter_modulename = new ArrayList<String>();
-        String unFilter_modulenames = (String) dict.get("unFilter_modulename");
-        if (!StringUtil.isEmptys(unFilter_modulenames)) {
-            unFilter_modulename = StringUtil.Str2List(unFilter_modulenames, ",");
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("updateConfigure: unFilter_modulename  = " + unFilter_modulenames);
-        }
-        actionService.registerActionFilter("authFilter", this, 1);
-    }
+	public void updated(Dictionary dict) {
+		unFilter_modulename = new ArrayList<String>();
+		String unFilter_modulenames = (String) dict.get("unFilter_modulename");
+		if (!StringUtil.isEmptys(unFilter_modulenames)) {
+			unFilter_modulename = StringUtil.Str2List(unFilter_modulenames, ",");
+		}
+		for (Iterator iterator = unFilter_modulename.iterator(); iterator.hasNext();) {
+			String module = (String) iterator.next();
+			try {
+				String unFilter_modulename_operation = (String) dict.get(module);
+				if (!StringUtil.isEmptys(unFilter_modulename_operation)) {
+					unFilter_module_operation.put(module, StringUtil.Str2List(unFilter_modulename_operation, ","));
+				}
+			} catch (Throwable e) {}
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("updateConfigure: unFilter_modulename  = " + unFilter_modulenames);
+		}
+		actionService.registerActionFilter("authFilter", this, 1);
+	}
 
-    @Override
-    public StatusResult doFilter(Map per) {
-        String modulename = MapUtil.getString(per, "modulename");
-        String tokenid = MapUtil.getString(per, "tokenid");
+	@Override
+	public StatusResult doFilter(Map per) {
+		String modulename = MapUtil.getString(per, "modulename");
+		String token = MapUtil.getString(per, "token");
 
-        modulename = modulename == null ? "" : modulename.trim();
-        tokenid = StringUtil.isEmptys(tokenid) ? null : tokenid.trim();
+		modulename = modulename == null ? "" : modulename.trim();
+		token = StringUtil.isEmptys(token) ? null : token.trim();
 
-        StatusResult afr = new StatusResult();
-        Map data = (Map) per.get("data");
-        if (modulename == null || (data == null && !"logout".equals(modulename))) {
-            afr.setResult(StatusResult._ncriticalAbnormal);
-            afr.setDescription("error request data!");
-            return afr;
-        }
-        Online online = null;
-        if (unFilter_modulename != null && unFilter_modulename.size() > 0 && unFilter_modulename.contains(modulename)) {
-            logger.info("un_Filter_modulename:" + modulename);
-            return permissionService.convert(per);
-        } else if (tokenid == null || "login".equals(modulename)) {
-            if (!StringUtil.isEmptys(tokenid) && onlineService.isOnlineByToken(tokenid)) {
-                online = onlineService.getOnlineByToken(tokenid);
-                data.clear();
-                data.put("tokenid", online.getToken());
-                afr.setResult(StatusResult._SUCCESS_OVER);
-                afr.setDescription("login success");
-                return afr;
-            } else {
-                try {
-                    online = authService.login(data);
-                } catch (Exception e) {
-                    logger.error("login status error,please login again:" + e.getMessage(), e);
-                    afr.setResult(StatusResult._pleaseLogin);
-                    afr.setDescription("login status error,please login again!");
-                    return afr;
-                }
+		StatusResult afr = new StatusResult();
+		Map data = (Map) per.get("data");
+		if (modulename == null) {
+			afr.setResult(StatusResult._ncriticalAbnormal);
+			afr.setDescription("error request data!");
+			return afr;
+		}
+		if(data == null){
+			data = new HashMap<>();
+			per.put("data", data);
+		}
+		Online online = null;
+		if (unFilter_modulename != null && unFilter_modulename.size() > 0 && unFilter_modulename.contains(modulename)) {
+			logger.info("un_Filter_modulename:" + modulename);
+			if("chat_execute".equals(modulename)){
+				String event_id = MapUtil.getVauleMatchCase(per, "operation") + "";
+				if(unFilter_module_operation.get(modulename)!=null&&!unFilter_module_operation.get(modulename).contains(event_id)){
+					afr.setResult(StatusResult._permissionDenied);
+					return afr;
+				}
+				Map tmp = new HashMap<>();
+				tmp.put("serviceName","org.oiue.service.event.execute.EventExecuteService");
+				tmp.put("methodName", "execute");
+				tmp.put("service_event_id", event_id);
 
-                if (online == null || StringUtil.isEmptys(online.getToken())) {
-                    afr.setResult(StatusResult._ncriticalAbnormal);
-                    afr.setDescription(online == null ? "error login, please login again " : online.getO() + "");
-                    return afr;
-                }
+				per.put(PermissionConstant.permission_key, tmp);
+				afr.setResult(StatusResult._SUCCESS_CONTINUE);
+				return afr;
+			}else
+				return permissionService.convert(per);
+		} else if (token == null || "login".equals(modulename)) {
+			if (!StringUtil.isEmptys(token) && onlineService.isOnlineByToken(token)) {
+				online = onlineService.getOnlineByToken(token);
+				data.clear();
+				data.put("tokenid", online.getTokenId());
+				afr.setResult(StatusResult._SUCCESS_OVER);
+				afr.setDescription("login success");
+				return afr;
+			} else {
+				try {
+					online = authService.login(data);
+				} catch (Exception e) {
+					logger.error("login status error,please login again:" + e.getMessage(), e);
+					afr.setResult(StatusResult._pleaseLogin);
+					afr.setDescription("login status error,please login again!");
+					return afr;
+				}
 
-                per.put("tokenid", online.getToken());
-                onlineService.putOnline(online.getToken(), online);
-            }
-            if ("login".equals(modulename)) {
-                afr.setResult(StatusResult._SUCCESS_OVER);
-                afr.setDescription("login success");
-                return afr;
-            }
-            afr = permissionService.verify(per, online);
-            if (afr.getResult() < StatusResult._permissionDenied)
-                return afr;
-            return permissionService.convert(per);
-        } else if ("logout".equals(modulename)) {
-            authService.logout(data);
-            onlineService.removeOnlineByToken(tokenid);
-            afr.setResult(StatusResult._SUCCESS_OVER);
-            afr.setDescription("logout success");
-            per.put("success", true);
-            return afr;
-        } else {
-            if (!onlineService.isOnlineByToken(tokenid)) {
-                afr.setResult(StatusResult._pleaseLogin);
-                afr.setDescription("Tokenid is expired");
-                return afr;
-            } else {
-                online = onlineService.getOnlineByToken(tokenid);
-                afr = permissionService.verify(per, online);
-                if (afr.getResult() < StatusResult._permissionDenied)
-                    return afr;
-                return permissionService.convert(per);
-            }
-        }
-    }
+				if (online == null || StringUtil.isEmptys(online.getTokenId())) {
+					afr.setResult(StatusResult._ncriticalAbnormal);
+					afr.setDescription(online == null ? "error login, please login again " : online.getO() + "");
+					return afr;
+				}
+
+				onlineService.putOnline(online.getTokenId(), online);
+				per.put("token", online.getToken());
+			}
+			if ("login".equals(modulename)) {
+				afr.setResult(StatusResult._SUCCESS_OVER);
+				afr.setDescription("login success");
+				return afr;
+			}
+			afr = permissionService.verify(per, online);
+			if (afr.getResult() < StatusResult._permissionDenied||afr.getResult()>=StatusResult._SUCCESS_CONTINUE)
+				return afr;
+			return permissionService.convert(per);
+		} else if ("logout".equals(modulename)) {
+			authService.logout(data);
+			onlineService.removeOnlineByTokenId(token);
+			afr.setResult(StatusResult._SUCCESS_OVER);
+			afr.setDescription("logout success");
+			per.put("success", true);
+			return afr;
+		} else {
+			if (!onlineService.isOnlineByToken(token)) {
+				afr.setResult(StatusResult._pleaseLogin);
+				afr.setDescription("Tokenid is expired");
+				return afr;
+			} else {
+				online = onlineService.getOnlineByToken(token);
+				afr = permissionService.verify(per, online);
+				if (afr.getResult() < StatusResult._permissionDenied||afr.getResult()>=StatusResult._SUCCESS_CONTINUE)
+					return afr;
+				return permissionService.convert(per);
+			}
+		}
+	}
 }
