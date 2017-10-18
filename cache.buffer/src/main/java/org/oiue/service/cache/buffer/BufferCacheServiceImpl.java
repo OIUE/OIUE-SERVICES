@@ -23,7 +23,8 @@ public class BufferCacheServiceImpl implements CacheService {
 
 	@Override
 	public void put(String name, Object object, Type type) {
-		throw new RuntimeException("BufferCacheServiceImpl error put(String name, Object object, Type type) ");
+		//		throw new RuntimeException("BufferCacheServiceImpl error put(String name, Object object, Type type) ");
+		this.put(name, object+"", object, type);
 	}
 
 	@Override
@@ -93,7 +94,12 @@ public class BufferCacheServiceImpl implements CacheService {
 
 	@Override
 	public void put(String name, String key, Type type, Object... objects) {
+		bufferService.put(name, key, objects, org.oiue.service.buffer.Type.KeyToOne);
+	}
 
+	@Override
+	public void swap(String nameA, String nameB) {
+		bufferService.swap(nameA, nameB);
 	}
 
 }

@@ -18,6 +18,11 @@
 			<artifactId>org.oiue.service.odp.res.api</artifactId>
 			<version>${odp.res.api.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${cache.version}</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.activator>${artifactId}.Activator</project.activator>

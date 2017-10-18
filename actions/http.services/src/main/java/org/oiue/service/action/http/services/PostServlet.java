@@ -43,6 +43,10 @@ public class PostServlet extends HttpServlet {
 		if (!StringUtil.isEmptys(c_referer))
 			refererGrant = true;
 	}
+	@Override
+	protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		this.doPost(req, resp);
+	}
 
 	@SuppressWarnings({ "unchecked", "unused" })
 	@Override
@@ -77,7 +81,7 @@ public class PostServlet extends HttpServlet {
 							jb.append(line);
 						perStr = jb.toString();
 					}
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					//					logger.error(e.getMessage(), e);
 				}
 				if (!StringUtil.isEmptys(perStr)) {
@@ -153,10 +157,10 @@ public class PostServlet extends HttpServlet {
 			resp.setContentType("application/json");
 			resp.setHeader("Access-Control-Allow-Origin", "*");
 			resp.setHeader("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+			resp.setCharacterEncoding("UTF-8");
 			if(authInHeader)
 				resp.setHeader("Authorization", rtn.remove("token")+"");
 
-			resp.setCharacterEncoding("UTF-8");
 
 			byte bytes[] = (StringUtil.isEmptys(callBackFn) ? JSONUtil.parserToStr(rtn) : (callBackFn + "(" + JSONUtil.parserToStr(rtn) + ")")).getBytes();
 			resp.setContentLength(bytes.length);

@@ -3,6 +3,7 @@ package org.oiue.service.permission.impl;
 import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.oiue.service.log.LogService;
@@ -63,13 +64,22 @@ public class PermissionServiceManagerImpl implements PermissionServiceManager, S
 			return afr;
 		}
 
-		Map data = (Map) per.get("data");
-		data.put("user_id", online.getUser_id());
-		data.put("domain",per.get("domain"));
+		Object data = per.get("data");
+		if(data instanceof Map){
+			((Map)data).put("user_id", online.getUser_id());
+			((Map)data).put("domain",per.get("domain"));
+		}else if(data instanceof List){
+			for (Map da : (List<Map>)data) {
+				da.put("user_id", online.getUser_id());
+				da.put("domain",per.get("domain"));
+			}
+			per.put("user_id", online.getUser_id());
+			per.put("domain",per.get("domain"));
+		}
 
 		per.put("token", online.getToken());
 
-		String type = (String) data.remove(permission_type);
+		String type = (String) per.remove(permission_type);
 
 		if (StringUtil.isEmptys(type)) {
 			String msg = "the key[" + permission_type + "] con't null or empty!";

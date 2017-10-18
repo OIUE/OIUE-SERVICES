@@ -75,12 +75,12 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		token = StringUtil.isEmptys(token) ? null : token.trim();
 
 		StatusResult afr = new StatusResult();
-		Map data = (Map) per.get("data");
 		if (modulename == null) {
 			afr.setResult(StatusResult._ncriticalAbnormal);
 			afr.setDescription("error request data!");
 			return afr;
 		}
+		Object data = per.get("data");
 		if(data == null){
 			data = new HashMap<>();
 			per.put("data", data);
@@ -105,16 +105,17 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 			}else
 				return permissionService.convert(per);
 		} else if (token == null || "login".equals(modulename)) {
+
 			if (!StringUtil.isEmptys(token) && onlineService.isOnlineByToken(token)) {
 				online = onlineService.getOnlineByToken(token);
-				data.clear();
-				data.put("tokenid", online.getTokenId());
+				((Map)data).clear();
+				((Map)data).put("tokenid", online.getTokenId());
 				afr.setResult(StatusResult._SUCCESS_OVER);
 				afr.setDescription("login success");
 				return afr;
 			} else {
 				try {
-					online = authService.login(data);
+					online = authService.login(((Map)data));
 				} catch (Exception e) {
 					logger.error("login status error,please login again:" + e.getMessage(), e);
 					afr.setResult(StatusResult._pleaseLogin);
@@ -141,7 +142,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 				return afr;
 			return permissionService.convert(per);
 		} else if ("logout".equals(modulename)) {
-			authService.logout(data);
+			authService.logout(((Map)data));
 			onlineService.removeOnlineByTokenId(token);
 			afr.setResult(StatusResult._SUCCESS_OVER);
 			afr.setDescription("logout success");

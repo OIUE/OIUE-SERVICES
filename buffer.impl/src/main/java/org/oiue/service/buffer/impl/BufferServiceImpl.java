@@ -305,6 +305,8 @@ public class BufferServiceImpl implements BufferService,Serializable {
 
 	@Override
 	public boolean contains(String name, String key) {
+		if(key==null)
+			return false;
 		Object obj = hmBuffer.get(name);
 		if (obj instanceof KeyToOne) {
 			return ((KeyToOne) obj).contains(key);

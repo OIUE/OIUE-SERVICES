@@ -127,20 +127,26 @@ public class OnlineServiceImpl implements OnlineService {
 		String tokenId = JWTUtil.decodeTokenId(token);
 		if(openGlobal){
 			String data = this.cache.getCacheService(_GLOBAL_CACHE).get(_SYSTEM_ONLINE,tokenId)+"";
-			Map onlineStr = JSONUtil.parserStrToMap(data);
+			try {
+				Map onlineStr = JSONUtil.parserStrToMap(data);
 
-			String accessIp = MapUtil.getString(onlineStr, "accessIp");
-			if(accessIp!=null&&accessIp.equals("")){
+				String accessIp = MapUtil.getString(onlineStr, "accessIp");
+				if(accessIp!=null&&accessIp.equals("")){
 
-			}
-			Online online = (Online) cache.get(_SYSTEM_ONLINE, tokenId);
-			if (online == null) {
+				}
+				Online online = (Online) cache.get(_SYSTEM_ONLINE, tokenId);
+				if (online == null) {
+					return false;
+				} else {
+					online.setLastTime(System.currentTimeMillis());
+					this.cache.getCacheService(_GLOBAL_CACHE).put(_SYSTEM_ONLINE,tokenId, online.toString(), Type.ONE);
+					return true;
+				}
+			} catch (Throwable e) {
+				logger.error("data:"+data+", error: "+e.getMessage(), e);
 				return false;
-			} else {
-				online.setLastTime(System.currentTimeMillis());
-				this.cache.getCacheService(_GLOBAL_CACHE).put(_SYSTEM_ONLINE,tokenId, online.toString(), Type.ONE);
-				return true;
 			}
+
 		}else{
 			Online online = (Online) cache.get(_SYSTEM_ONLINE, tokenId);
 			if (online == null) {

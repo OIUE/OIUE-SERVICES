@@ -1,5 +1,7 @@
 package org.oiue.service.event.execute.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
@@ -29,6 +31,22 @@ public class EventExecuteServiceImpl implements EventExecuteService {
 		IResource iresource=factoryService.getBmo(IResource.class.getName());
 		if (onlineService != null && iresource != null) {
 			return iresource.callEvent(MapUtil.getString(event, EventField.service_event_id), data_source_name, data);
+		}
+		throw new RuntimeException("service can not init！");
+	}
+	@Override
+	public Object execute(List datas, Map event, String tokenId) throws Throwable {
+		IResource iresource=factoryService.getBmo(IResource.class.getName());
+		if (onlineService != null && iresource != null) {
+			List rtnList = new ArrayList();
+			for (Map data : (List<Map>)datas) {
+				try {
+					rtnList.add(iresource.callEvent(MapUtil.getString(event, EventField.service_event_id), data_source_name, data));
+				} catch (Throwable e) {
+					rtnList.add(e.getMessage());
+				}
+			}
+			return rtnList;
 		}
 		throw new RuntimeException("service can not init！");
 	}

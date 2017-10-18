@@ -23,6 +23,8 @@
     <module>tcp.bytes</module>
     <module>filter.auth</module>
     <module>filter.module2domain</module>
+    <module>filter.validate</module>
+    <module>filter.changepwd</module>
     <module>filter.auth.debug</module>
     <module>http.upload</module>
     <module>http.imageCode</module>

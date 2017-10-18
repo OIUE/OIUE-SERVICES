@@ -24,15 +24,17 @@
 		<module>http.client</module>
 		<module>event.system.time</module>
 		<module>event.execute</module>
+		<module>event.etl</module>
 		<module>task</module>
 		<module>tcp</module>
 		<module>socketio</module>
 		<module>threadpool</module>
 
 		<module>buffer.impl</module>
-		<module>buffer.synchronization.db</module>
+		<module>cache.synchronization.db</module>
 		<module>cache.buffer</module>
 		<module>cache.jedis</module>
+		<module>cache.jdbc</module>
 		<module>cache.script</module>
 		<module>cache.tree.script</module>
 		<module>file.upload.impl</module>
@@ -45,6 +47,7 @@
 
 		<module>event.execute.impl</module>
 		<module>event.system.time.impl</module>
+		<module>event.etl.impl</module>
 
 		<module>http.client.apache</module>
 

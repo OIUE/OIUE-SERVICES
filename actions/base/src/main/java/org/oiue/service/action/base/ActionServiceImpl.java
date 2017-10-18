@@ -64,7 +64,7 @@ public class ActionServiceImpl implements ActionService {
 	public Map request(Map per) {
 		long starttime = 0l;
 		if (logger.isDebugEnabled()) {
-			logger.debug("action request data :" + per);
+			logger.debug("action request data :" + JSONUtil.parserToStr(per));
 		}
 		//        Map rtnMap;
 		try {
@@ -139,7 +139,7 @@ public class ActionServiceImpl implements ActionService {
 				serviceOperation = (Map) temppermission;
 			}
 			if (serviceOperation == null) {
-				per.put("status", StatusResult._ncriticalAbnormal);
+				per.put("status", StatusResult._permissionDenied);
 				per.put("exception", "权限错误！");
 				return per;
 			}
@@ -254,9 +254,13 @@ public class ActionServiceImpl implements ActionService {
 			}
 			per.put("status", StatusResult._SUCCESS);
 		} catch (Throwable e) {
-			logger.error(ExceptionUtil.getCausedBySrcMsg(e), e);
-			per.put("status", StatusResult._permissionDenied);
-			per.put("exception", ExceptionUtil.getCausedBySrcMsg(e));
+			String ex = ExceptionUtil.getCausedBySrcMsg(e);
+			logger.error(ex, e);
+			per.put("status", StatusResult._ncriticalAbnormal);
+			per.put("exception", ex);
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("action response data :" + JSONUtil.parserToStr(per));
 		}
 		return per;
 	}

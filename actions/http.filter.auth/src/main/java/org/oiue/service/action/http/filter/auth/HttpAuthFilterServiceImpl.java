@@ -72,6 +72,7 @@ public class HttpAuthFilterServiceImpl implements Filter, Serializable {
 				HttpServletRequest req = (HttpServletRequest) ((ServletRequestWrapper) request).getRequest();
 				String target = req.getPathInfo();
 				String resName = target == null ? "" : target.startsWith("/") ? target.substring(1) : target;
+				logger.debug("target:{}", target);
 				if(resName.startsWith("services/")){
 					chain.doFilter(request, response);
 					return;
