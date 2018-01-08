@@ -13,7 +13,7 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             AuthLocalServiceImpl authService;
 
@@ -32,7 +32,7 @@ public class Activator extends FrameActivator {
 
                 authService = new AuthLocalServiceImpl(logService, factoryService, authServiceManager);
 
-                registerService(AuthService.class, authService);
+//                registerService(AuthService.class, authService);
             }
 
             @Override
@@ -43,5 +43,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

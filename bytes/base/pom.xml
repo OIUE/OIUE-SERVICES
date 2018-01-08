@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.oiue.services.bytes</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<packaging>bundle</packaging>
 
 	<name>OIUE service for bytes decode encoded impl </name>
 	<description>A bundle that bytes decode encoded service </description>
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 	</properties>
 </project>

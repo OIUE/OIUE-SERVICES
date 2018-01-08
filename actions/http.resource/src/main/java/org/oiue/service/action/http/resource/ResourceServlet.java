@@ -57,7 +57,6 @@ public class ResourceServlet implements Servlet {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			Visit fv = null;
@@ -70,6 +69,7 @@ public class ResourceServlet implements Servlet {
 				}
 				fv.visit(request, response);
 			} catch (FileNotFoundException e) {
+				logger.error("FileNotFoundException:"+request, e);
 				fv = new FileVisit(logService);
 				request.setAttribute("domain_path","/comm");
 				request.setAttribute("resName","notfound.html");

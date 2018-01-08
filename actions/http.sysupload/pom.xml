@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.oiue.services.actions</groupId>
+	<artifactId>org.oiue.service.action.http.sysupload</artifactId>
+
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for http upload impl no auth(/sysupload) </name>
+	<description>OIUE service for </description>
+	
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>imports</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+		<project.dependency>commons-fileupload,commons-io</project.dependency>
+		<project.import>org.osgi.framework,org.osgi.service.cm,org.osgi.service.http,javax.servlet,javax.servlet.http,org.oiue.service.action.api,org.oiue.service.file.upload,org.oiue.service.odp.res.api,org.oiue.service.log,org.oiue.service.online,org.oiue.service.osgi,org.oiue.tools,org.oiue.tools.json,org.oiue.tools.file,org.oiue.tools.string,org.oiue.tools.map,org.oiue.tools.exception,org.oiue.service.odp.base</project.import>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services.actions</groupId>
+			<artifactId>org.oiue.service.action.api</artifactId>
+			<version>${action.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.res.api</artifactId>
+			<version>${odp.res.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.online</artifactId>
+			<version>${online.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.file.upload</artifactId>
+			<version>${file.upload.version}</version>
+		</dependency>
+	</dependencies>
+</project>

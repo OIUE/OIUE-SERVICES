@@ -11,7 +11,7 @@ import org.oiue.service.buffer.*;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
 
             @Override
@@ -31,5 +31,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

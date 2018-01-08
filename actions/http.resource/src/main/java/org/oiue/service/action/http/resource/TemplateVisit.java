@@ -1,6 +1,7 @@
 package org.oiue.service.action.http.resource;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.oiue.service.action.http.services.ParseHtml;
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
@@ -32,8 +34,23 @@ public class TemplateVisit implements Visit{
 	}
 	private Logger logger;
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void visit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Map map = ParseHtml.parseRequest(request);
+		Map data = null;
+		try {
+			data = (Map) map.get("data");
+		} catch (Exception e) {}
+		if(data == null)
+			data=new HashMap<>();
+		
+		Enumeration<String> attributeNames = request.getAttributeNames();
+		while (attributeNames.hasMoreElements()) {
+			String an = (String) attributeNames.nextElement();
+			data.put(an, request.getAttribute(an));
+		}
+		
 		String domain = (String) request.getAttribute("domain");
 		String resName = (String) request.getAttribute("resName");
 		String resNameK = domain+":"+resName;
@@ -41,7 +58,7 @@ public class TemplateVisit implements Visit{
 		response.setCharacterEncoding("UTF-8");
 		if (cacheService.contains("system_template",resNameK)) {
 			Map parameter = new HashMap<>();
-			parameter.put("token", request.getParameter("token"));
+			parameter.put("token", map.get("token"));
 			parameter.put("user_name", request.getAttribute("user_name"));
 			parameter.put("login_name", request.getAttribute("login_name"));
 
@@ -49,11 +66,10 @@ public class TemplateVisit implements Visit{
 			Map events = new HashMap<>();
 			try {
 				IResource iresource = factoryService.getBmo(IResource.class.getName());
-				Map map = new HashMap();
-				map.put("model", "");
-				map.put("domain", domain);
-				map.put("user_id", request.getAttribute("user_id"));
-				List<Map> attributes = (List<Map>) iresource.callEvent("fm_system_query_attribute", null, map);
+				data.put("model", "");
+				data.put("domain", domain);
+				data.put("user_id", request.getAttribute("user_id"));
+				List<Map> attributes = (List<Map>) iresource.callEvent("fm_system_query_attribute", null, data);
 				if (attributes != null)
 					for (Map attribute : attributes) {
 						if ("string".equals(attribute.get("type"))) {
@@ -67,11 +83,10 @@ public class TemplateVisit implements Visit{
 			}
 			try {
 				IResource iresource = factoryService.getBmo(IResource.class.getName());
-				Map map = new HashMap();
-				map.put("model", resName);
-				map.put("domain", domain);
-				map.put("user_id", request.getAttribute("user_id"));
-				List<Map> attributes = (List<Map>) iresource.callEvent("fm_system_query_attribute", null, map);
+				data.put("model", resName);
+				data.put("domain", domain);
+				data.put("user_id", request.getAttribute("user_id"));
+				List<Map> attributes = (List<Map>) iresource.callEvent("fm_system_query_attribute", null, data);
 				if (attributes != null) {
 					for (Map attribute : attributes) {
 						if ("string".equals(attribute.get("type"))) {
@@ -86,11 +101,10 @@ public class TemplateVisit implements Visit{
 			}
 			try {
 				IResource iresource = factoryService.getBmo(IResource.class.getName());
-				Map map = new HashMap();
-				map.put("model", resName);
-				map.put("domain", domain);
-				map.put("user_id", request.getAttribute("user_id"));
-				List<Map> attributes = (List<Map>) iresource.callEvent("fm_system_query_r_attribute", null, map);
+				data.put("model", resName);
+				data.put("domain", domain);
+				data.put("user_id", request.getAttribute("user_id"));
+				List<Map> attributes = (List<Map>) iresource.callEvent("fm_system_query_r_attribute", null, data);
 				if (attributes != null) {
 					for (Map attribute : attributes) {
 						if ("string".equals(attribute.get("type"))) {
@@ -113,13 +127,12 @@ public class TemplateVisit implements Visit{
 				while (itor.hasNext()) {
 					entry = itor.next();
 					IResource iresource = factoryService.getBmo(IResource.class.getName());
-					Map map = new HashMap();
-					map.put("model", resName);
-					map.put("domain", domain);
-					map.put("user_id", request.getAttribute("user_id"));
+					data.put("model", resName);
+					data.put("domain", domain);
+					data.put("user_id", request.getAttribute("user_id"));
 					if (menu != null)
-						map.put("menu_id", menu.get("menu_id"));
-					parameter.put(entry.getKey(), iresource.callEvent(entry.getValue() + "", null, map));
+						data.put("menu_id", menu.get("menu_id"));
+					parameter.put(entry.getKey(), iresource.callEvent(entry.getValue() + "", null, data));
 				}
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);

@@ -27,7 +27,10 @@
 
 package org.apache.http.examples.client;
 
+import java.io.IOException;
+
 import org.apache.http.HttpHost;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -42,7 +45,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientExecuteProxy {
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             HttpHost target = new HttpHost("localhost", 443, "https");

@@ -26,6 +26,8 @@
  */
 package org.apache.http.examples.client;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.http.HttpEntity;
@@ -48,7 +50,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientCustomPublicSuffixList {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws MalformedURLException, IOException  {
 
         // Use PublicSuffixMatcherLoader to load public suffix list from a file,
         // resource or from an arbitrary URL

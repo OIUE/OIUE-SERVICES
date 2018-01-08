@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>org.oiue.services.actions</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.oiue.service.action.http.resource</artifactId>
 
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 	</properties>
 
 	<packaging>bundle</packaging>
@@ -22,6 +22,11 @@
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.http.jetty</artifactId>
 			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.actions</groupId>
+			<artifactId>org.oiue.service.action.http.services</artifactId>
+			<version>${action.http.services.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services.templates</groupId>

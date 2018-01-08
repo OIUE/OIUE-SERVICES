@@ -44,7 +44,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientWithResponseHandler {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws ClientProtocolException, IOException  {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             HttpGet httpget = new HttpGet("http://localhost/");

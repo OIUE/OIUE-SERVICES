@@ -332,7 +332,7 @@ public class TestMain {
 //	
 //	
 //	@Test
-//	public void testseconds() throws Exception {
+//	public void testseconds()  {
 //		long seconds=System.currentTimeMillis()/1000;
 //		System.out.println(seconds);
 //		java.util.Date d = new java.util.Date();

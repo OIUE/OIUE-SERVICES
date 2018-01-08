@@ -1,8 +1,12 @@
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -26,11 +30,11 @@ public class HttpPostUtil {
 	Map<String, File> fileparams = new HashMap<String, File>();
 	DataOutputStream ds;
 
-	public HttpPostUtil(String url) throws Exception {
+	public HttpPostUtil(String url) throws MalformedURLException  {
 		this.url = new URL(url);
 	}
     //重新设置要请求的服务器地址，即上传文件的地址。
-	public void setUrl(String url) throws Exception {
+	public void setUrl(String url) throws MalformedURLException  {
 		this.url = new URL(url);
 	}
     //增加一个普通字符串数据到form表单数据中
@@ -48,7 +52,7 @@ public class HttpPostUtil {
 	}
     // 发送数据到服务器，返回一个字节包含服务器的返回结果的数组
 	@SuppressWarnings("resource")
-    public byte[] send() throws Exception {
+    public byte[] send() throws IOException  {
 		initConnection();
 		try {
 			conn.connect();
@@ -70,7 +74,7 @@ public class HttpPostUtil {
 		return out.toByteArray();
 	}
     //文件上传的connection的一些必须设置
-	private void initConnection() throws Exception {
+	private void initConnection() throws IOException  {
 		conn = (HttpURLConnection) this.url.openConnection();
 		conn.setDoOutput(true);
 		conn.setUseCaches(false);
@@ -80,7 +84,7 @@ public class HttpPostUtil {
 				"multipart/form-data; boundary=" + boundary);
 	}
     //普通字符串数据
-	private void writeStringParams() throws Exception {
+	private void writeStringParams() throws IOException  {
 		Set<String> keySet = textParams.keySet();
 		for (Iterator<String> it = keySet.iterator(); it.hasNext();) {
 			String name = it.next();
@@ -96,7 +100,7 @@ public class HttpPostUtil {
 		}
 	}
     //文件数据
-	private void writeFileParams() throws Exception {
+	private void writeFileParams() throws IOException  {
 		Set<String> keySet = fileparams.keySet();
 		for (Iterator<String> it = keySet.iterator(); it.hasNext();) {
 			String name = it.next();
@@ -111,7 +115,7 @@ public class HttpPostUtil {
 		}
 	}
     //获取文件的上传类型，图片格式为image/png,image/jpg等。非图片为application/octet-stream
-	private String getContentType(File f) throws Exception {
+	private String getContentType(File f) throws IOException  {
 		
 //		return "application/octet-stream";  // 此行不再细分是否为图片，全部作为application/octet-stream 类型
 		ImageInputStream imagein = ImageIO.createImageInputStream(f);
@@ -129,7 +133,7 @@ public class HttpPostUtil {
 	}
     //把文件转换成字节数组
 	@SuppressWarnings("resource")
-    private byte[] getBytes(File f) throws Exception {
+    private byte[] getBytes(File f) throws IOException  {
 		FileInputStream in = new FileInputStream(f);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] b = new byte[1024];
@@ -141,26 +145,32 @@ public class HttpPostUtil {
 		return out.toByteArray();
 	}
 	//添加结尾数据
-	private void paramsEnd() throws Exception {
+	private void paramsEnd() throws IOException  {
 		ds.writeBytes("--" + boundary + "--" + "\r\n");
 		ds.writeBytes("\r\n");
 	}
 	// 对包含中文的字符串进行转码，此为UTF-8。服务器那边要进行一次解码
-    private String encode(String value) throws Exception{
+    private String encode(String value) throws UnsupportedEncodingException {
     	return URLEncoder.encode(value, "UTF-8");
     }
 	@SuppressWarnings("unused")
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)  {
 		TestMain tm = new TestMain();
-		HttpPostUtil u = new HttpPostUtil("http://leting.leauto.com/newupload");
+		HttpPostUtil u;
+		try {
+			u = new HttpPostUtil("http://leting.leauto.com/newupload");
 //		HttpPostUtil u = new HttpPostUtil("http://127.0.0.1:8080/upload");
-		u.addFileParameter("img", new File("/workspace/work/leauto.zip"));
+			u.addFileParameter("img", new File("/workspace/work/leauto.zip"));
 //		u.addTextParameter("tokenid", tm.testLogin());
 //		u.addTextParameter("parameter", "{\"tokenid\":\""+tm.testLogin()+"\",\"modulename\":\"information_map_insert\",\"tag\":\"ext-gen659\"}");
-		u.addTextParameter("parameter", "{\"tokenid\":\"123\",\"modulename\":\"camera\",\"tag\":\"ext-gen659\"}");
-		byte[] b = u.send();
-		String result = new String(b);
-		System.out.println(result);
+			u.addTextParameter("parameter", "{\"tokenid\":\"123\",\"modulename\":\"camera\",\"tag\":\"ext-gen659\"}");
+			byte[] b = u.send();
+			String result = new String(b);
+			System.out.println(result);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

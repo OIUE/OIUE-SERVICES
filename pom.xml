@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.oiue</groupId>
 		<artifactId>oiue</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>/work/github/oiue/pom.xml</relativePath>
 	</parent>
 	<groupId>org.oiue.services</groupId>
@@ -48,6 +48,8 @@
 		<module>event.execute.impl</module>
 		<module>event.system.time.impl</module>
 		<module>event.etl.impl</module>
+		<module>event.etl.table</module>
+		<module>event.etl.csv</module>
 
 		<module>http.client.apache</module>
 

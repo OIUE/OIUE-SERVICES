@@ -34,7 +34,7 @@ public class ClientServerHandler implements Handler {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public void received(Session session, String line, byte[] bytes) throws Exception {
+    public void received(Session session, String line, byte[] bytes)  {
         System.out.println("reader line:" + line);
 
         try {
@@ -205,7 +205,7 @@ public class ClientServerHandler implements Handler {
      * @param obj Object obj是参数值
      * @throws SQLException
      */
-    public void setParameter(int column, Object obj, PreparedStatement pstmt) throws java.sql.SQLException {
+    public void setParameter(int column, Object obj, PreparedStatement pstmt)  {
         try {
             if (obj instanceof java.lang.String) {
                 String keyStrs = (String) obj;
@@ -245,10 +245,10 @@ public class ClientServerHandler implements Handler {
      * 根据参数值queryParams集合
      * 
      * @param queryParams
-     * @throws Exception
+     * @
      */
     @SuppressWarnings("rawtypes")
-    public void setQueryParams(Collection queryParams, PreparedStatement pstmt) throws Exception {
+    public void setQueryParams(Collection queryParams, PreparedStatement pstmt)  {
         if ((queryParams == null) || (queryParams.isEmpty())) {
             return;
         }
@@ -262,20 +262,20 @@ public class ClientServerHandler implements Handler {
     }
 
     @Override
-    public void closed(Session session) throws Exception {}
+    public void closed(Session session)  {}
 
     @Override
-    public void opened(Session session) throws Exception {
+    public void opened(Session session)  {
         session.write("debug Cache Tree Service");
     }
 
     @Override
-    public void idled(Session session) throws Exception {
+    public void idled(Session session)  {
         session.close();
     }
 
     @Override
-    public void sent(Session session) throws Exception {
+    public void sent(Session session)  {
 
     }
 

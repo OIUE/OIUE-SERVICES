@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<build>
 		<pluginManagement>
@@ -55,8 +55,8 @@
 				<configuration>
 					<instructions>
 						<X-bundle-Version>${version}</X-bundle-Version>
-						<Bundle-Activator>${artifactId}.Activator</Bundle-Activator>
-						<Import-Package>org.oiue.service.osgi,org.oiue.service.log,org.oiue.service.http.client,org.osgi.framework,org.osgi.service.cm,org.oiue.tools.string,org.oiue.tools.json,javax.naming,javax.net.ssl</Import-Package>
+						<Bundle-Activator>${project.artifactId}.Activator</Bundle-Activator>
+						<Import-Package>org.oiue.service.osgi,org.oiue.service.log,org.oiue.service.http.client,org.osgi.framework,org.osgi.service.cm,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.exception,javax.naming,javax.net.ssl</Import-Package>
 						<Bundle-Name>${name}</Bundle-Name>
 						<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
 						<Bundle-Description>${description}</Bundle-Description>

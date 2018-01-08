@@ -11,7 +11,7 @@ import org.oiue.service.system.analyzer.AnalyzerService;
 public class Activator extends FrameActivator {
 
 	@Override
-	public void start() throws Exception {
+	public void start()  {
 		FrameActivator tracker = this;
 		this.start(new MulitServiceTrackerCustomizer() {
 			private ActionServiceImpl actionService;
@@ -31,13 +31,13 @@ public class Activator extends FrameActivator {
 
 			@Override
 			public void updated(Dictionary<String, ?> props) {
-
+				actionService.updated(props);
 			}
 		}, LogService.class, AnalyzerService.class);
 	}
 
 	@Override
-	public void stop() throws Exception {
+	public void stop()  {
 
 	}
 }

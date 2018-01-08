@@ -24,6 +24,7 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.sql.SqlService;
 import org.oiue.service.sql.SqlServiceResult;
+import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.map.MapUtil;
 
 public class StorageServiceImpl implements CacheService, Runnable {
@@ -36,7 +37,7 @@ public class StorageServiceImpl implements CacheService, Runnable {
 	public StorageServiceImpl(LogService logService, SqlService sqlService) {
 		logger = logService.getLogger(this.getClass());
 		this.sqlService = sqlService;
-		new Thread(this).start();
+		new Thread(this,"SystemJDBCStorageService").start();
 	}
 
 	@Override
@@ -160,7 +161,7 @@ public class StorageServiceImpl implements CacheService, Runnable {
 	 * @throws SQLException
 	 *             sql异常
 	 */
-	public void setParameter(PreparedStatement pstmt, int column, Object obj) throws java.sql.SQLException {
+	public void setParameter(PreparedStatement pstmt, int column, Object obj) {
 		try {
 			if (obj instanceof java.lang.String) {
 				String keyStrs = (String) obj;
@@ -179,6 +180,10 @@ public class StorageServiceImpl implements CacheService, Runnable {
 				pstmt.setString(column, ((URL) obj).getPath());
 			} else if (obj instanceof URI) {
 				pstmt.setString(column, ((URI) obj).getPath());
+			} else if (obj instanceof Map) {
+				pstmt.setString(column, JSONUtil.parserToStr((Map) obj));
+			} else if (obj instanceof List) {
+				pstmt.setString(column, JSONUtil.parserToStr((List) obj));
 			} else {// if(obj instanceof Boolean)
 				pstmt.setObject(column, obj);
 			}
@@ -189,7 +194,7 @@ public class StorageServiceImpl implements CacheService, Runnable {
 		}
 	}
 
-	public void setQueryParams(PreparedStatement pstmt, Collection queryParams) throws Exception {
+	public void setQueryParams(PreparedStatement pstmt, Collection queryParams)  {
 		if ((queryParams == null) || (queryParams.isEmpty())) {
 			return;
 		}
@@ -223,8 +228,12 @@ public class StorageServiceImpl implements CacheService, Runnable {
 							List datas=(List) sr.getData();
 							if(datas.size()==1)
 								event = (Map) datas.get(0);
-							else
+							else{
 								logger.error("query event is error:"+datas);
+								synchronized (storageParamsMap) {
+									storageParamsMap.remove(key);
+								}
+							}
 						}
 						if(event!=null){
 							LinkedList<Collection<Object>> list=null;

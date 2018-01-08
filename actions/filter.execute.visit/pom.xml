@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.oiue.service.action.filter.execute.visit</artifactId>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for action change execute visit </name>
+	<description>A bundle that registers an action change execute visit </description>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${cache.version}</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+	</properties>
+
+</project>

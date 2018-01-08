@@ -27,6 +27,7 @@
 
 package org.apache.http.examples.client;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.CodingErrorAction;
@@ -41,6 +42,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.AuthSchemes;
@@ -88,7 +90,7 @@ import org.apache.http.util.CharArrayBuffer;
  */
 public class ClientConfiguration {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws ClientProtocolException, IOException  {
 
         // Use custom message parser / writer to customize the way HTTP
         // messages are parsed from and written out to the data stream.

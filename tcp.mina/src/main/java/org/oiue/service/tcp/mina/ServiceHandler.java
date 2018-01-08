@@ -64,7 +64,7 @@ public class ServiceHandler extends IoHandlerAdapter implements Serializable {
     }
 
     @Override
-    public void messageReceived(IoSession session, Object message) throws Exception {
+    public void messageReceived(IoSession session, Object message)  {
         session.setAttribute(LAST_TIME, System.currentTimeMillis());
         if (binary) {
             IoBuffer buffer = (IoBuffer) message;
@@ -85,14 +85,14 @@ public class ServiceHandler extends IoHandlerAdapter implements Serializable {
     }
 
     @Override
-    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+    public void exceptionCaught(IoSession session, Throwable cause)  {
         if (logger.isInfoEnabled()) {
             logger.info("exceptionCaught session = " + session + ", cause message = " + cause.getMessage());
         }
     }
 
     @Override
-    public void sessionCreated(IoSession session) throws Exception {
+    public void sessionCreated(IoSession session)  {
         if (logger.isInfoEnabled()) {
             logger.info("sessionCreated session = " + session);
         }
@@ -101,7 +101,7 @@ public class ServiceHandler extends IoHandlerAdapter implements Serializable {
     }
 
     @Override
-    public void sessionClosed(IoSession session) throws Exception {
+    public void sessionClosed(IoSession session)  {
         if (connector != null) {
             new Thread(new Runnable() {
                 @Override
@@ -126,7 +126,7 @@ public class ServiceHandler extends IoHandlerAdapter implements Serializable {
     }
 
     @Override
-    public void messageSent(IoSession session, Object message) throws Exception {
+    public void messageSent(IoSession session, Object message)  {
         if (logger.isDebugEnabled()) {
             logger.info("messageSent session = " + session);
         }
@@ -135,7 +135,7 @@ public class ServiceHandler extends IoHandlerAdapter implements Serializable {
     }
 
     @Override
-    public void sessionOpened(IoSession session) throws Exception {
+    public void sessionOpened(IoSession session)  {
         if (logger.isInfoEnabled()) {
             logger.info("sessionOpened session = " + session);
         }
@@ -146,7 +146,7 @@ public class ServiceHandler extends IoHandlerAdapter implements Serializable {
     }
 
     @Override
-    public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
+    public void sessionIdle(IoSession session, IdleStatus status)  {
         if (logger.isInfoEnabled()) {
             logger.info("idled is_reader = " + (status == IdleStatus.READER_IDLE) + "|sessionIdle session = " + session);
         }

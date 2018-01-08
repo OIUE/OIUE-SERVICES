@@ -5,7 +5,7 @@ package com.eg.demo;
  * @author maochangming 
  */  
 public class Test {  
-    public static void main(String[] args) throws Exception {  
+    public static void main(String[] args)  {  
         try {  
             //去首尾空格，不管是全角半角：  
             String s = "nihaoｈｋ　　　　ｎｉｈｅｈｅ　　　　　";  
@@ -25,7 +25,6 @@ public class Test {
             System.out.println(QJstr + "\n" + result);  
             System.out.println(QJstr1 + "\n" + result1);  
         } catch (Exception ex) {  
-            throw new Exception("ERROR:" + ex.getMessage());  
         }  
     }  
   

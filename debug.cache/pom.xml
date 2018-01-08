@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>services</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<packaging>bundle</packaging>
 
 	<name>OIUE service for managed cache by tcp util </name>
 	<description>a bundle that managed cache by tcp util </description>
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 	</properties>
 	<dependencies>
 		<dependency>

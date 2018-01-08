@@ -17,6 +17,7 @@ import org.oiue.service.tcp.Handler;
 import org.oiue.service.tcp.Session;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.ExceptionUtil;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.string.StringUtil;
 
@@ -33,7 +34,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void received(Session session, String line, byte[] bytes) throws Exception {
+	public void received(Session session, String line, byte[] bytes)  {
 		Map<Object, Object> per = null;
 		Map<Object, Object> rtn = null;
 		try {
@@ -52,10 +53,10 @@ public class ServerHandler implements Handler {
 				String tag = per.get("tag") + "";
 				Object stag = session.getAttribute("tag");
 				if (stag != null && !tag.equals(stag)) {
-					throw new RuntimeException("session tag can not change!");
+					throw new OIUEException(StatusResult._data_error,"session tag can not change!");
 				}
 			} catch (Throwable e) {
-				throw new RuntimeException("参数格式不正确！[" + ExceptionUtil.getCausedBySrcMsg(e) + "]" + " /n " + line + " /n " + per, e);
+				throw new OIUEException(StatusResult._format_error,"参数格式不正确！[" + ExceptionUtil.getCausedBySrcMsg(e) + "]" + " /n " + line + " /n " + per, e);
 			}
 			new Thread(new asynchronismction(session, per),asynchronismction.class.getName()).start();
 			// session.write("{\"modulename\":\"systime\",\"tag\":\"exttag\",\"operation\":\"systime\",\"data\":{}}");
@@ -143,7 +144,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void closed(Session session) throws Exception {
+	public void closed(Session session)  {
 		this.logger.info("tcp closed " + session);
 		try {
 			if (session != null) {
@@ -173,7 +174,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void opened(Session session) throws Exception {
+	public void opened(Session session)  {
 		this.logger.info("tcp opened " + session);
 		if (session == null)
 			return;
@@ -199,13 +200,13 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void idled(Session session) throws Exception {
+	public void idled(Session session)  {
 		if (session != null)
 			session.close();
 	}
 
 	@Override
-	public void sent(Session session) throws Exception {
+	public void sent(Session session)  {
 		// this.logger.info("tcp sent");
 		// Thread.sleep(5000);
 		// Map<Object,Object> rtn =new HashMap<Object, Object>();

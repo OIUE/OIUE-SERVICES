@@ -16,6 +16,7 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.ExceptionUtil;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.string.StringUtil;
 
@@ -49,19 +50,15 @@ public class PostServlet extends HttpServlet {
         String perStr = null;
         String callBackFn = "";
         try {
-            try {
-                String c_referer = properties.get("Referer") + "";
-                if (refererGrant) {
-                    // 从 HTTP 头中取得 Referer 值
-                    String referer = req.getHeader("Referer");
-                    // 判断 Referer 是否以配置 开头
-                    if ((referer == null) || !(referer.trim().startsWith(c_referer))) {
-                        throw new RuntimeException("发起地址：" + referer + ",站点地址：" + c_referer);
-                    }
-                }
-            } catch (Throwable e) {
-                throw new RuntimeException("非法的请求源地址！" + e.getMessage(), e);
-            }
+			String c_referer = properties.get("Referer") + "";
+			if (refererGrant) {
+				// 从 HTTP 头中取得 Referer 值
+				String referer = req.getHeader("Referer");
+				// 判断 Referer 是否以配置 开头
+				if ((referer == null) || !(referer.trim().startsWith(c_referer))) {
+					throw new OIUEException(StatusResult._data_error, "发起地址：" + referer + ",站点地址：" + c_referer);
+				}
+			}
             // StringBuffer jb = new StringBuffer();
             // String line = null;
             // try {

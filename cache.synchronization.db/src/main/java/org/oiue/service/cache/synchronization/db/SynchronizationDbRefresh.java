@@ -28,6 +28,7 @@ public class SynchronizationDbRefresh implements Task {
 	private FactoryService factoryService;
 	private Logger logger;
 	private List<String> jobNameList = new ArrayList<String>();
+	private boolean isdebug = false;
 
 	public SynchronizationDbRefresh(CacheServiceManager cacheService, TaskService taskService, FactoryService factoryService, LogService logService) {
 		this.cacheService = cacheService;
@@ -42,6 +43,9 @@ public class SynchronizationDbRefresh implements Task {
 			logger.error("property is null, please check configure file");
 			return;
 		}
+		try {
+			isdebug = StringUtil.isTrue(props.get("isdebug")+"");
+		} catch (Throwable e) {}
 
 		for (String jobName : jobNameList) {
 			taskService.unregister(jobName);
@@ -62,6 +66,10 @@ public class SynchronizationDbRefresh implements Task {
 			List<Map> object = (List) iresource.callEvent(event_id, data_source_name, new HashMap<>());
 
 			for (Map event : object) {
+				if(isdebug){
+					this.execute(event);
+					continue;
+				}
 				String quartz = MapUtil.getString(event, "quartz");
 				String task_event_id = MapUtil.getString(event, "task_event_id");
 
@@ -72,6 +80,7 @@ public class SynchronizationDbRefresh implements Task {
 				} else {
 					logger.warn("register cron error, task = " + event);
 				}
+				
 			}
 
 		} catch (Throwable e) {

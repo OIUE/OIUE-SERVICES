@@ -33,7 +33,7 @@ package org.apache.http.client.fluent;
  */
 public class FluentResponseHandling {
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) {
 //        Document result = Request.Get("http://somehost/content")
 //                .execute().handleResponse(new ResponseHandler<Document>() {
 //

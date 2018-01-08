@@ -93,6 +93,7 @@ public class TransExecutionConfigurationCodec {
 		return jsonObject;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static TransExecutionConfiguration decode(JSONObject jsonObject, AbstractMeta meta) throws ParserConfigurationException, SAXException, IOException {
 		TransExecutionConfiguration executionConfiguration = new TransExecutionConfiguration();
 		executionConfiguration.setExecutingLocally("Y".equalsIgnoreCase(jsonObject.optString("exec_local")));

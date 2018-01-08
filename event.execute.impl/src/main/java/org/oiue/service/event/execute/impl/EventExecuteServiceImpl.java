@@ -27,7 +27,7 @@ public class EventExecuteServiceImpl implements EventExecuteService {
 
 	@SuppressWarnings({ "rawtypes",  "unchecked" })
 	@Override
-	public Object execute(Map data, Map event, String tokenId) throws Throwable {
+	public Object execute(Map data, Map event, String tokenId) {
 		IResource iresource=factoryService.getBmo(IResource.class.getName());
 		if (onlineService != null && iresource != null) {
 			return iresource.callEvent(MapUtil.getString(event, EventField.service_event_id), data_source_name, data);
@@ -35,7 +35,7 @@ public class EventExecuteServiceImpl implements EventExecuteService {
 		throw new RuntimeException("service can not init！");
 	}
 	@Override
-	public Object execute(List datas, Map event, String tokenId) throws Throwable {
+	public Object execute(List datas, Map event, String tokenId) {
 		IResource iresource=factoryService.getBmo(IResource.class.getName());
 		if (onlineService != null && iresource != null) {
 			List rtnList = new ArrayList();

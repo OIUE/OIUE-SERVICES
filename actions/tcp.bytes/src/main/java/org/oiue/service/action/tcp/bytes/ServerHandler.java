@@ -23,6 +23,7 @@ import org.oiue.tools.StatusResult;
 import org.oiue.tools.bytes.ByteUtil;
 import org.oiue.tools.bytes.Crc;
 import org.oiue.tools.exception.ExceptionUtil;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.map.MapUtil;
 import org.oiue.tools.string.StringUtil;
@@ -70,7 +71,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void received(Session session, String line, byte[] bytes) throws Exception {
+	public void received(Session session, String line, byte[] bytes)  {
 		Map<Object, Object> per = null;
 		Map<Object, Object> rtn = null;
 		if (logger.isDebugEnabled()) {
@@ -94,7 +95,7 @@ public class ServerHandler implements Handler {
 					receivedTh.start();
 				}
 			} catch (Throwable e) {
-				throw new RuntimeException("参数格式不正确！[" + ExceptionUtil.getCausedBySrcMsg(e) + "]" + " /n " + line + " /n " + per, e);
+				throw new OIUEException(StatusResult._format_error,"参数格式不正确！[" + ExceptionUtil.getCausedBySrcMsg(e) + "]" + " /n " + line + " /n " + per, e);
 			}
 		} catch (Throwable ex) {
 			logger.error("received error：" + ExceptionUtil.getCausedBySrcMsg(ex), ex);
@@ -183,7 +184,7 @@ public class ServerHandler implements Handler {
 						}
 						String msg_type_regex = props.get("msg.type." + d.get("command_id")) + "";
 						if (StringUtil.isEmptys(msg_type_regex)) {
-							throw new RuntimeException("not found command ID [" + d.get("command_id") + "] ");
+							throw new OIUEException(StatusResult._url_can_not_found,"not found command ID [" + d.get("command_id") + "] ");
 						}
 						Object regex;
 						if (msg_type_regex.startsWith("{")) {
@@ -376,7 +377,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void closed(Session session) throws Exception {
+	public void closed(Session session)  {
 		this.logger.info("tcp closed " + session);
 		try {
 			if (session != null) {
@@ -408,7 +409,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void opened(Session session) throws Exception {
+	public void opened(Session session)  {
 		this.logger.info("tcp opened " + session);
 		if (session == null)
 			return;
@@ -433,7 +434,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void idled(Session session) throws Exception {
+	public void idled(Session session)  {
 		if (session != null)
 			if (StringUtil.isEmptys(session.getAttribute("token") + "")) {
 				logger.info("Close invalid connection:" + session);
@@ -442,7 +443,7 @@ public class ServerHandler implements Handler {
 	}
 
 	@Override
-	public void sent(Session session) throws Exception {
+	public void sent(Session session)  {
 		if (logger.isInfoEnabled())
 			logger.info("tcp sent");
 		if (session.getAttribute(KEY_SENT_INFO) == null) {

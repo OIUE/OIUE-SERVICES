@@ -23,7 +23,7 @@ import org.osgi.service.http.HttpService;
 public class Activator extends FrameActivator {
 
 	@Override
-	public void start() throws Exception {
+	public void start()  {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/";
 			private HttpService httpService;
@@ -121,5 +121,5 @@ public class Activator extends FrameActivator {
 	}
 
 	@Override
-	public void stop() throws Exception {}
+	public void stop()  {}
 }

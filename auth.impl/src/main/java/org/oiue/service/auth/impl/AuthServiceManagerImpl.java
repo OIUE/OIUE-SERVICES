@@ -10,6 +10,8 @@ import org.oiue.service.auth.AuthServiceManager;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.online.Online;
+import org.oiue.tools.StatusResult;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.string.StringUtil;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -27,20 +29,19 @@ public class AuthServiceManagerImpl implements AuthServiceManager, ManagedServic
 
     @Override
     public Online login(Map per) {
-
         String type = (String) per.remove(login_type);
         
         if(StringUtil.isEmptys(type)){
             String msg ="the key["+login_type+"] con't null or empty!";
             logger.error(msg+":"+per);
-            throw new RuntimeException(msg);
+            throw new OIUEException(StatusResult._data_error,msg);
         }
         AuthService auth = auths.get(type);
 
         if(auth==null){
             String msg ="AuthService the key["+type+"] con't find!";
             logger.error(msg+":"+per);
-            throw new RuntimeException(msg);
+            throw new OIUEException(StatusResult._data_error,msg);
         }
         return auth.login(per);
     }
@@ -78,7 +79,7 @@ public class AuthServiceManagerImpl implements AuthServiceManager, ManagedServic
     }
 
     @Override
-    public void updated(Dictionary<String, ?> props) throws ConfigurationException {
+    public void updated(Dictionary<String, ?> props) {
         String login_type = props.get("loginType")+"";
         if(!StringUtil.isEmptys(login_type)){
             this.login_type=login_type;
@@ -87,7 +88,6 @@ public class AuthServiceManagerImpl implements AuthServiceManager, ManagedServic
 
     @Override
     public void unregister() {
-        // TODO Auto-generated method stub
         
     }
 

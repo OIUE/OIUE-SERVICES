@@ -27,6 +27,11 @@
 package org.apache.http.examples.client;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLContext;
 
@@ -46,7 +51,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientCustomSSL {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException  {
         // Trust own CA and all self-signed certs
         SSLContext sslcontext = SSLContexts.custom()
                 .loadTrustMaterial(new File("my.keystore"), "nopassword".toCharArray(),

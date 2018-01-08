@@ -32,7 +32,7 @@ package org.apache.http.client.fluent;
  */
 public class FluentRequests {
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) {
 //        // Execute a GET with timeout settings and return response content as String.
 //        Request.Get("http://somehost/")
 //                .connectTimeout(1000)

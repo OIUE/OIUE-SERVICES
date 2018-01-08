@@ -18,6 +18,7 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.ExceptionUtil;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.map.MapUtil;
 import org.oiue.tools.string.StringUtil;
@@ -57,64 +58,27 @@ public class PostServlet extends HttpServlet {
 		String callBackFn = "";
 		boolean authInHeader = false;
 		try {
-			try {
-				String c_referer = properties.get("Referer") + "";
-				if (refererGrant) {
-					// 从 HTTP 头中取得 Referer 值
-					String referer = req.getHeader("Referer");
-					// 判断 Referer 是否以配置 开头
-					if ((referer == null) || !(referer.trim().startsWith(c_referer))) {
-						throw new RuntimeException("发起地址：" + referer + ",站点地址：" + c_referer);
-					}
+			String c_referer = properties.get("Referer") + "";
+			if (refererGrant) {
+				// 从 HTTP 头中取得 Referer 值
+				String referer = req.getHeader("Referer");
+				// 判断 Referer 是否以配置 开头
+				if ((referer == null) || !(referer.trim().startsWith(c_referer))) {
+					throw new OIUEException(StatusResult._url_can_not_found,"发起地址：" + referer + ",站点地址：" + c_referer);
 				}
-			} catch (Throwable e) {
-				throw new RuntimeException("非法的请求源地址！" + e.getMessage(), e);
 			}
-			try {
-				perStr = req.getParameter("parameter");
-				try {
-					if (StringUtil.isEmptys(perStr)) {
-						StringBuffer jb = new StringBuffer();
-						String line = null;
-						BufferedReader reader = req.getReader();
-						while ((line = reader.readLine()) != null)
-							jb.append(line);
-						perStr = jb.toString();
-					}
-				} catch (Throwable e) {
-					//					logger.error(e.getMessage(), e);
-				}
-				if (!StringUtil.isEmptys(perStr)) {
-					per = JSONUtil.parserStrToMap(perStr);
-				}
-				if (per == null || per.size() == 0) {
-					Map data =  ParseHtml.parseRequest(req);
-					if(data!=null&&data.size()>0){
-						per = new HashMap<>();
-						per.put("token", data.remove("token"));
-						per.put("data", data);
-					}
-				}
-				if(per==null){
-					per = new HashMap<>();
-					per.put("data", new HashMap<>());
-				}
-				String token = req.getHeader("Authorization");
-				if(!StringUtil.isEmptys(token)){
-					int index = token.indexOf(" ");
-					if(index>0)
-						token = token.substring(index+1);
-					authInHeader = true;
-					per.put("token", token);
-				}
-			} catch (Throwable e) {
-				throw new RuntimeException("参数格式不正确！" + " /n " + perStr + " /n " + per, e);
+			
+			per = ParseHtml.parseRequest(req);
+			
+			String token = req.getHeader("Authorization");
+			if(!StringUtil.isEmptys(token)){
+				authInHeader = true;
 			}
-
+			
 			String path = req.getPathInfo();
 			String[] paths = path.split("/");
 			if(paths.length<3)
-				throw new RuntimeException("请求地址格式不正确（/version/modulename/operation）！" + " /n " + path );
+				throw new OIUEException(StatusResult._url_can_not_found,"请求地址格式不正确（/version/modulename/operation）！" + " /n " + path );
 
 			per.put("version", paths[1]);
 			per.put("modulename", paths[2]);

@@ -28,7 +28,7 @@ package org.apache.http.client.fluent;
 
 public class FluentQuickStart {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)  {
         // The fluent API relieves the user from having to deal with manual
         // deallocation of system resources at the cost of having to buffer
         // response content in memory in some cases.

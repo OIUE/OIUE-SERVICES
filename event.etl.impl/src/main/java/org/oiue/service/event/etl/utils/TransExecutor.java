@@ -304,7 +304,7 @@ public class TransExecutor implements Runnable {
 		return finished;
 	}
 
-	public List getStepMeasure() throws Exception {
+	public List getStepMeasure() throws Exception  {
 		List jsonArray = new ArrayList<>();
 
 		if(executionConfiguration.isExecutingLocally()) {
@@ -371,7 +371,7 @@ public class TransExecutor implements Runnable {
 		return jsonArray;
 	}
 
-	public String getExecutionLog() throws Exception {
+	public String getExecutionLog() throws Exception  {
 
 		if(executionConfiguration.isExecutingLocally()) {
 			StringBuffer sb = new StringBuffer();
@@ -408,7 +408,7 @@ public class TransExecutor implements Runnable {
 		return "";
 	}
 
-	public List getStepStatus() throws Exception {
+	public List getStepStatus() throws Exception  {
 		List jsonArray = new ArrayList<>();
 
 		HashMap<String, Integer> stepIndex = new HashMap<String, Integer>();

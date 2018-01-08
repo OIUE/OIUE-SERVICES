@@ -46,22 +46,27 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 	}
 
 	public void updated(Dictionary dict) {
-		unFilter_modulename = new ArrayList<String>();
-		String unFilter_modulenames = (String) dict.get("unFilter_modulename");
-		if (!StringUtil.isEmptys(unFilter_modulenames)) {
-			unFilter_modulename = StringUtil.Str2List(unFilter_modulenames, ",");
-		}
-		for (Iterator iterator = unFilter_modulename.iterator(); iterator.hasNext();) {
-			String module = (String) iterator.next();
-			try {
-				String unFilter_modulename_operation = (String) dict.get(module);
-				if (!StringUtil.isEmptys(unFilter_modulename_operation)) {
-					unFilter_module_operation.put(module, StringUtil.Str2List(unFilter_modulename_operation, ","));
-				}
-			} catch (Throwable e) {}
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("updateConfigure: unFilter_modulename  = " + unFilter_modulenames);
+		try {
+			unFilter_modulename = new ArrayList<String>();
+			String unFilter_modulenames = (String) dict.get("unFilter_modulename");
+			if (!StringUtil.isEmptys(unFilter_modulenames)) {
+				unFilter_modulename = StringUtil.Str2List(unFilter_modulenames, ",");
+			}
+			for (Iterator iterator = unFilter_modulename.iterator(); iterator.hasNext();) {
+				String module = (String) iterator.next();
+				try {
+					String unFilter_modulename_operation = (String) dict.get(module);
+					if (!StringUtil.isEmptys(unFilter_modulename_operation)) {
+						unFilter_module_operation.put(module, StringUtil.Str2List(unFilter_modulename_operation, ","));
+					}
+				} catch (Throwable e) {}
+			}
+			if (logger.isDebugEnabled()) {
+				logger.debug("updateConfigure: unFilter_modulename  = " + unFilter_modulenames);
+			}
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 		actionService.registerActionFilter("authFilter", this, 1);
 	}
@@ -97,6 +102,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 				Map tmp = new HashMap<>();
 				tmp.put("serviceName","org.oiue.service.event.execute.EventExecuteService");
 				tmp.put("methodName", "execute");
+				tmp.put("component_instance_event_id",null);
 				tmp.put("service_event_id", event_id);
 
 				per.put(PermissionConstant.permission_key, tmp);
@@ -113,15 +119,8 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 				afr.setResult(StatusResult._SUCCESS_OVER);
 				afr.setDescription("login success");
 				return afr;
-			} else {
-				try {
-					online = authService.login(((Map)data));
-				} catch (Exception e) {
-					logger.error("login status error,please login again:" + e.getMessage(), e);
-					afr.setResult(StatusResult._pleaseLogin);
-					afr.setDescription("login status error,please login again!");
-					return afr;
-				}
+			} else if("login".equals(modulename)||StringUtil.isTrue(MapUtil.getString(per, "auto_login","n"))){
+				online = authService.login(((Map)data));
 
 				if (online == null || StringUtil.isEmptys(online.getTokenId())) {
 					afr.setResult(StatusResult._ncriticalAbnormal);
@@ -130,11 +129,16 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 				}
 
 				onlineService.putOnline(online.getTokenId(), online);
+				per.put("data", online.getUser());
 				per.put("token", online.getToken());
-			}
-			if ("login".equals(modulename)) {
-				afr.setResult(StatusResult._SUCCESS_OVER);
-				afr.setDescription("login success");
+				if ("login".equals(modulename)) {
+					afr.setResult(StatusResult._SUCCESS_OVER);
+					afr.setDescription("login success");
+					return afr;
+				}
+			}else{
+				afr.setResult(StatusResult._pleaseLogin);
+				afr.setDescription("please login！");
 				return afr;
 			}
 			afr = permissionService.verify(per, online);
@@ -142,8 +146,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 				return afr;
 			return permissionService.convert(per);
 		} else if ("logout".equals(modulename)) {
-			authService.logout(((Map)data));
-			onlineService.removeOnlineByTokenId(token);
+			onlineService.removeOnlineByToken(token);
 			afr.setResult(StatusResult._SUCCESS_OVER);
 			afr.setDescription("logout success");
 			per.put("success", true);

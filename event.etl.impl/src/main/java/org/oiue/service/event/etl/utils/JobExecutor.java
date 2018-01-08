@@ -150,7 +150,7 @@ public class JobExecutor implements Runnable {
 
 	public int previousNrItems;
 	@SuppressWarnings("deprecation")
-	public List getJobMeasure() throws Exception {
+	public List getJobMeasure()  {
 		List jsonArray = new ArrayList<>();
 		if(executionConfiguration.isExecutingLocally()) {
 			JobTracker jobTracker = job.getJobTracker();
@@ -239,7 +239,7 @@ public class JobExecutor implements Runnable {
 	}
 
 
-	public String getExecutionLog() throws Exception {
+	public String getExecutionLog() throws Exception  {
 		if(executionConfiguration.isExecutingLocally()) {
 			StringBuffer sb = new StringBuffer();
 			KettleLogLayout logLayout = new KettleLogLayout( true );

@@ -27,8 +27,10 @@
 
 package org.apache.http.examples.client;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -45,7 +47,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientCustomContext {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws ClientProtocolException, IOException  {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             // Create a local instance of cookie store

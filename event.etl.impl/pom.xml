@@ -10,8 +10,14 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
+  <repositories>
+      <repository>
+          <id>pentaho</id>
+          <url>https://public.nexus.pentaho.org/content/groups/omni/</url>
+      </repository>
+  </repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
@@ -98,6 +104,11 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.javassist</groupId>
@@ -122,11 +133,6 @@
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20170516</version>
 		</dependency>
 		
 		<dependency>
@@ -155,27 +161,49 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.35</version>
 		</dependency>
-		<!-- http://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.1.1</version>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>42.1.1</version>
 		</dependency>
-
-
+		<!-- https://mvnrepository.com/artifact/net.postgis/postgis-jdbc -->
 		<dependency>
+			<groupId>net.postgis</groupId>
+			<artifactId>postgis-jdbc</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		
+		<!-- <dependency>
 			<groupId>com.mxgraph</groupId>
 			<artifactId>jgraphx</artifactId>
 			<version>3.7.2</version>
-		</dependency>
+		</dependency> -->
+
+		<dependency>
+			<groupId>net.sourceforge.javacsv</groupId>
+			<artifactId>javacsv</artifactId>
+			<version>2.0</version>
+		</dependency>  
 	</dependencies>
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 		<!-- <kettle-version>7.0.0.0-25</kettle-version> -->
 		<!-- <kettle-version>7.0.0.6-91</kettle-version> -->
-		<kettle-version>7.1.0.4-66</kettle-version>
-		<project.dependency>metastore,kettle-core,kettle-engine,encoder,kettle-dbdialog,commons-vfs2,guava,commons-logging,commons-lang,scannotation,javassist,jackson-core,jackson-core-asl,jackson-mapper-asl,postgresql,mysql-connector-java,neo4j-java-driver</project.dependency>
-		<project.import>org.oiue.service.event.etl,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.list,org.w3c.dom,org.xml.sax,javax.xml.parsers,javax.net,javax.xml.transform,javax.naming,org.oiue.service.cache;version="[1.0,2)",org.oiue.service.event.execute;version="[1.0,2)",org.oiue.service.log;version="[1.0,2)",org.oiue.service.odp.base;version="[1.0,2)",org.oiue.service.odp.res.api;version="[1.0,2)",org.oiue.service.online;version="[1.0,2)",org.oiue.service.osgi;version="[1.0,2)",org.oiue.service.system.analyzer;version="[1.0,2)",org.oiue.tools.map;version="[1.0,2)"</project.import>
-		<project.export></project.export>
+		<!-- <kettle-version>7.1.0.4-66</kettle-version> -->
+		<!-- <kettle-version>8.0-SNAPSHOT</kettle-version> -->
+		<kettle-version>8.0.0.0-28</kettle-version>
+		<project.dependency>metastore,javacsv,kettle-core,kettle-engine,encoder,kettle-dbdialog,commons-vfs2,guava,commons-logging,commons-lang,commons-io,scannotation,javassist,jackson-core,jackson-core-asl,jackson-mapper-asl,postgresql,postgis-jdbc,mysql-connector-java,neo4j-java-driver</project.dependency>
+		<project.import>org.oiue.service.event.etl,org.oiue.service.odp.event.api,org.oiue.service.odp.dmo,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.list,org.w3c.dom,org.xml.sax,javax.xml.parsers,javax.net,javax.xml.transform,javax.naming,org.oiue.service.cache;version="[1.0,2)",org.oiue.service.event.execute;version="[1.0,2)",org.oiue.service.log;version="[1.0,2)",org.oiue.service.odp.base;version="[1.0,2)",org.oiue.service.odp.res.api;version="[1.0,2)",org.oiue.service.online;version="[1.0,2)",org.oiue.service.osgi;version="[1.0,2)",org.oiue.tools.exception,org.oiue.tools,org.oiue.service.system.analyzer;version="[1.0,2)",org.oiue.tools.map;version="[1.0,2)"</project.import>
+		<project.export>
+			org.oiue.service.event.etl.impl,org.oiue.service.event.etl.utils,
+			com.fasterxml.jackson.databind,javax.xml.parsers,org.codehaus.jackson.map,
+			org.pentaho.di.base,org.pentaho.di.cluster,org.pentaho.di.core,org.pentaho.di.core.database,org.pentaho.di.core.encryption,org.pentaho.di.core.exception,
+			org.pentaho.di.core.gui,org.pentaho.di.core.logging,org.pentaho.di.core.plugins,org.pentaho.di.core.row,
+			org.pentaho.di.core.variables,org.pentaho.di.core.xml,org.pentaho.di.i18n,org.pentaho.di.job,org.pentaho.di.job.entry,
+			org.pentaho.di.repository,org.pentaho.di.trans,org.pentaho.di.trans.cluster,org.pentaho.di.trans.step,
+			org.pentaho.di.trans.step.errorhandling,org.pentaho.di.trans.steps.tableinput,org.pentaho.di.www,
+			org.pentaho.metastore.api,org.pentaho.metastore.stores.delegate,org.xml.sax,org.pentaho.di.trans.steps.csvinput,org.pentaho.di.trans.steps.textfileinput
+		</project.export>
 	</properties>
 </project>

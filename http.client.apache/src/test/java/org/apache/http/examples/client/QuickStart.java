@@ -26,11 +26,13 @@
  */
 package org.apache.http.examples.client;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -42,7 +44,7 @@ import org.apache.http.util.EntityUtils;
 
 public class QuickStart {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException  {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             HttpGet httpGet = new HttpGet("http://targethost/homepage");

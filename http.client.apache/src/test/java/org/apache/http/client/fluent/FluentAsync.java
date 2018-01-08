@@ -33,7 +33,7 @@ package org.apache.http.client.fluent;
  */
 public class FluentAsync {
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) {
         // Use pool of two threads
 //        ExecutorService threadpool = Executors.newFixedThreadPool(2);
 //        Async async = Async.newInstance().use(threadpool);

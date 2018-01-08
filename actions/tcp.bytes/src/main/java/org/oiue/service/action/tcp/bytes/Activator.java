@@ -17,7 +17,7 @@ import org.oiue.service.tcp.TcpService;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             private SocketAddress address;
             private TcpService tcpService;
@@ -66,5 +66,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

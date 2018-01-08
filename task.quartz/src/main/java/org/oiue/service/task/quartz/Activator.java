@@ -10,7 +10,7 @@ import org.oiue.service.task.TaskService;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             QuartzServiceImpl quartzService;
 
@@ -34,5 +34,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

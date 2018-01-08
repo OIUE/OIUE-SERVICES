@@ -26,6 +26,8 @@
  */
 package org.apache.http.examples.client;
 
+import java.io.IOException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -42,7 +44,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientMultiThreadedExecution {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws InterruptedException, IOException  {
         // Create an HttpClient with the ThreadSafeClientConnManager.
         // This connection manager must be used if more than one thread will
         // be using the HttpClient.

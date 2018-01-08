@@ -26,10 +26,13 @@
  */
 package org.apache.http.examples.client;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -46,7 +49,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientFormLogin {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException  {
         BasicCookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCookieStore(cookieStore)

@@ -76,7 +76,7 @@ public class PermissionServiceManagerImpl implements PermissionServiceManager, S
 			per.put("user_id", online.getUser_id());
 			per.put("domain",per.get("domain"));
 		}
-
+		logger.debug("token time {}", System.currentTimeMillis());
 		per.put("token", online.getToken());
 
 		String type = (String) per.remove(permission_type);

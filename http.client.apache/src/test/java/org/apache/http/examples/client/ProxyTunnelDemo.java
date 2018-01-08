@@ -28,11 +28,13 @@
 package org.apache.http.examples.client;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.ProxyClient;
@@ -43,7 +45,7 @@ import org.apache.http.protocol.HTTP;
  */
 public class ProxyTunnelDemo {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws IOException, HttpException  {
 
         ProxyClient proxyClient = new ProxyClient();
         HttpHost target = new HttpHost("www.yahoo.com", 80);

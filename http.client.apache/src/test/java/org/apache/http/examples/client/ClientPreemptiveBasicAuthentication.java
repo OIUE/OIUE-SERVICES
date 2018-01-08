@@ -26,10 +26,13 @@
  */
 package org.apache.http.examples.client;
 
+import java.io.IOException;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -51,7 +54,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientPreemptiveBasicAuthentication {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException  {
         HttpHost target = new HttpHost("localhost", 80, "http");
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(

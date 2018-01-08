@@ -10,7 +10,7 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 public class Activator extends FrameActivator {
 
 	@Override
-	public void start() throws Exception {
+	public void start()  {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private AuthFilterServiceImpl actionFilter;
 
@@ -33,5 +33,5 @@ public class Activator extends FrameActivator {
 	}
 
 	@Override
-	public void stop() throws Exception {}
+	public void stop()  {}
 }

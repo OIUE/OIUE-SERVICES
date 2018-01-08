@@ -16,6 +16,8 @@ import org.oiue.service.odp.res.api.IResource;
 import org.oiue.service.online.Online;
 import org.oiue.service.online.OnlineImpl;
 import org.oiue.service.online.Type;
+import org.oiue.tools.StatusResult;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.string.StringUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -67,19 +69,16 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 			map.put("origin_name", type);
 			map.put("user_name", username);
 			map.put("password", password);
-			try {
 				IResource iResource = factoryService.getBmo(IResource.class.getName());
 				map = (Map<String, Object>) iResource.callEvent(event_id, null, map);
 				if (map == null || map.size() == 0) {
-					throw new RuntimeException("login error,username or password is error!");
+					throw new OIUEException(StatusResult._login_error,"login error,username or password is error!");
 				}
-			} catch (Throwable e) {
-				throw new RuntimeException(e);
-			}
 			tokenId = UUID.randomUUID().toString().replaceAll("-", "");
 			online.setO(new ConcurrentHashMap<>());
 			online.setTokenId(tokenId);
 			online.setType(Type.http);
+			map.remove("password");
 			online.setUser(map);
 			online.setUser_id(map.get("user_id") + "");
 			online.setUser_name(map.get("user_name") + "");

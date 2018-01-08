@@ -12,7 +12,7 @@ import org.oiue.service.tcp.UdpService;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             private TcpServiceImpl tcpService;
             private UdpServiceImpl udpService;
@@ -38,5 +38,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

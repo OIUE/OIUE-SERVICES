@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.oiue.services.actions</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 	</properties>
 
 	<packaging>bundle</packaging>

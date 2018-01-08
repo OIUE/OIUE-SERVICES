@@ -26,6 +26,8 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.online.Online;
 import org.oiue.service.online.OnlineService;
+import org.oiue.tools.StatusResult;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.file.MimeTypes;
 import org.oiue.tools.map.MapUtil;
 import org.oiue.tools.string.StringUtil;
@@ -82,7 +84,7 @@ public class HttpAuthFilterServiceImpl implements Filter, Serializable {
 					return;
 				}
 				String domain = req.getServerName();
-				req.setAttribute("resName", resName);
+				logger.debug("domain:{}", domain);
 				req.setAttribute("domain", domain);
 				req.setAttribute("httpContext", request.getServletContext());
 				String domain_path = (String) cacheService.get("system_domain", domain);
@@ -95,13 +97,22 @@ public class HttpAuthFilterServiceImpl implements Filter, Serializable {
 				if (mimeType != null) {
 					response.setContentType(mimeType);
 				}
-
+				String dynamic = req.getParameter("dynamic");
+				if(dynamic!=null){
+					String[] per = resName.split("/");
+					if(per.length==2){
+						resName=(String) cacheService.get("system_pbtemplate", per[0]);
+						req.setAttribute(per[0], per[1]);
+					}else{
+						throw new OIUEException(StatusResult._url_can_not_found,"Unsupported format："+resName);
+					}
+				}
+				req.setAttribute("resName", resName);
 				if (!unFilter.contains(mimeType)) {
-
 					Map menu = (Map) cacheService.get("system_menu", domain + ":" + resName);
 					if (menu == null) {
-						//					((HttpServletResponse) response).sendRedirect(notFoundPage);
-						//					return;
+						//((HttpServletResponse) response).sendRedirect(notFoundPage);
+						//return;
 						chain.doFilter(request, response);
 						return;
 					}
@@ -144,7 +155,7 @@ public class HttpAuthFilterServiceImpl implements Filter, Serializable {
 			chain.doFilter(request, response);
 
 		} catch (Throwable e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
 

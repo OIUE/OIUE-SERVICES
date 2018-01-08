@@ -11,7 +11,7 @@ import org.oiue.service.permission.PermissionServiceManager;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             PermissionServiceImpl permissionService;
 
@@ -35,5 +35,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

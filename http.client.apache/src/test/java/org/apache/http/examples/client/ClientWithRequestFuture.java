@@ -28,9 +28,11 @@ package org.apache.http.examples.client;
 
 import java.io.IOException;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -45,7 +47,7 @@ import org.apache.http.impl.client.HttpRequestFutureTask;
 
 public class ClientWithRequestFuture {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws InterruptedException, ExecutionException, TimeoutException, IOException  {
         // the simplest way to create a HttpAsyncClientWithFuture
         HttpClient httpclient = HttpClientBuilder.create()
                 .setMaxConnPerRoute(5)

@@ -11,7 +11,7 @@ public class EventSystemTimeServiceImpl implements EventSystemTimeService {
     protected static Logger logger;
     @SuppressWarnings({ "rawtypes"})
     @Override
-    public Object getTime(Map data, Map event, String tokenid) throws Throwable {
+    public Object getTime(Map data, Map event, String tokenid) {
         return System.currentTimeMillis()/1000;
     }
 }

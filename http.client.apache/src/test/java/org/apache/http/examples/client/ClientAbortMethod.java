@@ -27,6 +27,9 @@
 
 package org.apache.http.examples.client;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -37,7 +40,7 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class ClientAbortMethod {
 
-    public final static void main(String[] args) throws Exception {
+    public final static void main(String[] args) throws ClientProtocolException, IOException  {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             HttpGet httpget = new HttpGet("http://www.apache.org/");

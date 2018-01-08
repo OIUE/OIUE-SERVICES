@@ -27,8 +27,10 @@
 package org.apache.http.examples.entity.mime;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -44,7 +46,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientMultipartFormPost {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException  {
         if (args.length != 1)  {
             System.out.println("File path not given");
             System.exit(1);

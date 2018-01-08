@@ -10,7 +10,7 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             private CacheServiceManager cacheServiceManager;
             private mongoCacheService cacheService;
@@ -37,5 +37,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }

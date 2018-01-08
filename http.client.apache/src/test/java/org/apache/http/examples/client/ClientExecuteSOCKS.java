@@ -34,6 +34,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 import org.apache.http.HttpHost;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -54,7 +55,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientExecuteSOCKS {
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException {
         Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", new MyConnectionSocketFactory())
                 .build();

@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.oiue.services.actions</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>org.oiue.service.action.http.imageCode</artifactId>
 
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 	</properties>
 
 	<packaging>bundle</packaging>
@@ -35,7 +35,7 @@
 				<configuration>
 					<instructions>
 						<X-bundle-Version>${version}</X-bundle-Version>
-						<Bundle-Activator>${artifactId}.Activator</Bundle-Activator>
+						<Bundle-Activator>${project.artifactId}.Activator</Bundle-Activator>
 						<Import-Package>com.sun.image.codec.jpeg,org.oiue.service.log,org.oiue.service.action.api,org.oiue.service.osgi,org.osgi.service.http</Import-Package>
 						<Bundle-Name>${name}</Bundle-Name>
 						<Bundle-Description>${description}</Bundle-Description>

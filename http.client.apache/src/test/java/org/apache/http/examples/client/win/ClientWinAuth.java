@@ -35,7 +35,7 @@ package org.apache.http.examples.client.win;
  */
 public class ClientWinAuth {
 
-//    public final static void main(String[] args) throws Exception {
+//    public final static void main(String[] args)  {
 //
 //        if (!WinHttpClients.isWinAuthAvailable()) {
 //            System.out.println("Integrated Win auth is not supported!!!");

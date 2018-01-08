@@ -35,7 +35,7 @@ package org.apache.http.client.fluent;
  */
 public class FluentExecutor {
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) {
 //        Executor executor = Executor.newInstance()
 //                .auth(new HttpHost("somehost"), "username", "password")
 //                .auth(new HttpHost("myproxy", 8080), "username", "password")

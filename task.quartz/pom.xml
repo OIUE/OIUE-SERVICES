@@ -8,10 +8,10 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<properties>
-		<project.activator>${artifactId}.Activator</project.activator>
+		<project.activator>${project.artifactId}.Activator</project.activator>
 		<project.dependency>quartz</project.dependency>
 		<project.import>org.osgi.framework,org.osgi.service.cm,org.oiue.service.log,org.oiue.service.osgi,org.oiue.service.task,org.slf4j,org.oiue.tools.string</project.import>
 	</properties>

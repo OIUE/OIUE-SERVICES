@@ -16,7 +16,6 @@ import org.pentaho.di.core.database.GenericDatabaseMeta;
 import org.pentaho.di.core.database.MSSQLServerNativeDatabaseMeta;
 import org.pentaho.di.core.database.PartitionDatabaseMeta;
 import org.pentaho.di.core.encryption.Encr;
-import org.pentaho.di.core.exception.KettleDatabaseException;
 
 public class DatabaseCodec {
 
@@ -139,7 +138,7 @@ public class DatabaseCodec {
 		return jsonObject;
 	}
 
-	public static DatabaseMeta decode(Map jsonObject) throws KettleDatabaseException {
+	public static DatabaseMeta decode(Map jsonObject){
 		String name=MapUtil.getString(jsonObject,"name");
 		String type=MapUtil.getString(jsonObject,"type");
 		String access=MapUtil.getString(jsonObject,"access");
@@ -148,18 +147,21 @@ public class DatabaseCodec {
 		String port=MapUtil.getString(jsonObject,"port");
 		String user=MapUtil.getString(jsonObject,"username");
 		String pass=MapUtil.getString(jsonObject,"password");
+		while(pass.startsWith("Encrypted")){
+			pass = Encr.decryptPasswordOptionallyEncrypted(pass);
+		}
 
 		DatabaseMeta databaseMeta = new DatabaseMeta(name,type,access,host,db,port,user,pass);
 		databaseMeta.setDisplayName(databaseMeta.getName());
 
 		if(jsonObject.containsKey("hostname"))
-			databaseMeta.setHostname(MapUtil.getString(jsonObject,"hostname"));
+			databaseMeta.setHostname(host);
 		if(jsonObject.containsKey("databasename"))
-			databaseMeta.setDBName(MapUtil.getString(jsonObject,"databasename"));
+			databaseMeta.setDBName(db);
 		if(jsonObject.containsKey("username"))
-			databaseMeta.setUsername(MapUtil.getString(jsonObject,"username"));
+			databaseMeta.setUsername(user);
 		if(jsonObject.containsKey("password"))
-			databaseMeta.setPassword(MapUtil.getString(jsonObject,"password"));
+			databaseMeta.setPassword(pass);
 		if(jsonObject.containsKey("streamingResults"))	// infobright-jndi
 			databaseMeta.setStreamingResults(true);
 		if(jsonObject.containsKey("dataTablespace"))	//oracle-jndi
@@ -281,7 +283,12 @@ public class DatabaseCodec {
 					meta.setPort(MapUtil.getString(jsonObject2,"port"));
 					meta.setDatabaseName(MapUtil.getString(jsonObject2,"databaseName"));
 					meta.setUsername(MapUtil.getString(jsonObject2,"username"));
-					meta.setPassword(MapUtil.getString(jsonObject2,"password"));
+
+					String pass2=MapUtil.getString(jsonObject2,"password");
+					while(pass2.startsWith("Encrypted")){
+						pass2 = Encr.decryptPasswordOptionallyEncrypted(pass2);
+					}
+					meta.setPassword(pass2);
 					list.add(meta);
 				}
 				if (list.size() > 0)

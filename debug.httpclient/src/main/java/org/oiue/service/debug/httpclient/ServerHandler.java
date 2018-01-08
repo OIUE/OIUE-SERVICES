@@ -15,7 +15,7 @@ public class ServerHandler implements Handler {
     }
 
     @Override
-    public void received(Session session, String line, byte[] bytes) throws Exception {
+    public void received(Session session, String line, byte[] bytes)  {
         if (line.startsWith("g")) {
             String cmdArray[] = line.split(" ", 2);
             if (cmdArray.length == 2) {
@@ -48,22 +48,22 @@ public class ServerHandler implements Handler {
     }
 
     @Override
-    public void closed(Session session) throws Exception {
+    public void closed(Session session)  {
         
     }
 
     @Override
-    public void opened(Session session) throws Exception {
+    public void opened(Session session)  {
         session.write("debug Cache Tree Service");
     }
 
     @Override
-    public void idled(Session session) throws Exception {
+    public void idled(Session session)  {
         session.close();
     }
 
     @Override
-    public void sent(Session session) throws Exception {
+    public void sent(Session session)  {
 
     }
 

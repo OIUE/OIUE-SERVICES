@@ -14,7 +14,7 @@ import org.oiue.service.system.analyzer.AnalyzerService;
 public class Activator extends FrameActivator {
 
 	@Override
-	public void start() throws Exception {
+	public void start()  {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private ETLService eventExecuteService;
 
@@ -54,5 +54,5 @@ public class Activator extends FrameActivator {
 	}
 
 	@Override
-	public void stop() throws Exception {}
+	public void stop()  {}
 }

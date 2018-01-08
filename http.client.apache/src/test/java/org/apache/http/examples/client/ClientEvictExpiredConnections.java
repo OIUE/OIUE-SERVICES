@@ -26,8 +26,10 @@
  */
 package org.apache.http.examples.client;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -42,7 +44,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientEvictExpiredConnections {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws ClientProtocolException, IOException, InterruptedException  {
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(100);
         CloseableHttpClient httpclient = HttpClients.custom()

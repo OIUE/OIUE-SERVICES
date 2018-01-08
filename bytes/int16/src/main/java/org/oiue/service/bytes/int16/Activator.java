@@ -12,7 +12,7 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 public class Activator extends FrameActivator {
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         this.start(new MulitServiceTrackerCustomizer() {
             private final static String type = "int";
             private BytesDecodeEncoded intService;
@@ -40,5 +40,5 @@ public class Activator extends FrameActivator {
     }
 
     @Override
-    public void stop() throws Exception {}
+    public void stop()  {}
 }
