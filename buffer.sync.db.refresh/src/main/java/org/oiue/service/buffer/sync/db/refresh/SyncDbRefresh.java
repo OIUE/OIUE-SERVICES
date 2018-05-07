@@ -27,14 +27,14 @@ public class SyncDbRefresh implements Task {
 	private SqlService sqlService;
 	private Logger logger;
 	private List<String> jobNameList = new ArrayList<String>();
-
+	
 	public SyncDbRefresh(BufferService bufferService, TaskService quartzService, SqlService sqlService, LogService logService) {
 		this.bufferService = bufferService;
 		this.quartzService = quartzService;
 		this.sqlService = sqlService;
 		this.logger = logService.getLogger(this.getClass());
 	}
-
+	
 	@SuppressWarnings("rawtypes")
 	public void updateProps(Dictionary props) {
 		logger.info("update property, props = " + props);
@@ -42,44 +42,43 @@ public class SyncDbRefresh implements Task {
 			logger.error("property is null, please check configure file");
 			return;
 		}
-
+		
 		for (String jobName : jobNameList) {
 			quartzService.unregister(jobName);
 		}
 		jobNameList.clear();
-
+		
 		for (String refresh : ((String) props.get("refresh")).split(",")) {
 			refresh = refresh.trim();
 			String quartz = (String) props.get("refresh." + refresh + ".quartz");
 			String sql = (String) props.get("refresh." + refresh + ".sql");
 			String incrementReference = (String) props.get("refresh." + refresh + ".increment.reference");
 			String incrementSql = (String) props.get("refresh." + refresh + ".increment.sql");
-
+			
 			if ((quartz == null) || (sql == null)) {
-				logger.warn("refresh configure error, refresh = " + refresh + ", quartz = " + quartz + ", sql = " + sql + ", increment.reference = " + incrementReference + ", increment.sql = "
-						+ incrementSql);
+				logger.warn("refresh configure error, refresh = " + refresh + ", quartz = " + quartz + ", sql = " + sql + ", increment.reference = " + incrementReference + ", increment.sql = " + incrementSql);
 				continue;
 			}
-
+			
 			Map job = new HashMap<>();
-			job.put("Name",refresh);
-			job.put("Quartz",quartz);
-			job.put("sql",sql);
-
+			job.put("Name", refresh);
+			job.put("Quartz", quartz);
+			job.put("sql", sql);
+			
 			if (incrementReference != null) {
 				String[] tmp = incrementReference.split(",");
 				for (int i = 0; i < tmp.length; i++) {
 					tmp[i] = tmp[i].trim();
 				}
-				job.put("IncrementReference",tmp);
+				job.put("IncrementReference", tmp);
 			}
-
+			
 			if (incrementSql != null) {
-				job.put("IncrementSql",incrementSql.trim());
+				job.put("IncrementSql", incrementSql.trim());
 			}
-
+			
 			String jobName = this.getClass().getName() + "_" + refresh;
-			if (quartzService.registerCron(jobName, quartz , this, job)) {
+			if (quartzService.registerCron(jobName, quartz, this, job)) {
 				jobNameList.add(jobName);
 				logger.info("create refresh job successed, job = " + job);
 			} else {
@@ -87,7 +86,7 @@ public class SyncDbRefresh implements Task {
 			}
 		}
 	}
-
+	
 	public void shutdown() {
 		logger.info("shutdown");
 		for (String jobName : jobNameList) {
@@ -95,20 +94,20 @@ public class SyncDbRefresh implements Task {
 		}
 		jobNameList.clear();
 	}
-
+	
 	public Object max(Object a, Object b) {
 		if ((a == null) && (b == null)) {
 			return null;
 		}
-
+		
 		if (a == null) {
 			return b;
 		}
-
+		
 		if (b == null) {
 			return a;
 		}
-
+		
 		if (a instanceof Number) {
 			if (((Number) a).doubleValue() > ((Number) b).doubleValue()) {
 				return a;
@@ -136,10 +135,10 @@ public class SyncDbRefresh implements Task {
 		}
 		return b;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private void processRefreshJob(Map job) {
-
+		
 		String sql = null;
 		List<Object> params = null;
 		if (job.get("IncrementReference") == null) {
@@ -153,9 +152,9 @@ public class SyncDbRefresh implements Task {
 				params = Arrays.asList(incrementReferenceValue);
 			}
 		}
-
+		
 		// sql = buffer_name,[s,p,r],[o,m,s][v],[data_source],[sql]
-
+		
 		String args[] = sql.split(",", 5);
 		String bufferName = args[0].trim();
 		boolean isPut = args[1].equalsIgnoreCase("p");
@@ -163,39 +162,39 @@ public class SyncDbRefresh implements Task {
 		String bufferValueKey = (args[2].trim().length() >= 2 ? args[2].trim().substring(1, 2) : null);
 		String alias = args[3].trim();
 		String sqlString = args[4].trim();
-
+		
 		String swapBufferName = null;
 		if (isSwap == true) {
 			isPut = true;
 			swapBufferName = bufferName;
 			bufferName = bufferName + "_" + UUID.randomUUID().toString().replace("-", "");
 		}
-
+		
 		if (args.length != 5) {
 			logger.error("refresh format error, refresh = " + job.get("Name"));
 			return;
 		}
-
+		
 		if (logger.isDebugEnabled()) {
-			logger.debug("runing refresh, refresh = " +  job.get("Name"));
+			logger.debug("runing refresh, refresh = " + job.get("Name"));
 		}
-
+		
 		Type bufferType;
 		switch (args[2].trim().charAt(0)) {
-		case 'o':
-			bufferType = Type.KeyToOne;
-			break;
-		case 'm':
-			bufferType = Type.KeyToMany;
-			break;
-		case 's':
-			bufferType = Type.KeyToSpatial;
-			break;
-		default:
-			logger.error("sync action error, refresh = " +  job.get("Name"));
-			return;
+			case 'o':
+				bufferType = Type.KeyToOne;
+				break;
+			case 'm':
+				bufferType = Type.KeyToMany;
+				break;
+			case 's':
+				bufferType = Type.KeyToSpatial;
+				break;
+			default:
+				logger.error("sync action error, refresh = " + job.get("Name"));
+				return;
 		}
-
+		
 		SqlServiceResult result = sqlService.selectMap(alias, sqlString, params);
 		if (!result.getResult()) {
 			if (logger.isDebugEnabled()) {
@@ -203,7 +202,7 @@ public class SyncDbRefresh implements Task {
 				return;
 			}
 		}
-
+		
 		List<Map<String, Object>> records = (List<Map<String, Object>>) result.getData();
 		String incrementReference[] = (String[]) job.get("IncrementReference");
 		Object tmpIncrementReferenceValue[] = null;
@@ -216,7 +215,7 @@ public class SyncDbRefresh implements Task {
 					tmpIncrementReferenceValue[i] = max(tmpIncrementReferenceValue[i], MapUtil.get(record, incrementReference[i]));
 				}
 			}
-
+			
 			if (isPut == true) {
 				if (bufferType == Type.KeyToSpatial) {
 					if (record.containsKey("x")) {
@@ -249,7 +248,7 @@ public class SyncDbRefresh implements Task {
 		if (incrementReference != null) {
 			Object[] incrementReferenceValue = (Object[]) job.get("IncrementReferenceValue");
 			if (incrementReferenceValue == null) {
-				job.put("IncrementReferenceValue",tmpIncrementReferenceValue);
+				job.put("IncrementReferenceValue", tmpIncrementReferenceValue);
 			} else {
 				for (int i = 0; i < incrementReferenceValue.length; i++) {
 					incrementReferenceValue[i] = max(tmpIncrementReferenceValue[i], incrementReferenceValue[i]);
@@ -259,13 +258,13 @@ public class SyncDbRefresh implements Task {
 				logger.debug("update increment reference value, reference = " + Arrays.toString((String[]) job.get("IncrementReference")) + ", value = " + Arrays.toString((Object[]) job.get("IncrementReferenceValue")));
 			}
 		}
-
+		
 		if (swapBufferName != null) {
 			bufferService.swap(swapBufferName, bufferName);
 			bufferService.remove(bufferName);
 		}
 	}
-
+	
 	@Override
 	public void execute(Map context) {
 		try {

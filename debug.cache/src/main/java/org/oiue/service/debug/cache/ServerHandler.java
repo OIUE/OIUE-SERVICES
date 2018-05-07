@@ -12,14 +12,14 @@ import org.oiue.tools.map.MapUtil;
 
 public class ServerHandler implements Handler {
 	private CacheScriptService cacheScript = null;
-
+	
 	public ServerHandler(CacheScriptService cacheScript) {
 		this.cacheScript = cacheScript;
 	}
-
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void received(Session session, String line, byte[] bytes)  {
+	public void received(Session session, String line, byte[] bytes) {
 		if ("help".equals(line)) {
 			session.write("po cache,name,key,value");
 			session.write("poj cache,name,key,value");
@@ -27,7 +27,7 @@ public class ServerHandler implements Handler {
 			session.write("pmj cache,name,key,value");
 			session.write("ps cache,name,key,x,y,value");
 			session.write("pt cache,name,key,parentKey,value");
-
+			
 			session.write("rc cache");
 			session.write("rb cache,name");
 			session.write("ro cache,name,key");
@@ -36,7 +36,7 @@ public class ServerHandler implements Handler {
 			session.write("rs cache,name,key");
 			session.write("rr cache,oneToManyName,key,name");
 			session.write("rr cache,oneToManyName,key,removeOneToManyName,reomveKey");
-
+			
 			session.write("gb cache,name");
 			session.write("go cache,name,key");
 			session.write("gm cache,name,key");
@@ -46,50 +46,49 @@ public class ServerHandler implements Handler {
 			session.write("gr cache,oneToManyName,key,name");
 			session.write("gr cache,oneToManyName,key,name,x1,x2,y1,y2");
 			session.write("gr cache,oneToManyName,key,name,x1,x2,y1,y2,dx,dy");
-
-		} else
-			if (line.startsWith("o")) {
-				session.write("o");
-				session.close();
-			} else if (line.startsWith("k")) {
-				session.write("k");
+			
+		} else if (line.startsWith("o")) {
+			session.write("o");
+			session.close();
+		} else if (line.startsWith("k")) {
+			session.write("k");
+		} else {
+			CacheScriptResult result = cacheScript.eval(line);
+			if (result.getResult() != CacheScriptResult.OK) {
+				session.write(result.getResult());
 			} else {
-				CacheScriptResult result = cacheScript.eval(line);
-				if (result.getResult() != CacheScriptResult.OK) {
-					session.write(result.getResult());
+				Object data = result.getData();
+				if (data instanceof List) {
+					session.write(ListUtil.toString((List) data));
+				} else if (data instanceof Map) {
+					session.write(MapUtil.toString((Map) data));
 				} else {
-					Object  data=result.getData();
-					if(data instanceof List){
-						session.write(ListUtil.toString((List)data));
-					}else if(data instanceof Map){
-						session.write(MapUtil.toString((Map) data));
-					}else{
-						session.write(data+"");
-					}
+					session.write(data + "");
 				}
 			}
+		}
 	}
-
+	
 	@Override
-	public void closed(Session session)  {
-
+	public void closed(Session session) {
+		
 	}
-
+	
 	@Override
-	public void opened(Session session)  {
-
+	public void opened(Session session) {
+		
 	}
-
+	
 	@Override
-	public void idled(Session session)  {
+	public void idled(Session session) {
 		session.close();
 	}
-
+	
 	@Override
-	public void sent(Session session)  {
-
+	public void sent(Session session) {
+		
 	}
-
+	
 	@Override
 	public int getReaderIdleCount() {
 		return 0;

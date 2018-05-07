@@ -21,6 +21,7 @@ import org.oiue.service.online.OnlineService;
 import org.oiue.service.permission.PermissionConstant;
 import org.oiue.service.permission.PermissionServiceManager;
 import org.oiue.tools.StatusResult;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.map.MapUtil;
 import org.oiue.tools.string.StringUtil;
 
@@ -36,7 +37,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 	private AuthServiceManager authService = null;
 	private PermissionServiceManager permissionService = null;
 	private ActionService actionService = null;
-
+	
 	public AuthFilterServiceImpl(LogService logService, OnlineService onlineService, PermissionServiceManager permissionService, AuthServiceManager authService, ActionService actionService) {
 		logger = logService.getLogger(this.getClass());
 		this.authService = authService;
@@ -44,7 +45,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		this.actionService = actionService;
 		this.onlineService = onlineService;
 	}
-
+	
 	public void updated(Dictionary dict) {
 		try {
 			unFilter_modulename = new ArrayList<String>();
@@ -70,15 +71,15 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		}
 		actionService.registerActionFilter("authFilter", this, 1);
 	}
-
+	
 	@Override
 	public StatusResult doFilter(Map per) {
 		String modulename = MapUtil.getString(per, "modulename");
 		String token = MapUtil.getString(per, "token");
-
+		
 		modulename = modulename == null ? "" : modulename.trim();
 		token = StringUtil.isEmptys(token) ? null : token.trim();
-
+		
 		StatusResult afr = new StatusResult();
 		if (modulename == null) {
 			afr.setResult(StatusResult._ncriticalAbnormal);
@@ -86,48 +87,48 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 			return afr;
 		}
 		Object data = per.get("data");
-		if(data == null){
+		if (data == null) {
 			data = new HashMap<>();
 			per.put("data", data);
 		}
 		Online online = null;
 		if (unFilter_modulename != null && unFilter_modulename.size() > 0 && unFilter_modulename.contains(modulename)) {
 			logger.info("un_Filter_modulename:" + modulename);
-			if("chat_execute".equals(modulename)){
+			if ("chat_execute".equals(modulename)) {
 				String event_id = MapUtil.getVauleMatchCase(per, "operation") + "";
-				if(unFilter_module_operation.get(modulename)!=null&&!unFilter_module_operation.get(modulename).contains(event_id)){
+				if (unFilter_module_operation.get(modulename) != null && !unFilter_module_operation.get(modulename).contains(event_id)) {
 					afr.setResult(StatusResult._permissionDenied);
 					return afr;
 				}
 				Map tmp = new HashMap<>();
-				tmp.put("serviceName","org.oiue.service.event.execute.EventExecuteService");
+				tmp.put("serviceName", "org.oiue.service.event.execute.EventExecuteService");
 				tmp.put("methodName", "execute");
-				tmp.put("component_instance_event_id",null);
+				tmp.put("component_instance_event_id", null);
 				tmp.put("service_event_id", event_id);
-
+				
 				per.put(PermissionConstant.permission_key, tmp);
 				afr.setResult(StatusResult._SUCCESS_CONTINUE);
 				return afr;
-			}else
+			} else
 				return permissionService.convert(per);
 		} else if (token == null || "login".equals(modulename)) {
-
+			
 			if (!StringUtil.isEmptys(token) && onlineService.isOnlineByToken(token)) {
 				online = onlineService.getOnlineByToken(token);
-				((Map)data).clear();
-				((Map)data).put("tokenid", online.getTokenId());
+				((Map) data).clear();
+				((Map) data).put("tokenid", online.getTokenId());
 				afr.setResult(StatusResult._SUCCESS_OVER);
 				afr.setDescription("login success");
 				return afr;
-			} else if("login".equals(modulename)||StringUtil.isTrue(MapUtil.getString(per, "auto_login","n"))){
-				online = authService.login(((Map)data));
-
+			} else if ("login".equals(modulename) || StringUtil.isTrue(MapUtil.getString(per, "auto_login", "n"))) {
+				online = authService.login(((Map) data));
+				
 				if (online == null || StringUtil.isEmptys(online.getTokenId())) {
 					afr.setResult(StatusResult._ncriticalAbnormal);
 					afr.setDescription(online == null ? "error login, please login again " : online.getO() + "");
 					return afr;
 				}
-
+				
 				onlineService.putOnline(online.getTokenId(), online);
 				per.put("data", online.getUser());
 				per.put("token", online.getToken());
@@ -136,13 +137,14 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 					afr.setDescription("login success");
 					return afr;
 				}
-			}else{
-				afr.setResult(StatusResult._pleaseLogin);
-				afr.setDescription("please login！");
-				return afr;
+			} else {
+//				afr.setResult(StatusResult._pleaseLogin);
+//				afr.setDescription("please login！");
+//				return afr;
+				throw new OIUEException(StatusResult._pleaseLogin, "please login！");
 			}
 			afr = permissionService.verify(per, online);
-			if (afr.getResult() < StatusResult._permissionDenied||afr.getResult()>=StatusResult._SUCCESS_CONTINUE)
+			if (afr.getResult() < StatusResult._permissionDenied || afr.getResult() >= StatusResult._SUCCESS_CONTINUE)
 				return afr;
 			return permissionService.convert(per);
 		} else if ("logout".equals(modulename)) {
@@ -153,13 +155,14 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 			return afr;
 		} else {
 			if (!onlineService.isOnlineByToken(token)) {
-				afr.setResult(StatusResult._pleaseLogin);
-				afr.setDescription("Tokenid is expired");
-				return afr;
+//				afr.setResult(StatusResult._pleaseLogin);
+//				afr.setDescription("Tokenid is expired");
+//				return afr;
+				throw new OIUEException(StatusResult._pleaseReLogin, "Tokenid is expired");
 			} else {
 				online = onlineService.getOnlineByToken(token);
 				afr = permissionService.verify(per, online);
-				if (afr.getResult() < StatusResult._permissionDenied||afr.getResult()>=StatusResult._SUCCESS_CONTINUE)
+				if (afr.getResult() < StatusResult._permissionDenied || afr.getResult() >= StatusResult._SUCCESS_CONTINUE)
 					return afr;
 				return permissionService.convert(per);
 			}

@@ -8,10 +8,9 @@ public class exp2 {
 	// if (mymath.shuixianhua(i) == true)
 	// System.out.println(i);
 	// }
-
-	public exp2() {
-	}
-
+	
+	public exp2() {}
+	
 	public void fengjie(int n) {
 		// System.out.println(">>>>>"+n);
 		for (int i = 2; i <= n / 2; i++) {
@@ -22,7 +21,7 @@ public class exp2 {
 			}
 		}
 	}
-
+	
 	public void wanshu() {
 		int s;
 		for (int i = 1; i <= 1000; i++) {
@@ -35,7 +34,7 @@ public class exp2 {
 		}
 		System.out.println();
 	}
-
+	
 	public static void main(String[] args) {
 		exp2 c = new exp2();
 		int N;
@@ -52,14 +51,14 @@ class math {
 		else
 			return f(x - 1) + f(x - 2);
 	}
-
+	
 	public boolean iszhishu(int x) {
 		for (int i = 2; i <= x / 2; i++)
 			if (x % i == 0)
 				return false;
 		return true;
 	}
-
+	
 	public boolean shuixianhua(int x) {
 		int i = 0, j = 0, k = 0;
 		i = x / 100;

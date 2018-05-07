@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>imports</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>org.oiue.service.cache.hbase</artifactId>
+	<packaging>bundle</packaging>
+	
+	<name>OIUE service for cache by hbase </name>
+	<description> bundle that cache service by hbase </description>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+		<project.dependency>hadoop-hdfs,hbase-client</project.dependency>
+		<project.import>org.osgi.framework,org.osgi.service.cm,org.oiue.service.log,org.oiue.service.osgi,org.oiue.service.cache,org.oiue.tools.string,javax.management,javax.net.ssl</project.import>
+		<project.export></project.export>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${cache.version}</version>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs -->
+       <!--  <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>2.7.4</version>
+        </dependency> -->
+        
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>2.7.4</version>
+        </dependency>
+		<!-- 
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-common</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+        https://mvnrepository.com/artifact/org.apache.hbase/hbase-protocol
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-protocol</artifactId>
+            <version>1.2.4</version>
+        </dependency> -->
+	</dependencies>
+</project>

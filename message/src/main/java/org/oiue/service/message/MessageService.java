@@ -16,25 +16,28 @@ public interface MessageService extends Serializable {
 	 * @param data
 	 * @return
 	 */
-	public StatusResult setDataBytokenId(String tokenid,Map<String,Object> data);
-
+	public StatusResult setDataBytokenId(String tokenid, Map<String, Object> data);
+	
 	/**
 	 * 向用户推送数据
 	 * @param userId
 	 * @param data
 	 * @return
 	 */
-	public StatusResult setDataByUserID(String userId,Map<String,Object> data);
+	public StatusResult setDataByUserID(String userId, Map<String, Object> data);
+	
 	/**
 	 * 向用户集推送数据
 	 * @param userIDS
 	 * @param data
 	 * @return
 	 */
-	public StatusResult setDataByUserIDS(Set userIDS,Map<String,Object> data);
-
+	public StatusResult setDataByUserIDS(Set userIDS, Map<String, Object> data);
+	
 	public StatusResult setDataByOnline(Online online, Map<String, Object> data);
+	
 	public StatusResult setDataByOnline(Online online, byte[] data);
+	
 	/**
 	 * 配置文件变更
 	 * @param props

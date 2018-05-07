@@ -7,13 +7,13 @@ import org.oiue.tools.StatusResult;
 
 @SuppressWarnings("serial")
 public class ImageCodeFilter implements ActionFilter {
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public StatusResult doFilter(Map per) {
-        StatusResult sr = new StatusResult();
-            
-        return sr;
-    }
-
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public StatusResult doFilter(Map per) {
+		StatusResult sr = new StatusResult();
+		
+		return sr;
+	}
+	
 }

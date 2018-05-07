@@ -21,9 +21,9 @@ import java.util.HashMap;
 
 public final class MimeTypes {
 	private final static MimeTypes INSTANCE = new MimeTypes();
-
+	
 	private final Map<String, String> extMap;
-
+	
 	private MimeTypes() {
 		this.extMap = new HashMap<String, String>();
 		this.extMap.put("abs", "audio/x-mpeg");
@@ -172,40 +172,40 @@ public final class MimeTypes {
 		this.extMap.put("Z", "application/x-compress");
 		this.extMap.put("z", "application/x-compress");
 		this.extMap.put("zip", "application/zip");
-
+		
 		this.extMap.put("woff", "application/font-woff");
 		this.extMap.put("ttf", "application/x-font-truetype");
 		this.extMap.put("otf", "application/x-font-opentype");
 		this.extMap.put("eot", "application/vnd.ms-fontobject");
 		this.extMap.put("svg", "application/image/svg+xml");
 	}
-
+	
 	public String getByFile(String file) {
 		if (file == null) {
 			return null;
 		}
-
+		
 		int dot = file.lastIndexOf(".");
 		if (dot < 0) {
 			return null;
 		}
-
+		
 		String ext = file.substring(dot + 1);
 		if (ext.length() < 1) {
 			return null;
 		}
-
+		
 		return getByExtension(ext);
 	}
-
+	
 	public String getByExtension(String ext) {
 		if (ext == null) {
 			return null;
 		}
-
+		
 		return this.extMap.get(ext);
 	}
-
+	
 	public static MimeTypes get() {
 		return INSTANCE;
 	}

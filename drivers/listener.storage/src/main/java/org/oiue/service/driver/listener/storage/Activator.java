@@ -11,18 +11,18 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.oiue.service.system.analyzer.AnalyzerService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private DriverListenerService driverListenerService;
 			private DriverListenerStorageServiceImpl driverListener;
-
+			
 			@Override
 			public void removedService() {
 				driverListenerService.unregisterListener(driverListener);
 			}
-
+			
 			@Override
 			public void addingService() {
 				LogService logService = getService(LogService.class);
@@ -30,18 +30,18 @@ public class Activator extends FrameActivator {
 				AnalyzerService analyzerService = getService(AnalyzerService.class);
 				CacheServiceManager cacheService = getService(CacheServiceManager.class);
 				driverListenerService = getService(DriverListenerService.class);
-
-				driverListener = new DriverListenerStorageServiceImpl(logService, iResource, analyzerService,cacheService);
+				
+				driverListener = new DriverListenerStorageServiceImpl(logService, iResource, analyzerService, cacheService);
 				driverListenerService.registerListener(driverListener);
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				driverListener.updated(props);
 			}
-		}, LogService.class, IResource.class, AnalyzerService.class, DriverListenerService.class,CacheServiceManager.class);
+		}, LogService.class, IResource.class, AnalyzerService.class, DriverListenerService.class, CacheServiceManager.class);
 	}
-
+	
 	@Override
-	public void stop()  {}
+	public void stop() {}
 }

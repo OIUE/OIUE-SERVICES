@@ -23,24 +23,24 @@ import org.oiue.tools.string.StringUtil;
 public class PermissionServiceImpl implements PermissionService, Serializable {
 	private Logger logger;
 	private FactoryService factoryService;
-
+	
 	private PermissionServiceManager permissionServiceManager;
 	private String permission_type = "def_permission";
-
+	
 	private String data_source_name = null;
 	private String event_id = "fm_system_query_component_service";
-
+	
 	public PermissionServiceImpl(LogService logService, PermissionServiceManager permissionServiceManager, FactoryService factoryService) {
 		logger = logService.getLogger(this.getClass());
 		this.permissionServiceManager = permissionServiceManager;
 		this.factoryService = factoryService;
 	}
-
+	
 	@Override
 	public void unregister() {
 		permissionServiceManager.unRegisterPermissionService(this.permission_type);
 	}
-
+	
 	public void updated(Dictionary<String, ?> props) {
 		try {
 			String permission_type = props.get("permissionKey") + "";
@@ -68,29 +68,29 @@ public class PermissionServiceImpl implements PermissionService, Serializable {
 			logger.error("config[data_source_name] is error:" + e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	public StatusResult verify(Map per, Online online) {
 		StatusResult afr = new StatusResult();
 		String modulename = MapUtil.getVauleMatchCase(per, "modulename") + "";
 		// String operation = MapUtil.getString(per, "operation");
-
+		
 		// Map data = (Map) per.get("data");
-
-		if("execute".equals(modulename)){
+		
+		if ("execute".equals(modulename)) {
 			String event_id = MapUtil.getVauleMatchCase(per, "operation") + "";
 			Map tmp = new HashMap<>();
-			tmp.put("serviceName","org.oiue.service.event.execute.EventExecuteService");
+			tmp.put("serviceName", "org.oiue.service.event.execute.EventExecuteService");
 			tmp.put("methodName", "execute");
 			tmp.put(EventField.service_event_id, event_id);
-
+			
 			per.put(PermissionConstant.permission_key, tmp);
 			afr.setResult(StatusResult._SUCCESS_CONTINUE);
-		}else
+		} else
 			afr.setResult(StatusResult._SUCCESS);
 		return afr;
 	}
-
+	
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public StatusResult convert(Map per) {
@@ -104,11 +104,11 @@ public class PermissionServiceImpl implements PermissionService, Serializable {
 			try {
 				IResource iresource = factoryService.getBmo(IResource.class.getName());
 				Object ro = iresource.callEvent(event_id, data_source_name, temp);
-				if(ro==null)
+				if (ro == null)
 					throw new RuntimeException("Data does not exist！");
 				if (ro instanceof Map) {
 					Map tmp = (Map) ro;
-					if(tmp.size()==0)
+					if (tmp.size() == 0)
 						throw new RuntimeException("Data does not exist！");
 					tmp.put("serviceName", MapUtil.getVauleMatchCase(tmp, "bundle_service_id"));
 					tmp.put("methodName", MapUtil.getVauleMatchCase(tmp, "name"));

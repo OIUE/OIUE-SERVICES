@@ -21,43 +21,45 @@ import org.pentaho.di.trans.steps.textfileinput.TextFileInputField;
 public class CsvInputStepMeta implements InputStepMeta {
 	private static final long serialVersionUID = 1L;
 	protected static Logger logger;
-
+	
 	@Override
 	public StepMeta ConvertToStepMeta(Map data, TransMeta transMeta) {
 		String instepid = "CsvInput";
-		String instepname = MapUtil.getString(data, "table","CvsInput"+System.currentTimeMillis());
+		String instepname = MapUtil.getString(data, "table", "CvsInput" + System.currentTimeMillis());
 		PluginRegistry registry = PluginRegistry.getInstance();
 		PluginInterface sp = registry.findPluginWithId(StepPluginType.class, instepid);
 		StepMetaInterface stepMetaInterface;
 		try {
 			stepMetaInterface = (StepMetaInterface) registry.loadClass(sp);
 			CsvInputMeta inputMeta = (CsvInputMeta) stepMetaInterface;
-
-			inputMeta.setFilename(EventETLServiceImpl.path+"/uploadfile/"+MapUtil.getString(data, "upload_file"));
-			inputMeta.setDelimiter( MapUtil.getString(data, "delimiter",",") );
-			inputMeta.setEncoding( MapUtil.getString(data, "charset","UTF-8") );
-			inputMeta.setEnclosure( MapUtil.getString(data, "enclosure", "\"") );
-			inputMeta.setBufferSize( "1024" );
-			inputMeta.setHeaderPresent( true );
-			inputMeta.setRunningInParallel( true );
-
+			
+			inputMeta.setFilename(EventETLServiceImpl.path + "/uploadfile/" + MapUtil.getString(data, "upload_file"));
+			inputMeta.setDelimiter(MapUtil.getString(data, "delimiter", ","));
+			inputMeta.setEncoding(MapUtil.getString(data, "charset", "UTF-8"));
+			inputMeta.setEnclosure(MapUtil.getString(data, "enclosure", "\""));
+			inputMeta.setBufferSize("1024");
+			inputMeta.setHeaderPresent(true);
+			inputMeta.setRunningInParallel(true);
+			
 			List<Map> fields;
 			fields = (List) data.get("fields");
-
-			int nrNonEmptyFields =fields.size();
-			inputMeta.allocate( nrNonEmptyFields );
-			for (int i = 0; i < nrNonEmptyFields; i++) {
-				Map field = fields.get(i);
-
-				inputMeta.getInputFields()[i] = new TextFileInputField();
-				inputMeta.getInputFields()[i].setName(MapUtil.getString(field, "name"));
-				inputMeta.getInputFields()[i].setType( MapUtil.getInt(field, "type") );
+			
+			int nrNonEmptyFields = fields.size();
+			inputMeta.allocate(nrNonEmptyFields - 1);
+			int i = 0;
+			for (Map field : fields) {
+				if (EventETLServiceImpl._system_colnum.equals(MapUtil.getString(field, "column_name"))) {} else {
+					inputMeta.getInputFields()[i] = new TextFileInputField();
+					inputMeta.getInputFields()[i].setName(MapUtil.getString(field, "name"));
+					inputMeta.getInputFields()[i].setType(MapUtil.getInt(field, "type"));
+					i++;
+				}
 			}
+			
 			return new StepMeta(instepid, instepname, stepMetaInterface);
 		} catch (KettlePluginException e) {
 			throw new RuntimeException(e);
 		}
-
+		
 	}
 }
-

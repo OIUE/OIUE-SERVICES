@@ -19,14 +19,14 @@ public class ResourceContext implements HttpContext {
 	Logger logger;
 	TemplateService templateService;
 	private String root_path;
-
+	
 	public ResourceContext(TemplateService templateService, LogService logService, HttpContext base, String root_path) {
 		this.logger = logService.getLogger(getClass());
 		this.base = base;
 		this.templateService = templateService;
 		this.root_path = root_path;
 	}
-
+	
 	@Override
 	public String getMimeType(String name) {
 		try {
@@ -34,7 +34,7 @@ public class ResourceContext implements HttpContext {
 			if (type == null) {
 				type = MimeTypes.get().getByFile(name);
 			}
-
+			
 			if (logger.isDebugEnabled()) {
 				logger.debug("ManagedContext getMimeType:" + name + ":" + type);
 			}
@@ -44,7 +44,7 @@ public class ResourceContext implements HttpContext {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public URL getResource(String path) {
 		try {
@@ -53,7 +53,7 @@ public class ResourceContext implements HttpContext {
 			}
 			if (path != null)
 				path = path.trim();
-
+			
 			URL url = new File(root_path + path).toURI().toURL();
 			return url;
 		} catch (Throwable e) {
@@ -61,7 +61,7 @@ public class ResourceContext implements HttpContext {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
@@ -82,5 +82,5 @@ public class ResourceContext implements HttpContext {
 		}
 		return true;
 	}
-
+	
 }

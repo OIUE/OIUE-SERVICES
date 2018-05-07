@@ -13,12 +13,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class JWTUtil {
 	static String key = "secret";
-
-
+	
 	public static Map decode(String token) {
 		JWTVerifier verifier;
 		try {
-			//		DecodedJWT jwt = JWT.decode(token);
+			// DecodedJWT jwt = JWT.decode(token);
 			verifier = JWT.require(Algorithm.HMAC256(key)).build();
 			DecodedJWT jwt = verifier.verify(token);
 			String dataStr = jwt.getClaim("data").asString();
@@ -30,7 +29,7 @@ public class JWTUtil {
 		}
 		return null;
 	}
-
+	
 	public static String decodeTokenId(String token) {
 		JWTVerifier verifier;
 		try {
@@ -44,7 +43,7 @@ public class JWTUtil {
 		}
 		return null;
 	}
-
+	
 	public static String encode(String tokenId, Date notBefore, Date expires, Map data) {
 		Algorithm algorithm;
 		String token = null;

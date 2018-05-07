@@ -5,11 +5,10 @@ import java.util.Map;
 
 import org.oiue.service.online.Online;
 
-
 @SuppressWarnings("rawtypes")
 public interface AuthService extends Serializable {
-    Online login(Map per);
-
+	Online login(Map per);
+	
 	boolean logout(Map per);
 	
 	void unregister();

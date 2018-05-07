@@ -7,5 +7,5 @@ import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.StepMeta;
 
 public interface InputStepMeta extends Serializable {
-	StepMeta ConvertToStepMeta(Map data,TransMeta transMeta);
+	StepMeta ConvertToStepMeta(Map data, TransMeta transMeta);
 }

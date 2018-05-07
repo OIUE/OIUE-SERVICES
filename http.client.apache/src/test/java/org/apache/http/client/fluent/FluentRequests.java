@@ -26,34 +26,33 @@
  */
 package org.apache.http.client.fluent;
 
-
 /**
  * This example demonstrates basics of request execution with the HttpClient fluent API.
  */
 public class FluentRequests {
-
-    public static void main(String[] args) {
-//        // Execute a GET with timeout settings and return response content as String.
-//        Request.Get("http://somehost/")
-//                .connectTimeout(1000)
-//                .socketTimeout(1000)
-//                .execute().returnContent().asString();
-//
-//        // Execute a POST with the 'expect-continue' handshake, using HTTP/1.1,
-//        // containing a request body as String and return response content as byte array.
-//        Request.Post("http://somehost/do-stuff")
-//                .useExpectContinue()
-//                .version(HttpVersion.HTTP_1_1)
-//                .bodyString("Important stuff", ContentType.DEFAULT_TEXT)
-//                .execute().returnContent().asBytes();
-//
-//        // Execute a POST with a custom header through the proxy containing a request body
-//        // as an HTML form and save the result to the file
-//        Request.Post("http://somehost/some-form")
-//                .addHeader("X-Custom-header", "stuff")
-//                .viaProxy(new HttpHost("myproxy", 8080))
-//                .bodyForm(Form.form().add("username", "vip").add("password", "secret").build())
-//                .execute().saveContent(new File("result.dump"));
-    }
-
+	
+	public static void main(String[] args) {
+		// // Execute a GET with timeout settings and return response content as String.
+		// Request.Get("http://somehost/")
+		// .connectTimeout(1000)
+		// .socketTimeout(1000)
+		// .execute().returnContent().asString();
+		//
+		// // Execute a POST with the 'expect-continue' handshake, using HTTP/1.1,
+		// // containing a request body as String and return response content as byte array.
+		// Request.Post("http://somehost/do-stuff")
+		// .useExpectContinue()
+		// .version(HttpVersion.HTTP_1_1)
+		// .bodyString("Important stuff", ContentType.DEFAULT_TEXT)
+		// .execute().returnContent().asBytes();
+		//
+		// // Execute a POST with a custom header through the proxy containing a request body
+		// // as an HTML form and save the result to the file
+		// Request.Post("http://somehost/some-form")
+		// .addHeader("X-Custom-header", "stuff")
+		// .viaProxy(new HttpHost("myproxy", 8080))
+		// .bodyForm(Form.form().add("username", "vip").add("password", "secret").build())
+		// .execute().saveContent(new File("result.dump"));
+	}
+	
 }

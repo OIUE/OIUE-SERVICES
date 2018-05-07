@@ -27,13 +27,13 @@ import org.oiue.tools.string.StringUtil;
 public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 	private OnlineService onlineService = null;
 	private FactoryService factoryService;
-
+	
 	public AuthFilterServiceImpl(LogService logService, OnlineService onlineService, ActionService actionService, FactoryService factoryService) {
 		this.onlineService = onlineService;
 		this.factoryService = factoryService;
 		actionService.registerActionFilter("debugAuthFilter", this, 0);
 	}
-
+	
 	@Override
 	public StatusResult doFilter(Map per) {
 		String tokenid = MapUtil.getString(per, "tokenid");
@@ -41,17 +41,17 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		if (per.containsKey("auto_login")) {
 			auto_login = StringUtil.isTrue(MapUtil.getString(per, "auto_login"));
 		}
-
+		
 		tokenid = StringUtil.isEmptys(tokenid) ? null : tokenid.trim();
-
+		
 		StatusResult afr = new StatusResult();
 		Online online = null;
-
+		
 		try {
 			IResource iresource = factoryService.getBmo(IResource.class.getName());
-
+			
 			if (!StringUtil.isEmptys(tokenid) && !onlineService.isOnlineByToken(tokenid)) {
-
+				
 				if (auto_login) {
 					if ("17f3f93a-4580-11e5-b785-fa163e6f7961".equals(tokenid)) {
 						String uid = "88888888";
@@ -69,7 +69,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 						online.setUser(map);
 						online.setUser_id(map.get("user_id") + "");
 						online.setUser_name(map.get("user_name") + "");
-
+						
 						onlineService.putOnline(online.getTokenId(), online);
 					} else {
 						String uid = "88888888";
@@ -89,7 +89,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 						online.setUser(map);
 						online.setUser_id(map.get("user_id") + "");
 						online.setUser_name(map.get("user_name") + "");
-
+						
 						onlineService.putOnline(online.getTokenId(), online);
 					}
 				}

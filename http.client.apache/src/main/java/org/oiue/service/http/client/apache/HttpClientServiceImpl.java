@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +20,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,14 +41,14 @@ import org.oiue.tools.string.StringUtil;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class HttpClientServiceImpl implements HttpClientService {
-
+	
 	Logger logger;
 	public static final int cache = 10 * 1024;
-
+	
 	public HttpClientServiceImpl(LogService logService) {
 		logger = logService.getLogger(this.getClass());
 	}
-
+	
 	@Override
 	public Map getPostData(String url, Map<String, String> para) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -62,12 +60,12 @@ public class HttpClientServiceImpl implements HttpClientService {
 					List pl = new ArrayList();
 					for (Iterator iterator = para.keySet().iterator(); iterator.hasNext();) {
 						String key = (String) iterator.next();
-
+						
 						Object ov = para.get(key);
 						if (ov instanceof Integer) {
 							ov = String.valueOf(ov);
 						}
-
+						
 						pl.add(new BasicNameValuePair(key, ov + ""));
 					}
 					httppost.setEntity(new UrlEncodedFormEntity(pl));
@@ -95,7 +93,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						// end 读取整个页面内容
 						returnMap.put("data", buffer.toString());
 					}
-
+					
 				}
 				// 如果失败
 				else {
@@ -106,7 +104,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						returnMap.put(header.getName(), header.getValue());
 					}
 				}
-
+				
 			} finally {
 				response.close();
 			}
@@ -121,7 +119,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 		}
 		return returnMap;
 	}
-
+	
 	@Override
 	public Map httpDownload(String url, Map<String, String> para, String path) {
 		if (!StringUtil.isEmptys(path)) {
@@ -133,7 +131,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public Map<?, ?> getGetData(String url) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -159,7 +157,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						// end 读取整个页面内容
 						returnMap.put("data", buffer.toString());
 					}
-
+					
 				}
 				// 如果失败
 				else {
@@ -170,23 +168,22 @@ public class HttpClientServiceImpl implements HttpClientService {
 						returnMap.put(header.getName(), header.getValue());
 					}
 				}
-
+				
 			} finally {
 				response.close();
 			}
-		}catch (Exception e) {
-			throw new OIUEException(StatusResult._conn_error, url,e);
+		} catch (Throwable e) {
+			throw new OIUEException(StatusResult._conn_error, url, e);
 		} finally {
 			try {
 				httpclient.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return returnMap;
 	}
-
+	
 	@Override
 	public Map<?, ?> getGetData(String url, Map<String, String> para) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -197,14 +194,14 @@ public class HttpClientServiceImpl implements HttpClientService {
 				if (para != null) {
 					for (Iterator iterator = para.keySet().iterator(); iterator.hasNext();) {
 						String key = (String) iterator.next();
-
+						
 						Object ov = para.get(key);
 						if (ov instanceof Integer) {
 							ov = String.valueOf(ov);
 						}
 						rb.addParameter(key, ov + "");
 					}
-
+					
 				}
 			} catch (Throwable e) {
 				throw new RuntimeException("para=" + para, e);
@@ -229,7 +226,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						// end 读取整个页面内容
 						returnMap.put("data", buffer.toString());
 					}
-
+					
 				}
 				// 如果失败
 				else {
@@ -240,12 +237,12 @@ public class HttpClientServiceImpl implements HttpClientService {
 						returnMap.put(header.getName(), header.getValue());
 					}
 				}
-
+				
 			} finally {
 				response.close();
 			}
 		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, url,e);
+			throw new OIUEException(StatusResult._conn_error, url, e);
 		} finally {
 			try {
 				httpclient.close();
@@ -255,7 +252,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 		}
 		return returnMap;
 	}
-
+	
 	@Override
 	public Map<?, ?> getGetData(String url, Object object) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -281,7 +278,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						// end 读取整个页面内容
 						returnMap.put("data", buffer.toString());
 					}
-
+					
 				}
 				// 如果失败
 				else {
@@ -292,23 +289,22 @@ public class HttpClientServiceImpl implements HttpClientService {
 						returnMap.put(header.getName(), header.getValue());
 					}
 				}
-
+				
 			} finally {
 				response.close();
 			}
 		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, url,e);
+			throw new OIUEException(StatusResult._conn_error, url, e);
 		} finally {
 			try {
 				httpclient.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return returnMap;
 	}
-
+	
 	@Override
 	public Map<?, ?> getPostData(String url, String str) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -340,7 +336,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						// end 读取整个页面内容
 						returnMap.put("data", buffer.toString());
 					}
-
+					
 				}
 				// 如果失败
 				else {
@@ -351,23 +347,22 @@ public class HttpClientServiceImpl implements HttpClientService {
 						returnMap.put(header.getName(), header.getValue());
 					}
 				}
-
+				
 			} finally {
 				response.close();
 			}
 		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, url,e);
+			throw new OIUEException(StatusResult._conn_error, url, e);
 		} finally {
 			try {
 				httpclient.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return returnMap;
 	}
-
+	
 	@Override
 	public Map<?, ?> getPostDataByJson(String url, String str) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -409,7 +404,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 						// end 读取整个页面内容
 						returnMap.put("data", isjson ? JSONUtil.parserStrToMap(buffer.toString().replace("\\\"", "\"")) : buffer.toString());
 					}
-
+					
 				}
 				// 如果失败
 				else {
@@ -420,23 +415,22 @@ public class HttpClientServiceImpl implements HttpClientService {
 						returnMap.put(header.getName(), header.getValue());
 					}
 				}
-
+				
 			} finally {
 				response.close();
 			}
 		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, url,e);
+			throw new OIUEException(StatusResult._conn_error, url, e);
 		} finally {
 			try {
 				httpclient.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return returnMap;
 	}
-
+	
 	@SuppressWarnings("unused")
 	@Override
 	public String download(String url, String filepath) {
@@ -475,7 +469,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 			throw new OIUEException(StatusResult._conn_error, url, e);
 		}
 	}
-
+	
 	/**
 	 * 获取response header中Content-Disposition中的filename值
 	 * @param response
@@ -505,7 +499,7 @@ public class HttpClientServiceImpl implements HttpClientService {
 		}
 		return filename;
 	}
-
+	
 	/**
 	 * 获取随机文件名
 	 * @return
@@ -513,5 +507,5 @@ public class HttpClientServiceImpl implements HttpClientService {
 	public static String getRandomFileName() {
 		return String.valueOf(System.currentTimeMillis());
 	}
-
+	
 }

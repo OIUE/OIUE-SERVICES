@@ -7,11 +7,12 @@ import org.oiue.service.log.Logger;
 
 @SuppressWarnings("serial")
 public class EventSystemTimeServiceImpl implements EventSystemTimeService {
-
-    protected static Logger logger;
-    @SuppressWarnings({ "rawtypes"})
-    @Override
-    public Object getTime(Map data, Map event, String tokenid) {
-        return System.currentTimeMillis()/1000;
-    }
+	
+	protected static Logger logger;
+	
+	@SuppressWarnings({ "rawtypes" })
+	@Override
+	public Object getTime(Map data, Map event, String tokenid) {
+		return System.currentTimeMillis() / 1000;
+	}
 }

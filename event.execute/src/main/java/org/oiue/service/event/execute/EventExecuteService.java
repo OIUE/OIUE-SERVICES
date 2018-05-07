@@ -6,6 +6,7 @@ import java.util.Map;
 
 @SuppressWarnings("rawtypes")
 public interface EventExecuteService extends Serializable {
-	Object execute(Map data,Map event,String tokenid);
-	Object execute(List data,Map event,String tokenid);
+	Object execute(Map data, Map event, String tokenid);
+	
+	Object execute(List data, Map event, String tokenid);
 }

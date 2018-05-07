@@ -8,7 +8,9 @@ import org.oiue.tools.StatusResult;
 
 @SuppressWarnings("rawtypes")
 public interface PermissionService extends Serializable {
-    StatusResult verify(Map per,Online online);
-    StatusResult convert(Map per);
-    void unregister();
+	StatusResult verify(Map per, Online online);
+	
+	StatusResult convert(Map per);
+	
+	void unregister();
 }

@@ -20,20 +20,21 @@ import org.oiue.service.odp.base.FactoryService;
 import org.oiue.service.odp.res.api.IResource;
 import org.oiue.service.template.TemplateService;
 
-public class TemplateVisit implements Visit{
+public class TemplateVisit implements Visit {
 	private static final long serialVersionUID = 1L;
 	private FactoryService factoryService;
 	private CacheServiceManager cacheService;
 	private TemplateService templateService;
-
-	public TemplateVisit(FactoryService factoryService, CacheServiceManager cacheService,TemplateService templateService,LogService logService) {
+	
+	public TemplateVisit(FactoryService factoryService, CacheServiceManager cacheService, TemplateService templateService, LogService logService) {
 		this.factoryService = factoryService;
 		this.cacheService = cacheService;
 		this.templateService = templateService;
 		this.logger = logService.getLogger(getClass());
 	}
+	
 	private Logger logger;
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void visit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -42,8 +43,8 @@ public class TemplateVisit implements Visit{
 		try {
 			data = (Map) map.get("data");
 		} catch (Exception e) {}
-		if(data == null)
-			data=new HashMap<>();
+		if (data == null)
+			data = new HashMap<>();
 		
 		Enumeration<String> attributeNames = request.getAttributeNames();
 		while (attributeNames.hasMoreElements()) {
@@ -53,15 +54,15 @@ public class TemplateVisit implements Visit{
 		
 		String domain = (String) request.getAttribute("domain");
 		String resName = (String) request.getAttribute("resName");
-		String resNameK = domain+":"+resName;
-
+		String resNameK = domain + ":" + resName;
+		
 		response.setCharacterEncoding("UTF-8");
-		if (cacheService.contains("system_template",resNameK)) {
+		if (cacheService.contains("system_template", resNameK)) {
 			Map parameter = new HashMap<>();
 			parameter.put("token", map.get("token"));
 			parameter.put("user_name", request.getAttribute("user_name"));
 			parameter.put("login_name", request.getAttribute("login_name"));
-
+			
 			Map menu = (Map) cacheService.get("system_menu", resNameK);
 			Map events = new HashMap<>();
 			try {
@@ -117,13 +118,13 @@ public class TemplateVisit implements Visit{
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
-
+			
 			try {
 				LinkedList<Map.Entry<String, String>> tempList = new LinkedList<Map.Entry<String, String>>();
 				tempList.addAll(events.entrySet());
 				ListIterator<Map.Entry<String, String>> itor = tempList.listIterator();
 				Map.Entry entry = null;
-
+				
 				while (itor.hasNext()) {
 					entry = itor.next();
 					IResource iresource = factoryService.getBmo(IResource.class.getName());
@@ -137,16 +138,15 @@ public class TemplateVisit implements Visit{
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
-
+			
 			try {
 				parameter.put("resName", resName);
 				this.templateService.render(request, response, parameter);
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
-			} finally {
-			}
+			} finally {}
 			return;
-		}else{
+		} else {
 			logger.warn("找不到模板配置！");
 			this.templateService.render(request, response, new HashMap<>());
 		}

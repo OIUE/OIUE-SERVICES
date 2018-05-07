@@ -44,64 +44,57 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 /**
- * A example that demonstrates how HttpClient APIs can be used to perform
- * form-based logon.
+ * A example that demonstrates how HttpClient APIs can be used to perform form-based logon.
  */
 public class ClientFormLogin {
-
-    public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException  {
-        BasicCookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCookieStore(cookieStore)
-                .build();
-        try {
-            HttpGet httpget = new HttpGet("https://someportal/");
-            CloseableHttpResponse response1 = httpclient.execute(httpget);
-            try {
-                HttpEntity entity = response1.getEntity();
-
-                System.out.println("Login form get: " + response1.getStatusLine());
-                EntityUtils.consume(entity);
-
-                System.out.println("Initial set of cookies:");
-                List<Cookie> cookies = cookieStore.getCookies();
-                if (cookies.isEmpty()) {
-                    System.out.println("None");
-                } else {
-                    for (int i = 0; i < cookies.size(); i++) {
-                        System.out.println("- " + cookies.get(i).toString());
-                    }
-                }
-            } finally {
-                response1.close();
-            }
-
-            HttpUriRequest login = RequestBuilder.post()
-                    .setUri(new URI("https://someportal/"))
-                    .addParameter("IDToken1", "username")
-                    .addParameter("IDToken2", "password")
-                    .build();
-            CloseableHttpResponse response2 = httpclient.execute(login);
-            try {
-                HttpEntity entity = response2.getEntity();
-
-                System.out.println("Login form get: " + response2.getStatusLine());
-                EntityUtils.consume(entity);
-
-                System.out.println("Post logon cookies:");
-                List<Cookie> cookies = cookieStore.getCookies();
-                if (cookies.isEmpty()) {
-                    System.out.println("None");
-                } else {
-                    for (int i = 0; i < cookies.size(); i++) {
-                        System.out.println("- " + cookies.get(i).toString());
-                    }
-                }
-            } finally {
-                response2.close();
-            }
-        } finally {
-            httpclient.close();
-        }
-    }
+	
+	public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException {
+		BasicCookieStore cookieStore = new BasicCookieStore();
+		CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+		try {
+			HttpGet httpget = new HttpGet("https://someportal/");
+			CloseableHttpResponse response1 = httpclient.execute(httpget);
+			try {
+				HttpEntity entity = response1.getEntity();
+				
+				System.out.println("Login form get: " + response1.getStatusLine());
+				EntityUtils.consume(entity);
+				
+				System.out.println("Initial set of cookies:");
+				List<Cookie> cookies = cookieStore.getCookies();
+				if (cookies.isEmpty()) {
+					System.out.println("None");
+				} else {
+					for (int i = 0; i < cookies.size(); i++) {
+						System.out.println("- " + cookies.get(i).toString());
+					}
+				}
+			} finally {
+				response1.close();
+			}
+			
+			HttpUriRequest login = RequestBuilder.post().setUri(new URI("https://someportal/")).addParameter("IDToken1", "username").addParameter("IDToken2", "password").build();
+			CloseableHttpResponse response2 = httpclient.execute(login);
+			try {
+				HttpEntity entity = response2.getEntity();
+				
+				System.out.println("Login form get: " + response2.getStatusLine());
+				EntityUtils.consume(entity);
+				
+				System.out.println("Post logon cookies:");
+				List<Cookie> cookies = cookieStore.getCookies();
+				if (cookies.isEmpty()) {
+					System.out.println("None");
+				} else {
+					for (int i = 0; i < cookies.size(); i++) {
+						System.out.println("- " + cookies.get(i).toString());
+					}
+				}
+			} finally {
+				response2.close();
+			}
+		} finally {
+			httpclient.close();
+		}
+	}
 }

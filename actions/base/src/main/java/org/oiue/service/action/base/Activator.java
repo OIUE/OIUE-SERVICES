@@ -9,18 +9,18 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.oiue.service.system.analyzer.AnalyzerService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		FrameActivator tracker = this;
 		this.start(new MulitServiceTrackerCustomizer() {
 			private ActionServiceImpl actionService;
-
+			
 			@Override
 			public void removedService() {
 				actionService.unregisterAllActionFilter();
 			}
-
+			
 			@Override
 			public void addingService() {
 				LogService logService = getService(LogService.class);
@@ -28,16 +28,16 @@ public class Activator extends FrameActivator {
 				actionService = new ActionServiceImpl(logService, analyzerService, tracker);
 				registerService(ActionService.class, actionService);
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				actionService.updated(props);
 			}
 		}, LogService.class, AnalyzerService.class);
 	}
-
+	
 	@Override
-	public void stop()  {
-
+	public void stop() {
+		
 	}
 }

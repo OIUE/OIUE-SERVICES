@@ -21,24 +21,24 @@ import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/";
 			private HttpService httpService;
-
+			
 			private ResourceServlet servlet;
 			private TemplateService templateService;
 			private LogService logService;
 			private HttpContext httpContext;
 			private Logger log;
-
+			
 			@Override
 			public void removedService() {
 				httpService.unregister(url);
 			}
-
+			
 			@Override
 			public void addingService() {
 				httpService = getService(HttpService.class);
@@ -47,11 +47,11 @@ public class Activator extends FrameActivator {
 				FactoryService factoryService = getService(FactoryService.class);
 				CacheServiceManager cacheService = getService(CacheServiceManager.class);
 				OnlineService onlineService = getService(OnlineService.class);
-
+				
 				log = logService.getLogger(this.getClass());
-				servlet = new ResourceServlet(cacheService, onlineService, factoryService, logService,templateService, httpService);
+				servlet = new ResourceServlet(cacheService, onlineService, factoryService, logService, templateService, httpService);
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				try {
@@ -60,57 +60,57 @@ public class Activator extends FrameActivator {
 					httpContext = new ResourceContext(templateService, logService, httpService.createDefaultHttpContext(), (String) props.get("root_path"));
 					httpService.registerServlet(url, servlet, props, httpContext);
 					httpService.registerServlet("/storefront/track", new Servlet() {
-
+						
 						@Override
 						public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
 							log.debug(req.toString());
 						}
-
+						
 						@Override
 						public void init(ServletConfig config) throws ServletException {
-
+						
 						}
-
+						
 						@Override
 						public String getServletInfo() {
 							return null;
 						}
-
+						
 						@Override
 						public ServletConfig getServletConfig() {
 							return null;
 						}
-
+						
 						@Override
 						public void destroy() {
-
+							
 						}
 					}, null, null);
 					httpService.registerServlet("/storefront/page", new Servlet() {
-
+						
 						@Override
 						public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
 							log.debug(req.toString());
 						}
-
+						
 						@Override
 						public void init(ServletConfig config) throws ServletException {
-
+							
 						}
-
+						
 						@Override
 						public String getServletInfo() {
 							return null;
 						}
-
+						
 						@Override
 						public ServletConfig getServletConfig() {
 							return null;
 						}
-
+						
 						@Override
 						public void destroy() {
-
+							
 						}
 					}, null, null);
 				} catch (Exception e) {
@@ -119,7 +119,7 @@ public class Activator extends FrameActivator {
 			}
 		}, HttpService.class, TemplateService.class, LogService.class, FactoryService.class, OnlineService.class, CacheServiceManager.class);
 	}
-
+	
 	@Override
-	public void stop()  {}
+	public void stop() {}
 }

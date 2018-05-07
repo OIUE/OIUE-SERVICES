@@ -11,12 +11,12 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<properties>
 		<project.activator>${project.artifactId}.Activator</project.activator>
 		<project.dependency>commons-fileupload,commons-io</project.dependency>
-		<project.import>org.osgi.framework,org.osgi.service.cm,org.osgi.service.http,javax.servlet,javax.servlet.http,org.oiue.service.action.api,org.oiue.service.file.upload,org.oiue.service.log,org.oiue.service.online,org.oiue.service.osgi,org.oiue.tools,org.oiue.tools.json,org.oiue.tools.file,org.oiue.tools.string,org.oiue.tools.exception</project.import>
+		<project.import>org.oiue.tools.map,org.osgi.framework,org.osgi.service.cm,org.osgi.service.http,javax.servlet,javax.servlet.http,org.oiue.service.action.api,org.oiue.service.file.upload,org.oiue.service.log,org.oiue.service.online,org.oiue.service.osgi,org.oiue.tools,org.oiue.tools.json,org.oiue.tools.file,org.oiue.tools.string,org.oiue.tools.exception</project.import>
 	</properties>
 	<dependencies>
 		<dependency>

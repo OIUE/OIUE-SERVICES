@@ -30,13 +30,13 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 	protected String type = "local";
 	private String name = "userName";
 	private String pass = "userPass";
-
+	
 	public AuthLocalServiceImpl(LogService logService, FactoryService iresource, AuthServiceManager authServiceManager) {
 		logger = logService.getLogger(this.getClass().getName());
 		this.factoryService = iresource;
 		this.authServiceManager = authServiceManager;
 	}
-
+	
 	public void updated(Dictionary dict) {
 		try {
 			event_id = (String) dict.get("login.local.auth.eventId");
@@ -52,12 +52,12 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 			logger.error("config is error :" + dict, e);
 		}
 	}
-
+	
 	@Override
 	public void unregister() {
 		authServiceManager.unRegisterAuthService(type);
 	}
-
+	
 	@Override
 	public Online login(Map per) {
 		String username = (String) per.remove(name);
@@ -69,11 +69,11 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 			map.put("origin_name", type);
 			map.put("user_name", username);
 			map.put("password", password);
-				IResource iResource = factoryService.getBmo(IResource.class.getName());
-				map = (Map<String, Object>) iResource.callEvent(event_id, null, map);
-				if (map == null || map.size() == 0) {
-					throw new OIUEException(StatusResult._login_error,"login error,username or password is error!");
-				}
+			IResource iResource = factoryService.getBmo(IResource.class.getName());
+			map = (Map<String, Object>) iResource.callEvent(event_id, null, map);
+			if (map == null || map.size() == 0) {
+				throw new OIUEException(StatusResult._login_error, "login error,username or password is error!");
+			}
 			tokenId = UUID.randomUUID().toString().replaceAll("-", "");
 			online.setO(new ConcurrentHashMap<>());
 			online.setTokenId(tokenId);
@@ -85,10 +85,10 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 		}
 		return online;
 	}
-
+	
 	@Override
 	public boolean logout(Map per) {
 		return false;
 	}
-
+	
 }

@@ -10,14 +10,14 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
-  <repositories>
-      <repository>
-          <id>pentaho</id>
-          <url>https://public.nexus.pentaho.org/content/groups/omni/</url>
-      </repository>
-  </repositories>
+	<repositories>
+		<repository>
+			<id>pentaho</id>
+			<url>https://public.nexus.pentaho.org/content/groups/omni/</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
@@ -28,6 +28,11 @@
 			<groupId>org.oiue.services.odps</groupId>
 			<artifactId>org.oiue.service.odp.res.api</artifactId>
 			<version>${odp.res.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.structure.api</artifactId>
+			<version>${odp.structure.api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
@@ -64,6 +69,16 @@
 			<groupId>pentaho-kettle</groupId>
 			<artifactId>kettle-dbdialog</artifactId>
 			<version>${kettle-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.pentaho.di.plugins</groupId>
+			<artifactId>kettle-shapefilereader-plugin-core</artifactId>
+			<version>${kettle-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jug-lgpl</groupId>
+			<artifactId>jug-lgpl</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -134,7 +149,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
@@ -150,7 +165,7 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.2</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.neo4j.driver</groupId>
 			<artifactId>neo4j-java-driver</artifactId>
@@ -163,9 +178,9 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
-		    <groupId>org.postgresql</groupId>
-		    <artifactId>postgresql</artifactId>
-		    <version>42.1.1</version>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.1.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.postgis/postgis-jdbc -->
 		<dependency>
@@ -173,18 +188,15 @@
 			<artifactId>postgis-jdbc</artifactId>
 			<version>2.2.1</version>
 		</dependency>
-		
-		<!-- <dependency>
-			<groupId>com.mxgraph</groupId>
-			<artifactId>jgraphx</artifactId>
-			<version>3.7.2</version>
-		</dependency> -->
+
+		<!-- <dependency> <groupId>com.mxgraph</groupId> <artifactId>jgraphx</artifactId> 
+			<version>3.7.2</version> </dependency> -->
 
 		<dependency>
 			<groupId>net.sourceforge.javacsv</groupId>
 			<artifactId>javacsv</artifactId>
 			<version>2.0</version>
-		</dependency>  
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.activator>${project.artifactId}.Activator</project.activator>
@@ -193,8 +205,8 @@
 		<!-- <kettle-version>7.1.0.4-66</kettle-version> -->
 		<!-- <kettle-version>8.0-SNAPSHOT</kettle-version> -->
 		<kettle-version>8.0.0.0-28</kettle-version>
-		<project.dependency>metastore,javacsv,kettle-core,kettle-engine,encoder,kettle-dbdialog,commons-vfs2,guava,commons-logging,commons-lang,commons-io,scannotation,javassist,jackson-core,jackson-core-asl,jackson-mapper-asl,postgresql,postgis-jdbc,mysql-connector-java,neo4j-java-driver</project.dependency>
-		<project.import>org.oiue.service.event.etl,org.oiue.service.odp.event.api,org.oiue.service.odp.dmo,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.list,org.w3c.dom,org.xml.sax,javax.xml.parsers,javax.net,javax.xml.transform,javax.naming,org.oiue.service.cache;version="[1.0,2)",org.oiue.service.event.execute;version="[1.0,2)",org.oiue.service.log;version="[1.0,2)",org.oiue.service.odp.base;version="[1.0,2)",org.oiue.service.odp.res.api;version="[1.0,2)",org.oiue.service.online;version="[1.0,2)",org.oiue.service.osgi;version="[1.0,2)",org.oiue.tools.exception,org.oiue.tools,org.oiue.service.system.analyzer;version="[1.0,2)",org.oiue.tools.map;version="[1.0,2)"</project.import>
+		<project.dependency>jug-lgpl,metastore,javacsv,kettle-core,kettle-engine,encoder,kettle-dbdialog,commons-vfs2,guava,commons-logging,commons-lang,commons-io,scannotation,javassist,jackson-core,jackson-core-asl,jackson-mapper-asl,postgresql,postgis-jdbc,mysql-connector-java,neo4j-java-driver</project.dependency>
+		<project.import>org.oiue.service.event.etl,org.oiue.service.odp.structure.api,org.oiue.service.odp.event.api,org.oiue.service.odp.dmo,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.list,org.w3c.dom,org.xml.sax,javax.xml.parsers,javax.net,javax.xml.transform,javax.naming,org.oiue.service.cache;version="[1.0,2)",org.oiue.service.event.execute;version="[1.0,2)",org.oiue.service.log;version="[1.0,2)",org.oiue.service.odp.base;version="[1.0,2)",org.oiue.service.odp.res.api;version="[1.0,2)",org.oiue.service.online;version="[1.0,2)",org.oiue.service.osgi;version="[1.0,2)",org.oiue.tools.exception,org.oiue.tools,org.oiue.service.system.analyzer;version="[1.0,2)",org.oiue.tools.map;version="[1.0,2)"</project.import>
 		<project.export>
 			org.oiue.service.event.etl.impl,org.oiue.service.event.etl.utils,
 			com.fasterxml.jackson.databind,javax.xml.parsers,org.codehaus.jackson.map,

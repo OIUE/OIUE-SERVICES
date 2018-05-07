@@ -11,18 +11,18 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.oiue.service.task.TaskService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private SynchronizationDbRefresh refreshDb;
-
+			
 			@Override
 			public void removedService() {
-				if(refreshDb!=null)
+				if (refreshDb != null)
 					refreshDb.shutdown();
 			}
-
+			
 			@SuppressWarnings("unused")
 			@Override
 			public void addingService() {
@@ -31,17 +31,17 @@ public class Activator extends FrameActivator {
 				TaskService taskService = getService(TaskService.class);
 				CacheServiceManager cacheService = getService(CacheServiceManager.class);
 				IResource iResource = getService(IResource.class);
-
+				
 				refreshDb = new SynchronizationDbRefresh(cacheService, taskService, factoryService, logService);
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				refreshDb.updateProps(props);
 			}
-		}, LogService.class,FactoryService.class,TaskService.class,CacheServiceManager.class,IResource.class);
+		}, LogService.class, FactoryService.class, TaskService.class, CacheServiceManager.class, IResource.class);
 	}
-
+	
 	@Override
-	public void stop()  {}
+	public void stop() {}
 }

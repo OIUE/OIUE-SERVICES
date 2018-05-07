@@ -49,49 +49,41 @@ import org.apache.http.util.EntityUtils;
  * This example demonstrates how to use a custom public suffix list.
  */
 public class ClientCustomPublicSuffixList {
-
-    public final static void main(String[] args) throws MalformedURLException, IOException  {
-
-        // Use PublicSuffixMatcherLoader to load public suffix list from a file,
-        // resource or from an arbitrary URL
-        PublicSuffixMatcher publicSuffixMatcher = PublicSuffixMatcherLoader.load(
-                new URL("https://publicsuffix.org/list/effective_tld_names.dat"));
-
-        // Please use the publicsuffix.org URL to download the list no more than once per day !!!
-        // Please consider making a local copy !!!
-
-        DefaultHostnameVerifier hostnameVerifier = new DefaultHostnameVerifier(publicSuffixMatcher);
-
-        RFC6265CookieSpecProvider cookieSpecProvider = new RFC6265CookieSpecProvider(publicSuffixMatcher);
-        Lookup<CookieSpecProvider> cookieSpecRegistry = RegistryBuilder.<CookieSpecProvider>create()
-                .register(CookieSpecs.DEFAULT, cookieSpecProvider)
-                .register(CookieSpecs.STANDARD, cookieSpecProvider)
-                .register(CookieSpecs.STANDARD_STRICT, cookieSpecProvider)
-                .build();
-
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setSSLHostnameVerifier(hostnameVerifier)
-                .setDefaultCookieSpecRegistry(cookieSpecRegistry)
-                .build();
-        try {
-
-            HttpGet httpget = new HttpGet("https://remotehost/");
-
-            System.out.println("executing request " + httpget.getRequestLine());
-
-            CloseableHttpResponse response = httpclient.execute(httpget);
-            try {
-                HttpEntity entity = response.getEntity();
-
-                System.out.println("----------------------------------------");
-                System.out.println(response.getStatusLine());
-                EntityUtils.consume(entity);
-            } finally {
-                response.close();
-            }
-        } finally {
-            httpclient.close();
-        }
-    }
-
+	
+	public final static void main(String[] args) throws MalformedURLException, IOException {
+		
+		// Use PublicSuffixMatcherLoader to load public suffix list from a file,
+		// resource or from an arbitrary URL
+		PublicSuffixMatcher publicSuffixMatcher = PublicSuffixMatcherLoader.load(new URL("https://publicsuffix.org/list/effective_tld_names.dat"));
+		
+		// Please use the publicsuffix.org URL to download the list no more than once per day !!!
+		// Please consider making a local copy !!!
+		
+		DefaultHostnameVerifier hostnameVerifier = new DefaultHostnameVerifier(publicSuffixMatcher);
+		
+		RFC6265CookieSpecProvider cookieSpecProvider = new RFC6265CookieSpecProvider(publicSuffixMatcher);
+		Lookup<CookieSpecProvider> cookieSpecRegistry = RegistryBuilder.<CookieSpecProvider>create().register(CookieSpecs.DEFAULT, cookieSpecProvider).register(CookieSpecs.STANDARD, cookieSpecProvider).register(CookieSpecs.STANDARD_STRICT, cookieSpecProvider).build();
+		
+		CloseableHttpClient httpclient = HttpClients.custom().setSSLHostnameVerifier(hostnameVerifier).setDefaultCookieSpecRegistry(cookieSpecRegistry).build();
+		try {
+			
+			HttpGet httpget = new HttpGet("https://remotehost/");
+			
+			System.out.println("executing request " + httpget.getRequestLine());
+			
+			CloseableHttpResponse response = httpclient.execute(httpget);
+			try {
+				HttpEntity entity = response.getEntity();
+				
+				System.out.println("----------------------------------------");
+				System.out.println(response.getStatusLine());
+				EntityUtils.consume(entity);
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpclient.close();
+		}
+	}
+	
 }

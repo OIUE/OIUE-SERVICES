@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.oiue.services</groupId>
 		<artifactId>imports</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<properties>
 		<project.dependency>java-jwt,jackson-core,jackson-databind,jackson-annotations,commons-codec</project.dependency>

@@ -11,18 +11,18 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.oiue.service.permission.PermissionServiceManager;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
 	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private AuthFilterServiceImpl actionFilter;
 			private ActionService actionService;
-
+			
 			@Override
 			public void removedService() {
 				actionService.unregisterActionFilter("authFilter");
 			}
-
+			
 			@Override
 			public void addingService() {
 				LogService logService = getService(LogService.class);
@@ -30,18 +30,17 @@ public class Activator extends FrameActivator {
 				AuthServiceManager authService = getService(AuthServiceManager.class);
 				PermissionServiceManager permissionService = getService(PermissionServiceManager.class);
 				OnlineService onlineService = getService(OnlineService.class);
-
+				
 				actionFilter = new AuthFilterServiceImpl(logService, onlineService, permissionService, authService, actionService);
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				actionFilter.updated(props);
 			}
 		}, LogService.class, ActionService.class, AuthServiceManager.class, PermissionServiceManager.class, OnlineService.class);
 	}
-
+	
 	@Override
-	public void stop() {
-	}
+	public void stop() {}
 }

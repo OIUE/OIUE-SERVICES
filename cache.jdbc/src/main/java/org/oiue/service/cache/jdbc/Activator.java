@@ -10,34 +10,34 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.oiue.service.sql.SqlService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private CacheServiceManager cacheServiceManager;
-
+			
 			@Override
 			public void removedService() {
 				cacheServiceManager.unRegisterCacheService("buffer");
 			}
-
+			
 			@Override
 			public void addingService() {
 				LogService logService = getService(LogService.class);
 				SqlService sqlService = getService(SqlService.class);
 				cacheServiceManager = getService(CacheServiceManager.class);
-
+				
 				CacheService cacheService = new StorageServiceImpl(logService, sqlService);
 				cacheServiceManager.registerCacheService("storage", cacheService);
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
-
+			
 			}
 		}, LogService.class, CacheServiceManager.class, SqlService.class);
 	}
-
+	
 	@Override
-	public void stop()  {}
+	public void stop() {}
 }

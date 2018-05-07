@@ -14,19 +14,19 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.osgi.service.http.HttpService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/sysupload";
 			private HttpService httpService;
 			private UploadPostServlet upload;
-
+			
 			@Override
 			public void removedService() {
 				httpService.unregister(url);
 			}
-
+			
 			@Override
 			public void addingService() {
 				httpService = getService(HttpService.class);
@@ -34,9 +34,9 @@ public class Activator extends FrameActivator {
 				ActionService actionService = getService(ActionService.class);
 				OnlineService onlineService = getService(OnlineService.class);
 				FileUploadService fileUploadService = getService(FileUploadService.class);
-				FactoryService  factoryService = getService(FactoryService.class);
-
-				upload = new UploadPostServlet(actionService, onlineService,logService, fileUploadService,factoryService,getProperty("user.dir"));
+				FactoryService factoryService = getService(FactoryService.class);
+				
+				upload = new UploadPostServlet(actionService, onlineService, logService, fileUploadService, factoryService, getProperty("user.dir"));
 				Logger log = logService.getLogger(this.getClass());
 				log.debug("绑定url：" + url);
 				try {
@@ -45,7 +45,7 @@ public class Activator extends FrameActivator {
 					log.error(e.getMessage(), e);
 				}
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				try {
@@ -54,9 +54,9 @@ public class Activator extends FrameActivator {
 					e.printStackTrace();
 				}
 			}
-		}, HttpService.class, ActionService.class, LogService.class, FileUploadService.class,OnlineService.class,FactoryService.class,IResource.class);
+		}, HttpService.class, ActionService.class, LogService.class, FileUploadService.class, OnlineService.class, FactoryService.class, IResource.class);
 	}
-
+	
 	@Override
-	public void stop()  {}
+	public void stop() {}
 }

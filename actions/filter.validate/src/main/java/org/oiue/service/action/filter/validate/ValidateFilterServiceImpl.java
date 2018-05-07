@@ -26,21 +26,21 @@ import org.oiue.tools.string.StringUtil;
 @SuppressWarnings({ "serial", "rawtypes", "unchecked" })
 public class ValidateFilterServiceImpl implements ActionFilter, Serializable {
 	private Logger logger;
-	private Map<String, Map<String,List<Map<String,Object>>>> validates = new HashMap<>();
+	private Map<String, Map<String, List<Map<String, Object>>>> validates = new HashMap<>();
 	private ActionService actionService = null;
-
+	
 	public ValidateFilterServiceImpl(LogService logService, ActionService actionService) {
 		logger = logService.getLogger(this.getClass());
 		this.actionService = actionService;
 	}
-
+	
 	public void updated(Dictionary dict) {
 		String validatesStr = (String) dict.get("validates");
-
-		if(!StringUtil.isEmptys(validatesStr))
+		
+		if (!StringUtil.isEmptys(validatesStr))
 			try {
 				Map validatest = JSONUtil.parserStrToMap(validatesStr);
-				validates=validatest;
+				validates = validatest;
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -49,64 +49,63 @@ public class ValidateFilterServiceImpl implements ActionFilter, Serializable {
 		}
 		actionService.registerActionFilter("validateFilter", this, 10);
 	}
-
+	
 	@Override
 	public StatusResult doFilter(Map per) {
 		String modulename = MapUtil.getString(per, "modulename");
 		String operation = MapUtil.getString(per, "operation");
-
+		
 		modulename = modulename == null ? "" : modulename.trim();
 		operation = operation == null ? "" : operation.trim();
-
+		
 		StatusResult afr = new StatusResult();
-		if (modulename == null||operation == null) {
+		if (modulename == null || operation == null) {
 			afr.setResult(StatusResult._ncriticalAbnormal);
 			afr.setDescription("error request!");
 			return afr;
 		}
-		Object data =  per.get("data");
-		if(data == null){
+		Object data = per.get("data");
+		if (data == null) {
 			data = new HashMap<>();
 			per.put("data", data);
 		}
-		Map<String,List<Map<String,Object>>> validate = validates.get(modulename+"/"+operation);
-		if(validate!=null&&validate.size()>0){
-			for (Map.Entry<String, List<Map<String,Object>>> entry : validate.entrySet()) {
-				Object value = ((Map)data).get(entry.getKey());
-				List<Map<String,Object>> validates = entry.getValue();
+		Map<String, List<Map<String, Object>>> validate = validates.get(modulename + "/" + operation);
+		if (validate != null && validate.size() > 0) {
+			for (Map.Entry<String, List<Map<String, Object>>> entry : validate.entrySet()) {
+				Object value = ((Map) data).get(entry.getKey());
+				List<Map<String, Object>> validates = entry.getValue();
 				for (Map<String, Object> map : validates) {
-					switch ((map.get("type")+"").toLowerCase()) {
-					case "notnull":
-						if(value==null||StringUtil.isEmptys(value+"")){
-							afr.setResult(StatusResult._ncriticalAbnormal);
-							afr.setDescription(map.get("msg")+"");
-							return afr;
-						}
-						break;
-					case "length":
-						if(value==null||StringUtil.isEmptys(value+"")){
-						}else{
-							if(value.toString().length()>MapUtil.getInt(map, "max")||value.toString().length()<MapUtil.getInt(map, "min")){
-								if(value==null||StringUtil.isEmptys(value+"")){
-									afr.setResult(StatusResult._ncriticalAbnormal);
-									afr.setDescription(map.get("msg")+"");
-									return afr;
+					switch ((map.get("type") + "").toLowerCase()) {
+						case "notnull":
+							if (value == null || StringUtil.isEmptys(value + "")) {
+								afr.setResult(StatusResult._ncriticalAbnormal);
+								afr.setDescription(map.get("msg") + "");
+								return afr;
+							}
+							break;
+						case "length":
+							if (value == null || StringUtil.isEmptys(value + "")) {} else {
+								if (value.toString().length() > MapUtil.getInt(map, "max") || value.toString().length() < MapUtil.getInt(map, "min")) {
+									if (value == null || StringUtil.isEmptys(value + "")) {
+										afr.setResult(StatusResult._ncriticalAbnormal);
+										afr.setDescription(map.get("msg") + "");
+										return afr;
+									}
 								}
 							}
-						}
-						break;
-					case "pattern":
-						Pattern p = Pattern.compile(map.get("pattern")+"");
-						Matcher m = p.matcher("aaaaab");
-						if(!m.matches()){
-							afr.setResult(StatusResult._ncriticalAbnormal);
-							afr.setDescription(map.get("msg")+"");
-							return afr;
-						}
-						break;
-
-					default:
-						break;
+							break;
+						case "pattern":
+							Pattern p = Pattern.compile(map.get("pattern") + "");
+							Matcher m = p.matcher("aaaaab");
+							if (!m.matches()) {
+								afr.setResult(StatusResult._ncriticalAbnormal);
+								afr.setDescription(map.get("msg") + "");
+								return afr;
+							}
+							break;
+						
+						default:
+							break;
 					}
 				}
 			}

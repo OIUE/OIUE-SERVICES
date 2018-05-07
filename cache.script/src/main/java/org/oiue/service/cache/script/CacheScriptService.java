@@ -5,8 +5,8 @@ import java.util.Map;
 
 public interface CacheScriptService {
 	public CacheScriptResult eval(String script);
-
+	
 	public CacheScriptResult eval(String script, List<Object> list);
-
+	
 	public CacheScriptResult eval(String script, Map<String, Object> map);
 }

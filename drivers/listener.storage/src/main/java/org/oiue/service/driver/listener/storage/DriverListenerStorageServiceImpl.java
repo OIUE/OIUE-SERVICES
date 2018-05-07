@@ -21,34 +21,34 @@ import org.oiue.tools.string.StringUtil;
 @SuppressWarnings({ "rawtypes", "unused" })
 public class DriverListenerStorageServiceImpl implements DriverListener {
 	private static final long serialVersionUID = 1L;
-
+	
 	private IResource iResource;
 	private AnalyzerService analyzerService;
 	private CacheServiceManager cacheService;
-
+	
 	private List<DriverListener> receiveListenerList = new ArrayList<>();
 	private HashMap<String, List<DriverListener>> receiveListenerMap = new HashMap<>();
-
+	
 	private Logger logger;
 	private Dictionary props;
-
+	
 	public DriverListenerStorageServiceImpl(LogService logService, IResource iResource, AnalyzerService analyzerService, CacheServiceManager cacheService) {
 		logger = logService.getLogger(this.getClass());
-		this.iResource=iResource;
-		this.analyzerService=analyzerService;
+		this.iResource = iResource;
+		this.analyzerService = analyzerService;
 	}
-
-	@SuppressWarnings({ "unchecked"})
+	
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public StatusResult receive(Map data) {
 		StatusResult sr = null;
-		if (data == null){
+		if (data == null) {
 			sr = new StatusResult();
 			sr.setResult(StatusResult._ncriticalAbnormal);
 			sr.setDescription("data con not null");
 			return sr;
 		}
-		if (props == null){
+		if (props == null) {
 			sr = new StatusResult();
 			sr.setResult(StatusResult._ncriticalAbnormal);
 			sr.setDescription("props is null");
@@ -56,30 +56,30 @@ public class DriverListenerStorageServiceImpl implements DriverListener {
 		}
 		String driverName = MapUtil.getString(data, DriverDataField.driverName);
 		String type = MapUtil.getString(data, DriverDataField.type);
-
-		String event=this.props.get("storage."+driverName+"."+type)+"";
-		if(StringUtil.isEmptys(event)){
+		
+		String event = this.props.get("storage." + driverName + "." + type) + "";
+		if (StringUtil.isEmptys(event)) {
 			sr = new StatusResult();
 			sr.setResult(StatusResult._SUCCESS);
 			return sr;
 		}
-
-		String[] events=event.split("\\|");
+		
+		String[] events = event.split("\\|");
 		for (String _event : events) {
 			try {
-				String[] _events=_event.split(",");
-				//				this.iResource.callEvent(_events[0], _events.length==2?_events[1]:null, data);
+				String[] _events = _event.split(",");
+				// this.iResource.callEvent(_events[0], _events.length==2?_events[1]:null, data);
 				cacheService.getCacheService("storage").put(_events[0], data, Type.ONE);
 			} catch (Throwable e) {
-				logger.error("call event["+_event+"] error:"+e.getMessage(), e);
+				logger.error("call event[" + _event + "] error:" + e.getMessage(), e);
 			}
 		}
-
+		
 		sr = new StatusResult();
 		sr.setResult(StatusResult._SUCCESS);
 		return sr;
 	}
-
+	
 	public void updated(Dictionary<String, ?> props) {
 		this.props = props;
 	}

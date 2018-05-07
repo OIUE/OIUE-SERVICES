@@ -12,10 +12,11 @@ import org.oiue.tools.json.JSONUtil;
 @SuppressWarnings("serial")
 public class KeyToTree implements Serializable {
 	private Map<Object, KeyToTreeNode> hashMap = new ConcurrentHashMap<Object, KeyToTreeNode>();
-
+	
 	public Map<Object, KeyToTreeNode> getHashMap() {
-        return hashMap;
-    }
+		return hashMap;
+	}
+	
 	public void put(Object key, Object parent, Object value) {
 		List<Object> list = getKey(key);
 		if (list != null) {
@@ -32,7 +33,7 @@ public class KeyToTree implements Serializable {
 			nodeParent.setValue(value);
 			hashMap.put(parent, nodeParent);
 		}
-
+		
 		KeyToTreeNode node = hashMap.get(key);
 		if (node != null) {
 			remove(key);
@@ -43,7 +44,7 @@ public class KeyToTree implements Serializable {
 		node.setKey(key);
 		node.setParent(parent);
 		node.setValue(value);
-
+		
 		for (KeyToTreeNode e : hashMap.values()) {
 			if (e.getKey().equals(parent)) {
 				e.children.add(node);
@@ -54,7 +55,7 @@ public class KeyToTree implements Serializable {
 			}
 		}
 	}
-
+	
 	private void appendChildren(KeyToTreeNode node, List<Object> list) {
 		for (KeyToTreeNode e : node.children) {
 			list.add(e.getValue());
@@ -63,7 +64,7 @@ public class KeyToTree implements Serializable {
 			appendChildren(e, list);
 		}
 	}
-
+	
 	public List<Object> get(Object key) {
 		List<Object> list = new ArrayList<Object>();
 		KeyToTreeNode node = hashMap.get(key);
@@ -73,7 +74,7 @@ public class KeyToTree implements Serializable {
 		}
 		return list;
 	}
-
+	
 	private void appendChildrenNode(KeyToTreeNode node, List<KeyToTreeNode> list) {
 		for (KeyToTreeNode e : node.children) {
 			list.add(e);
@@ -82,7 +83,7 @@ public class KeyToTree implements Serializable {
 			appendChildrenNode(e, list);
 		}
 	}
-
+	
 	private List<KeyToTreeNode> getNode(Object key) {
 		List<KeyToTreeNode> list = new ArrayList<KeyToTreeNode>();
 		KeyToTreeNode node = hashMap.get(key);
@@ -92,7 +93,7 @@ public class KeyToTree implements Serializable {
 		}
 		return list;
 	}
-
+	
 	private void appendChildrenKey(KeyToTreeNode node, List<Object> list) {
 		for (KeyToTreeNode e : node.children) {
 			list.add(e.getKey());
@@ -101,7 +102,7 @@ public class KeyToTree implements Serializable {
 			appendChildrenKey(e, list);
 		}
 	}
-
+	
 	private List<Object> getKey(Object key) {
 		List<Object> list = new ArrayList<Object>();
 		KeyToTreeNode node = hashMap.get(key);
@@ -111,7 +112,7 @@ public class KeyToTree implements Serializable {
 		}
 		return list;
 	}
-
+	
 	public List<Object> get(Set<Object> matchSet) {
 		List<Object> list = new ArrayList<Object>();
 		for (Object key : matchSet) {
@@ -123,7 +124,7 @@ public class KeyToTree implements Serializable {
 		}
 		return list;
 	}
-
+	
 	public void remove(Object key) {
 		List<KeyToTreeNode> list = getNode(key);
 		for (KeyToTreeNode e : list) {
@@ -131,17 +132,17 @@ public class KeyToTree implements Serializable {
 		}
 		hashMap.remove(key);
 	}
-
+	
 	public void remove(Set<Object> matchSet) {
 		for (Object key : matchSet) {
 			remove(key);
 		}
 	}
-
+	
 	public boolean contains(Object key) {
 		return hashMap.containsKey(key);
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuffer stringBuffer = new StringBuffer();
@@ -160,36 +161,36 @@ public class KeyToTree implements Serializable {
 				stringBuffer.append(obj);
 			}
 			stringBuffer.append(":");
-
+			
 			KeyToTreeNode node = hashMap.get(obj);
 			stringBuffer.append(node.getValue());
 		}
 		stringBuffer.append("}}");
 		return stringBuffer.toString();
 	}
-
+	
 	public static void main(String[] args) {
 		KeyToTree keyToTree = new KeyToTree();
-
+		
 		keyToTree.put(2, 3, "{k:2,p:3,new}");
 		keyToTree.put(3, 2, "{k:3,p:2}");
-
+		
 		keyToTree.put(0, -1, "{k:0,p:-1}");
 		keyToTree.put(1, 0, "{k:1,p:0}");
 		keyToTree.put(2, 1, "{k:2,p:1}");
 		System.out.println("all = " + keyToTree);
 		System.out.println("1 = " + JSONUtil.getJSONString(keyToTree.get(1)));
-
+		
 		// keyToTree.put(2, 2, "{k:2,p:2}");
 		keyToTree.put(2, 3, "{k:2,p:3,new}");
 		// keyToTree.put(1, 2, "{k:1,p:2}");
-
+		
 		System.out.println("all = " + keyToTree);
 		System.out.println("2 = " + JSONUtil.getJSONString(keyToTree.get(2)));
 		keyToTree.put(3, 2, "{k:3,p:2}");
 		System.out.println("all = " + keyToTree);
 		System.out.println("1 = " + JSONUtil.getJSONString(keyToTree.get(1)));
-
+		
 		keyToTree.put(4, 3, "{k:4,p:3}");
 		keyToTree.put(3, 1, "{k:3,p:1}");
 		System.out.println("all = " + keyToTree);

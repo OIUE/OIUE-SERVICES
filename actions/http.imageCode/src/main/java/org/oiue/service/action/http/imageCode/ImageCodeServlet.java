@@ -19,27 +19,27 @@ import javax.servlet.http.HttpSession;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings({ "unused" })
 public class ImageCodeServlet extends HttpServlet {
 	private static final long serialVersionUID = -6327347468651806863L;
 	private Logger logger;
 	private static final int WIDTH = 50;
 	private static final int HEIGHT = 20;
 	private static final int LENGTH = 4;
+	
 	public ImageCodeServlet(LogService logService) {
 		super();
 		this.logger = logService.getLogger(this.getClass());
 	}
-
+	
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setHeader("Pragma", "No-cache");
 		resp.setHeader("Cache-Control", "no-cache");
 		resp.setDateHeader("Expires", 0);
 		resp.setContentType("image/jpeg");
 		OutputStream out = resp.getOutputStream();
-
+		
 		BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		Font mFont = new Font("Arial", Font.TRUETYPE_FONT, 18);
 		Graphics g = image.getGraphics();
@@ -47,11 +47,11 @@ public class ImageCodeServlet extends HttpServlet {
 		// 设置背景颜色
 		g.setColor(getRandColor(100, 200));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
-
+		
 		// 设置字体
 		g.setFont(mFont);
-
-		//设置字体颜色
+		
+		// 设置字体颜色
 		g.setColor(getRandColor(180, 250));
 		for (int i = 0; i < 555; i++) {
 			int x = random.nextInt(WIDTH - 1);
@@ -67,24 +67,24 @@ public class ImageCodeServlet extends HttpServlet {
 			int yl = random.nextInt(6) + 1;
 			g.drawLine(x, y, x - xl, y - yl);
 		}
-
+		
 		String sRand = "";
 		for (int i = 0; i < LENGTH; i++) {
 			String tmp = getRandomChar();
-			while(tmp.equalsIgnoreCase("0")||tmp.equalsIgnoreCase("o") || tmp.equalsIgnoreCase("1") ||tmp.equalsIgnoreCase("i")|| tmp.equalsIgnoreCase("l") ||tmp.equalsIgnoreCase("z")||tmp.equalsIgnoreCase("2") ){
+			while (tmp.equalsIgnoreCase("0") || tmp.equalsIgnoreCase("o") || tmp.equalsIgnoreCase("1") || tmp.equalsIgnoreCase("i") || tmp.equalsIgnoreCase("l") || tmp.equalsIgnoreCase("z") || tmp.equalsIgnoreCase("2")) {
 				tmp = getRandomChar();
 			}
 			sRand += tmp;
 			g.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110), 20 + random.nextInt(110)));
 			g.drawString(tmp, 12 * i + 1, 16);
 		}
-
+		
 		HttpSession session = req.getSession(true);
 		
 		g.dispose();
 		try {
-//			JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//			encoder.encode(image);
+			// JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+			// encoder.encode(image);
 			ImageIO.write(image, "jpeg", out);
 			session.setAttribute("Login_Image_Code", sRand);
 		} catch (Exception e) {
@@ -93,21 +93,22 @@ public class ImageCodeServlet extends HttpServlet {
 		
 		out.close();
 	}
+	
 	private String getRandomChar() {
 		int rand = (int) Math.round(Math.random() * 2);
 		long itmp = 0;
 		char ctmp = '\u0000';
 		switch (rand) {
-		case 1:
-			itmp = (long) Math.round(Math.random() * 25 + 97);
-			ctmp = (char) itmp;
-			return String.valueOf(ctmp);
-		default:
-			itmp = (long) (Math.random() * 9);
-			return String.valueOf(itmp);
+			case 1:
+				itmp = (long) Math.round(Math.random() * 25 + 97);
+				ctmp = (char) itmp;
+				return String.valueOf(ctmp);
+			default:
+				itmp = (long) (Math.random() * 9);
+				return String.valueOf(itmp);
 		}
 	}
-
+	
 	// 设置颜色
 	Color getRandColor(int fc, int bc) {
 		Random random = new Random();
@@ -118,14 +119,13 @@ public class ImageCodeServlet extends HttpServlet {
 		int b = fc + random.nextInt(bc - fc);
 		return new Color(r, g, b);
 	}
+	
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		this.doPost(req, resp);
 	}
-
-    public void updated(Dictionary<String, ?> props) {
-        // TODO Auto-generated method stub
-        
-    }
+	
+	public void updated(Dictionary<String, ?> props) {
+		
+	}
 }

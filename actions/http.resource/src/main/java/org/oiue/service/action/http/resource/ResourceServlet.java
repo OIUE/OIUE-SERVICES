@@ -27,15 +27,15 @@ import org.osgi.service.http.HttpService;
 public class ResourceServlet implements Servlet {
 	private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
 	private ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
-
+	
 	private ServletConfig config;
 	private TemplateService templateService;
 	private FactoryService factoryService;
 	private CacheServiceManager cacheService;
-
+	
 	private Logger logger;
 	private LogService logService;
-
+	
 	public ResourceServlet(CacheServiceManager cacheService, OnlineService onlineService, FactoryService factoryService, LogService logService, TemplateService templateService, HttpService httpService) {
 		this.factoryService = factoryService;
 		this.templateService = templateService;
@@ -43,7 +43,7 @@ public class ResourceServlet implements Servlet {
 		this.logger = logService.getLogger(getClass());
 		this.logService = logService;
 	}
-
+	
 	@Override
 	public void service(final ServletRequest req, final ServletResponse res) throws ServletException, IOException {
 		try {
@@ -56,7 +56,7 @@ public class ResourceServlet implements Servlet {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
+	
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			Visit fv = null;
@@ -69,35 +69,35 @@ public class ResourceServlet implements Servlet {
 				}
 				fv.visit(request, response);
 			} catch (FileNotFoundException e) {
-				logger.error("FileNotFoundException:"+request, e);
+				logger.error("FileNotFoundException:" + request, e);
 				fv = new FileVisit(logService);
-				request.setAttribute("domain_path","/comm");
-				request.setAttribute("resName","notfound.html");
+				request.setAttribute("domain_path", "/comm");
+				request.setAttribute("resName", "notfound.html");
 				fv.visit(request, response);
 			}
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		this.config = config;
 	}
-
+	
 	@Override
 	public String getServletInfo() {
 		return "";
 	}
-
+	
 	@Override
 	public ServletConfig getServletConfig() {
 		return config;
 	}
-
+	
 	@Override
 	public void destroy() {}
-
+	
 	public ServletContext getServletContext() {
 		ServletConfig sc = getServletConfig();
 		if (sc == null) {
@@ -105,6 +105,6 @@ public class ResourceServlet implements Servlet {
 		}
 		return sc.getServletContext();
 	}
-
+	
 	public void updated(Dictionary<String, ?> props) {}
 }

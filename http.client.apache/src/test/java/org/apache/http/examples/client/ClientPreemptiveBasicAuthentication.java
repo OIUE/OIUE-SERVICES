@@ -45,52 +45,46 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 /**
- * An example of HttpClient can be customized to authenticate
- * preemptively using BASIC scheme.
+ * An example of HttpClient can be customized to authenticate preemptively using BASIC scheme.
  * 
- * Generally, preemptive authentication can be considered less
- * secure than a response to an authentication challenge
- * and therefore discouraged.
+ * Generally, preemptive authentication can be considered less secure than a response to an authentication challenge and therefore discouraged.
  */
 public class ClientPreemptiveBasicAuthentication {
-
-    public static void main(String[] args) throws ClientProtocolException, IOException  {
-        HttpHost target = new HttpHost("localhost", 80, "http");
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-                new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials("username", "password"));
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(credsProvider).build();
-        try {
-
-            // Create AuthCache instance
-            AuthCache authCache = new BasicAuthCache();
-            // Generate BASIC scheme object and add it to the local
-            // auth cache
-            BasicScheme basicAuth = new BasicScheme();
-            authCache.put(target, basicAuth);
-
-            // Add AuthCache to the execution context
-            HttpClientContext localContext = HttpClientContext.create();
-            localContext.setAuthCache(authCache);
-
-            HttpGet httpget = new HttpGet("/");
-
-            System.out.println("Executing request " + httpget.getRequestLine() + " to target " + target);
-            for (int i = 0; i < 3; i++) {
-                CloseableHttpResponse response = httpclient.execute(target, httpget, localContext);
-                try {
-                    System.out.println("----------------------------------------");
-                    System.out.println(response.getStatusLine());
-                    EntityUtils.consume(response.getEntity());
-                } finally {
-                    response.close();
-                }
-            }
-        } finally {
-            httpclient.close();
-        }
-    }
-
+	
+	public static void main(String[] args) throws ClientProtocolException, IOException {
+		HttpHost target = new HttpHost("localhost", 80, "http");
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(new AuthScope(target.getHostName(), target.getPort()), new UsernamePasswordCredentials("username", "password"));
+		CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+		try {
+			
+			// Create AuthCache instance
+			AuthCache authCache = new BasicAuthCache();
+			// Generate BASIC scheme object and add it to the local
+			// auth cache
+			BasicScheme basicAuth = new BasicScheme();
+			authCache.put(target, basicAuth);
+			
+			// Add AuthCache to the execution context
+			HttpClientContext localContext = HttpClientContext.create();
+			localContext.setAuthCache(authCache);
+			
+			HttpGet httpget = new HttpGet("/");
+			
+			System.out.println("Executing request " + httpget.getRequestLine() + " to target " + target);
+			for (int i = 0; i < 3; i++) {
+				CloseableHttpResponse response = httpclient.execute(target, httpget, localContext);
+				try {
+					System.out.println("----------------------------------------");
+					System.out.println(response.getStatusLine());
+					EntityUtils.consume(response.getEntity());
+				} finally {
+					response.close();
+				}
+			}
+		} finally {
+			httpclient.close();
+		}
+	}
+	
 }

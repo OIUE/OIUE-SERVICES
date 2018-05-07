@@ -12,19 +12,19 @@ import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.osgi.service.http.HttpService;
 
 public class Activator extends FrameActivator {
-
+	
 	@Override
-	public void start()  {
+	public void start() {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/upload";
 			private HttpService httpService;
 			private UploadPostServlet upload;
-
+			
 			@Override
 			public void removedService() {
 				httpService.unregister(url);
 			}
-
+			
 			@Override
 			public void addingService() {
 				httpService = getService(HttpService.class);
@@ -32,8 +32,8 @@ public class Activator extends FrameActivator {
 				ActionService actionService = getService(ActionService.class);
 				OnlineService onlineService = getService(OnlineService.class);
 				FileUploadService fileUploadService = getService(FileUploadService.class);
-
-				upload = new UploadPostServlet(actionService, onlineService,logService, fileUploadService, getProperty("user.dir"));
+				
+				upload = new UploadPostServlet(actionService, onlineService, logService, fileUploadService, getProperty("user.dir"));
 				Logger log = logService.getLogger(this.getClass());
 				log.debug("绑定url：" + url);
 				try {
@@ -42,14 +42,14 @@ public class Activator extends FrameActivator {
 					log.error(e.getMessage(), e);
 				}
 			}
-
+			
 			@Override
 			public void updated(Dictionary<String, ?> props) {
 				upload.updated(props);
 			}
-		}, HttpService.class, ActionService.class, LogService.class, FileUploadService.class,OnlineService.class);
+		}, HttpService.class, ActionService.class, LogService.class, FileUploadService.class, OnlineService.class);
 	}
-
+	
 	@Override
-	public void stop()  {}
+	public void stop() {}
 }

@@ -19,21 +19,21 @@ import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-@SuppressWarnings({"serial" })
+@SuppressWarnings({ "serial" })
 public class JedisCacheService implements CacheService, Serializable {
-
+	
 	private Logger logger;
-
+	
 	public JedisCacheService(LogService logService) {
 		logger = logService.getLogger(this.getClass());
 	}
-
+	
 	@Override
 	public void put(String name, Object object, Type type) {
 		if (type == Type.ONE) {
 			if (isCluster) {
 				getJedis().set(name, object == null ? null : object.toString());
-			}else{
+			} else {
 				Jedis jedis = (Jedis) getJedis();
 				try {
 					jedis.set(name, object == null ? null : object.toString());
@@ -43,19 +43,19 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	@Override
 	public void put(String name, String key, Object object, Type type) {
 		if (type == Type.ONE) {
 			try {
 				if (isCluster) {
 					synchronized (getJedis()) {
-						getJedis().hset(name,key, object == null ? null : object.toString());
+						getJedis().hset(name, key, object == null ? null : object.toString());
 					}
-				}else{
+				} else {
 					Jedis jedis = (Jedis) getJedis();
 					try {
-						jedis.hset(name,key, object == null ? null : object.toString());
+						jedis.hset(name, key, object == null ? null : object.toString());
 					} finally {
 						jedis.close();
 					}
@@ -63,12 +63,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
-		}else if (type == Type.MANY){
+		} else if (type == Type.MANY) {
 			if (isCluster) {
 				synchronized (getJedis()) {
-					getJedis().hset(name,key, object == null ? null : object.toString());
+					getJedis().hset(name, key, object == null ? null : object.toString());
 				}
-			}else{
+			} else {
 				Jedis jedis = (Jedis) getJedis();
 				try {
 					int db = 0;
@@ -83,22 +83,22 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	@Override
 	public void put(String name, Object object, Type type, int expire) {
-
+		
 	}
-
+	
 	@Override
 	public void put(String name, String key, Object object, Type type, int expire) {
-
+		
 	}
-
+	
 	@Override
 	public Object get(String name) {
 		if (isCluster) {
 			return getJedis().get(name);
-		}else{
+		} else {
 			Jedis jedis = (Jedis) getJedis();
 			try {
 				return jedis.get(name);
@@ -107,12 +107,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	@Override
 	public Object get(String name, String key) {
 		if (isCluster) {
 			return getJedis().hget(name, key);
-		}else{
+		} else {
 			Jedis jedis = (Jedis) getJedis();
 			try {
 				return jedis.hget(name, key);
@@ -121,12 +121,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	@Override
 	public long delete(String name) {
 		if (isCluster) {
 			return getJedis().del(name);
-		}else{
+		} else {
 			Jedis jedis = (Jedis) getJedis();
 			try {
 				return jedis.del(name);
@@ -135,12 +135,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	@Override
 	public long delete(String name, String... keys) {
 		if (isCluster) {
 			return getJedis().hdel(name, keys);
-		}else{
+		} else {
 			Jedis jedis = (Jedis) getJedis();
 			try {
 				return jedis.hdel(name, keys);
@@ -149,12 +149,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	@Override
 	public boolean exists(String name) {
 		if (isCluster) {
 			return getJedis().exists(name);
-		}else{
+		} else {
 			Jedis jedis = (Jedis) getJedis();
 			try {
 				return jedis.exists(name);
@@ -163,7 +163,7 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-
+	
 	public void updated(Dictionary<String, ?> dict) {
 		try {
 			isCluster = StringUtil.isTrue(dict.get("redis.isCluster") + "");
@@ -171,13 +171,13 @@ public class JedisCacheService implements CacheService, Serializable {
 			logger.error("redis.isCluster config error:" + e.getMessage(), e);
 		}
 		try {
-			if(pool!=null)
+			if (pool != null)
 				pool.close();
 		} catch (Throwable e) {
 			logger.error("close redis pool error:" + e.getMessage(), e);
 		}
 		try {
-			if(jedisCluster!=null)
+			if (jedisCluster != null)
 				jedisCluster.close();
 		} catch (Throwable e) {
 			logger.error("close redis pool error:" + e.getMessage(), e);
@@ -215,12 +215,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			config.setTestWhileIdle(true);
 			// 逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
 			config.setTimeBetweenEvictionRunsMillis(5000);
-
+			
 			int maxRedirections = Integer.valueOf(dict.get("redis.maxRedirections") + "");
 			int timeout = Integer.valueOf(dict.get("redis.timeout") + "");
 			String password = dict.get("redis.password") + "";
 			String nodes = dict.get("redis.nodes") + "";
-
+			
 			if (isCluster) {
 				String[] strs = nodes.split(",");
 				Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
@@ -234,36 +234,37 @@ public class JedisCacheService implements CacheService, Serializable {
 				// 创建连接池
 				pool = new JedisPool(config, tnode[0], Integer.parseInt(tnode[1]), timeout, password);
 			}
-
+			
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
+	
 	private boolean isCluster = true;
 	private JedisPool pool;
 	private JedisCluster jedisCluster;
+	
 	private JedisCommands getJedis() {
-		if(isCluster){
+		if (isCluster) {
 			return jedisCluster;
-		}else{
+		} else {
 			return pool.getResource();
 		}
 	}
-
+	
 	@Override
 	public boolean contains(String name, String... keys) {
 		return false;
 	}
-
+	
 	@Override
 	public void put(String name, String key, Type type, Object... objects) {
-
+		
 	}
-
+	
 	@Override
 	public void swap(String nameA, String nameB) {
-
+		
 	}
-
+	
 }

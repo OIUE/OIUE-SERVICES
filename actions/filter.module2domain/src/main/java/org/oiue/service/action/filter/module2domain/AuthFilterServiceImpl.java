@@ -22,14 +22,14 @@ import org.oiue.tools.string.StringUtil;
 @SuppressWarnings({ "serial", "rawtypes", "unchecked" })
 public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 	private Logger logger;
-	private Map<String,String> convert = new HashMap<>();
+	private Map<String, String> convert = new HashMap<>();
 	private ActionService actionService = null;
-
+	
 	public AuthFilterServiceImpl(LogService logService, ActionService actionService) {
 		logger = logService.getLogger(this.getClass());
 		this.actionService = actionService;
 	}
-
+	
 	public void updated(Dictionary dict) {
 		String convert_url = (String) dict.get("convert");
 		if (!StringUtil.isEmptys(convert_url)) {
@@ -40,24 +40,24 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		}
 		actionService.registerActionFilter("convertFilter", this, -1);
 	}
-
+	
 	@Override
 	public StatusResult doFilter(Map per) {
 		StatusResult afr = new StatusResult();
 		String modulename = MapUtil.getString(per, "modulename");
 		String operation = MapUtil.getString(per, "operation");
-
+		
 		modulename = modulename == null ? "" : modulename.trim();
 		operation = operation == null ? "" : operation.trim();
-		String key = modulename+"."+operation;
-		if(convert.containsKey(key)){
+		String key = modulename + "." + operation;
+		if (convert.containsKey(key)) {
 			String domain = convert.get(key);
 			per.put("domain", domain);
-
+			
 			Map data = (Map) per.get("data");
-			data.put("domain",domain);
+			data.put("domain", domain);
 		}
-
+		
 		return afr;
 	}
 }

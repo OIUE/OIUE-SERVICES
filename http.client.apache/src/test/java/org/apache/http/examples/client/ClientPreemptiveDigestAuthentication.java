@@ -45,58 +45,51 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 /**
- * An example of HttpClient can be customized to authenticate
- * preemptively using DIGEST scheme.
+ * An example of HttpClient can be customized to authenticate preemptively using DIGEST scheme.
  * <p>
- * Generally, preemptive authentication can be considered less
- * secure than a response to an authentication challenge
- * and therefore discouraged.
+ * Generally, preemptive authentication can be considered less secure than a response to an authentication challenge and therefore discouraged.
  * </p>
  */
 public class ClientPreemptiveDigestAuthentication {
-
-    public static void main(String[] args) throws ClientProtocolException, IOException  {
-        HttpHost target = new HttpHost("localhost", 80, "http");
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-                new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials("username", "password"));
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(credsProvider)
-                .build();
-        try {
-
-            // Create AuthCache instance
-            AuthCache authCache = new BasicAuthCache();
-            // Generate DIGEST scheme object, initialize it and add it to the local
-            // auth cache
-            DigestScheme digestAuth = new DigestScheme();
-            // Suppose we already know the realm name
-            digestAuth.overrideParamter("realm", "some realm");
-            // Suppose we already know the expected nonce value
-            digestAuth.overrideParamter("nonce", "whatever");
-            authCache.put(target, digestAuth);
-
-            // Add AuthCache to the execution context
-            HttpClientContext localContext = HttpClientContext.create();
-            localContext.setAuthCache(authCache);
-
-            HttpGet httpget = new HttpGet("/");
-
-            System.out.println("Executing request " + httpget.getRequestLine() + " to target " + target);
-            for (int i = 0; i < 3; i++) {
-                CloseableHttpResponse response = httpclient.execute(target, httpget, localContext);
-                try {
-                    System.out.println("----------------------------------------");
-                    System.out.println(response.getStatusLine());
-                    EntityUtils.consume(response.getEntity());
-                } finally {
-                    response.close();
-                }
-            }
-        } finally {
-            httpclient.close();
-        }
-    }
-
+	
+	public static void main(String[] args) throws ClientProtocolException, IOException {
+		HttpHost target = new HttpHost("localhost", 80, "http");
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(new AuthScope(target.getHostName(), target.getPort()), new UsernamePasswordCredentials("username", "password"));
+		CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+		try {
+			
+			// Create AuthCache instance
+			AuthCache authCache = new BasicAuthCache();
+			// Generate DIGEST scheme object, initialize it and add it to the local
+			// auth cache
+			DigestScheme digestAuth = new DigestScheme();
+			// Suppose we already know the realm name
+			digestAuth.overrideParamter("realm", "some realm");
+			// Suppose we already know the expected nonce value
+			digestAuth.overrideParamter("nonce", "whatever");
+			authCache.put(target, digestAuth);
+			
+			// Add AuthCache to the execution context
+			HttpClientContext localContext = HttpClientContext.create();
+			localContext.setAuthCache(authCache);
+			
+			HttpGet httpget = new HttpGet("/");
+			
+			System.out.println("Executing request " + httpget.getRequestLine() + " to target " + target);
+			for (int i = 0; i < 3; i++) {
+				CloseableHttpResponse response = httpclient.execute(target, httpget, localContext);
+				try {
+					System.out.println("----------------------------------------");
+					System.out.println(response.getStatusLine());
+					EntityUtils.consume(response.getEntity());
+				} finally {
+					response.close();
+				}
+			}
+		} finally {
+			httpclient.close();
+		}
+	}
+	
 }

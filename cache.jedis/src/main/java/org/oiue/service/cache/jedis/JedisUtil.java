@@ -13,25 +13,25 @@ import redis.clients.jedis.JedisPool;
  * @author lisuo
  *
  */
-public class JedisUtil  {
-
+public class JedisUtil {
+	
 	// jedis连接池
 	private JedisPool jedisPool;
-
+	
 	// jedis集群
 	private JedisCluster jedisCluster;
-
+	
 	// 是否为集群,默认不是集群
 	private boolean isCluster = false;
-
+	
 	/**
 	 * 连接池构建方式
-	 * @param jedisPool  jedis连接池
+	 * @param jedisPool jedis连接池
 	 */
 	public JedisUtil(JedisPool jedisPool) {
 		this.jedisPool = jedisPool;
 	}
-
+	
 	/**
 	 * 集群构建方式
 	 * @param jedisCluster jedis集群实例
@@ -40,7 +40,7 @@ public class JedisUtil  {
 		this.jedisCluster = jedisCluster;
 		isCluster = true;
 	}
-
+	
 	// -----------------------------------实现脚本命令-----------------------------------
 	public Object eval(String script, int keyCount, String... params) {
 		if (isCluster) {
@@ -54,7 +54,7 @@ public class JedisUtil  {
 			}
 		}
 	}
-
+	
 	public Object eval(String script, List<String> keys, List<String> args) {
 		if (isCluster) {
 			return jedisCluster.eval(script, keys, args);
@@ -67,7 +67,7 @@ public class JedisUtil  {
 			}
 		}
 	}
-
+	
 	public Object evalsha(String sha1, int keyCount, String... params) {
 		if (isCluster) {
 			return jedisCluster.evalsha(sha1, keyCount, params);
@@ -80,7 +80,7 @@ public class JedisUtil  {
 			}
 		}
 	}
-
+	
 	/**
 	 * 获取JedisCommands实例
 	 * @return JedisCommands
@@ -92,7 +92,7 @@ public class JedisUtil  {
 			return jedisPool.getResource();
 		}
 	}
-
+	
 	/**
 	 * Callback 回调接口
 	 * @param <T>
@@ -105,7 +105,7 @@ public class JedisUtil  {
 		 */
 		public T call(JedisCommands commands);
 	}
-
+	
 	/**
 	 * 执行Redis 命令
 	 * @param callback 回调接口
@@ -122,7 +122,7 @@ public class JedisUtil  {
 			}
 		}
 	}
-
+	
 	// 实现JedisCommands,关于@Deprecated标记的方法参看Jedis API,如果报错可能是版本过高,一些方法被废除
 	public String get(final String key) {
 		return execute(new Callback<String>() {

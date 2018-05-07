@@ -21,12 +21,12 @@ public class TcpServiceImpl implements TcpService {
 	protected HashMap<SocketAddress, IoAcceptor> acceptorMap = new HashMap<SocketAddress, IoAcceptor>();
 	protected Logger logger;
 	protected LogService logService;
-
+	
 	public TcpServiceImpl(LogService logService) {
 		this.logService = logService;
 		logger = logService.getLogger(this.getClass());
 	}
-
+	
 	public synchronized void unregisterAll() {
 		if (logger.isInfoEnabled()) {
 			logger.info("unregisterAll");
@@ -36,7 +36,7 @@ public class TcpServiceImpl implements TcpService {
 		}
 		acceptorMap.clear();
 	}
-
+	
 	@Override
 	public synchronized boolean register(SocketAddress address, Handler handler, boolean binary, int idleTime, String charsetName) {
 		if (logger.isInfoEnabled()) {
@@ -59,8 +59,8 @@ public class TcpServiceImpl implements TcpService {
 			acceptor.getSessionConfig().setTcpNoDelay(true);
 			acceptor.getSessionConfig().setSendBufferSize(2 * 1024 * 1024);
 			acceptor.getSessionConfig().setReadBufferSize(2 * 1024 * 1024);
-			acceptor.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, idleTime/1000);
-			acceptor.getSessionConfig().setIdleTime(IdleStatus.WRITER_IDLE, idleTime/1000);
+			acceptor.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, idleTime / 1000);
+			acceptor.getSessionConfig().setIdleTime(IdleStatus.WRITER_IDLE, idleTime / 1000);
 			acceptor.bind(address);
 			acceptorMap.put(address, acceptor);
 			return true;
@@ -71,7 +71,7 @@ public class TcpServiceImpl implements TcpService {
 			return false;
 		}
 	}
-
+	
 	@Override
 	public synchronized void unregister(SocketAddress address) {
 		if (logger.isInfoEnabled()) {
@@ -83,7 +83,7 @@ public class TcpServiceImpl implements TcpService {
 			acceptorMap.remove(address);
 		}
 	}
-
+	
 	@Override
 	public boolean connect(SocketAddress address, Handler handler, boolean binary, int connectTimeout, int idleTime, String charsetName) {
 		if (logger.isInfoEnabled()) {
@@ -106,12 +106,12 @@ public class TcpServiceImpl implements TcpService {
 			connector.getSessionConfig().setTcpNoDelay(true);
 			connector.getSessionConfig().setSendBufferSize(2 * 1024 * 1024);
 			connector.getSessionConfig().setReadBufferSize(2 * 1024 * 1024);
-			connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, idleTime/1000);
-			connector.getSessionConfig().setIdleTime(IdleStatus.WRITER_IDLE, idleTime/1000);
-
+			connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, idleTime / 1000);
+			connector.getSessionConfig().setIdleTime(IdleStatus.WRITER_IDLE, idleTime / 1000);
+			
 			ConnectFuture future = connector.connect(address);
 			future.addListener(new ConnectFutureListener(serviceHandler));
-
+			
 			return true;
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
@@ -120,21 +120,20 @@ public class TcpServiceImpl implements TcpService {
 		}
 		return false;
 	}
-
+	
 	private class ConnectFutureListener implements IoFutureListener<ConnectFuture> {
 		private ServiceHandler handler;
-
+		
 		public ConnectFutureListener(ServiceHandler handler) {
 			this.handler = handler;
 		}
-
+		
 		@Override
 		public void operationComplete(ConnectFuture future) {
 			if (!future.isConnected()) {
 				try {
 					handler.sessionClosed(null);
-				} catch (Exception e) {
-				}
+				} catch (Exception e) {}
 			}
 		}
 	}

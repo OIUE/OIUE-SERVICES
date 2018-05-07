@@ -8,20 +8,20 @@ import org.json.JSONException;
 import org.oiue.service.cache.tree.CacheTreeService;
 
 public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
-
+	
 	private CacheTreeService buffer;
-
+	
 	public CacheTreeScriptServiceImpl(CacheTreeService buffer) {
 		this.buffer = buffer;
 	}
-
+	
 	@Override
 	public Object eval(String script) {
 		String line = script.toString().trim();
 		BufferScriptResult result = new BufferScriptResult();
 		result.setResult(BufferScriptResult.OK);
 		result.setData("ok");
-
+		
 		if (line.startsWith("p")) {
 			parsePut(line, result);
 		} else if (line.startsWith("r")) {
@@ -38,7 +38,7 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 		}
 		return result;
 	}
-
+	
 	private void parsePut(String line, BufferScriptResult result) {
 		// pc path,data
 		// pt tempPath,data
@@ -54,7 +54,7 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 			} else if (cmd.equalsIgnoreCase("pt")) {
 				// pt tempPath,data
 				String tmp[] = cmdArray[1].split(",", 2);
-                buffer.createTemp(tmp[0], tmp[1]);
+				buffer.createTemp(tmp[0], tmp[1]);
 			} else if (cmd.equalsIgnoreCase("pcc")) {
 				// pcc path,type,data
 				String tmp[] = cmdArray[1].split(",", 3);
@@ -67,7 +67,7 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 				// ptc tempPath,type,data
 				String tmp[] = cmdArray[1].split(",", 3);
 				if (tmp.length == 3) {
-				    
+					
 				} else {
 					result.setResult(BufferScriptResult.ERROR_ARGUMENTS);
 				}
@@ -78,7 +78,7 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 			result.setResult(BufferScriptResult.ERROR_ARGUMENTS);
 		}
 	}
-
+	
 	private void parseRemove(String line, BufferScriptResult result) {
 		// r path
 		String cmdArray[] = line.split(" ", 2);
@@ -93,10 +93,10 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 			result.setResult(BufferScriptResult.ERROR_COMMAND);
 		}
 	}
-
+	
 	private void parseGet(String line, BufferScriptResult result) throws JSONException {
-	    // gt
-	    // gd path
+		// gt
+		// gd path
 		// gt path
 		// gm name,key
 		// gs name,key
@@ -110,8 +110,8 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 			if (cmdArray[0].equalsIgnoreCase("gt")) {
 				result.setData(buffer.getChildren("/"));
 			} else if (cmdArray[0].equalsIgnoreCase("gd")) {
-                result.setData(buffer.getData("/"));
-            } else {
+				result.setData(buffer.getData("/"));
+			} else {
 				result.setResult(BufferScriptResult.ERROR_COMMAND);
 			}
 		} else if (cmdArray.length == 2) {
@@ -119,15 +119,15 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 			if (cmd.equalsIgnoreCase("gt")) {
 				result.setData(buffer.getChildren(cmdArray[1]));
 			} else if (cmd.equalsIgnoreCase("gd")) {
-                result.setData(buffer.getData(cmdArray[1]));
-            } else {
+				result.setData(buffer.getData(cmdArray[1]));
+			} else {
 				result.setResult(BufferScriptResult.ERROR_COMMAND);
 			}
 		} else {
 			result.setResult(BufferScriptResult.ERROR_ARGUMENTS);
 		}
 	}
-
+	
 	public Object getParamValue(String param, List<Object> list) {
 		String temp[] = param.split("\\{|\\}");
 		if (temp.length == 1) {
@@ -142,7 +142,7 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 				}
 			}
 		}
-
+		
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < temp.length; i = i + 2) {
 			sb.append(temp[i]);
@@ -154,7 +154,7 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 		}
 		return sb.toString();
 	}
-
+	
 	// po name,key,value
 	// pm name,key,value
 	// ps name,key,x,y,value
@@ -172,18 +172,18 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 	@Override
 	public BufferScriptResult eval(String script, List<Object> list) {
 		script = script.trim();
-
+		
 		BufferScriptResult result = new BufferScriptResult();
 		String tmp[] = script.split(" |,", 3);
 		if (tmp.length < 3) {
 			result.setResult(BufferScriptResult.ERROR_ARGUMENTS);
 			return result;
 		}
-
+		
 		if (tmp[0].startsWith("p")) {
-
+			
 			Map<String, Object> map = new HashMap<String, Object>();
-
+			
 			for (String e : tmp[2].split(",")) {
 				e = e.trim();
 				String kv[] = e.split(":", 2);
@@ -199,15 +199,14 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 					return result;
 				}
 			}
-
-		} else if (tmp[0].startsWith("rr")) {
-		} else if (tmp[0].startsWith("g")) {
-
+			
+		} else if (tmp[0].startsWith("rr")) {} else if (tmp[0].startsWith("g")) {
+			
 		}
 		result.setResult(BufferScriptResult.OK);
 		return result;
 	}
-
+	
 	// po name,key,value
 	// pm name,key,value
 	// ps name,key,x,y,value
@@ -222,17 +221,16 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 			result.setResult(BufferScriptResult.ERROR_ARGUMENTS);
 			return result;
 		}
-
+		
 		if (tmp[0].startsWith("p")) {
-
-		} else if (tmp[0].startsWith("r")) {
-		} else if (tmp[0].startsWith("g")) {
-
+			
+		} else if (tmp[0].startsWith("r")) {} else if (tmp[0].startsWith("g")) {
+			
 		}
 		result.setResult(BufferScriptResult.OK);
 		return result;
 	}
-
+	
 	public static void main(String[] args) {
 		System.out.println("start");
 		for (String e : "a{3}{34}c".split("\\{|\\}")) {
@@ -240,5 +238,5 @@ public class CacheTreeScriptServiceImpl implements CacheTreeScriptService {
 		}
 		System.out.println("end");
 	}
-
+	
 }

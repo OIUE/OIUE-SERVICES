@@ -3,15 +3,15 @@ package org.oiue.service.action.http.resource;
 import org.junit.Test;
 
 public class TestListNode {
-
+	
 	@Test
 	public void testListNode() {
 		String src, dest;
-		src="ab1dkj2ksjf3ae32ks1iji2sk1ksl1223ab;1ik3saj123";
-		dest="skf";
+		src = "ab1dkj2ksjf3ae32ks1iji2sk1ksl1223ab;1ik3saj123";
+		dest = "skf";
 		MinSubString(src, dest);
 	}
-
+	
 	public void MinSubString(String src, String dest) {
 		int min = Integer.MAX_VALUE;// 找最短子串
 		int minfront = 0;// 最短子串开始位置

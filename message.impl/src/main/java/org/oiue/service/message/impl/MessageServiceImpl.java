@@ -35,19 +35,19 @@ import org.oiue.tools.map.MapUtil;
  */
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 public class MessageServiceImpl implements MessageService, OnlineHandler, OfflineHandler {
-
+	
 	public static boolean setDataByUserIDS = false;
 	public static boolean setDataByUserID = false;
-
+	
 	public static int maxMessage = 20;
-
+	
 	public Logger logger;
 	public CacheServiceManager cache;
 	public LogService logService;
 	public OnlineService onlineService;
 	private BytesService bytesService;
 	private Dictionary props;
-
+	
 	@Override
 	public void updated(Dictionary props) {
 		this.props = props;
@@ -57,7 +57,7 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 			logger.error("updateConfigure is error:" + e.getMessage(), e);
 		}
 	}
-
+	
 	public MessageServiceImpl(LogService logService, CacheServiceManager cache, OnlineService onlineService, BytesService bytesService) {
 		try {
 			logger = logService.getLogger(this.getClass());
@@ -69,7 +69,7 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 			logger.error("MessageServiceImpl is error:" + e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	public StatusResult setDataByUserID(String user_id, Map<String, Object> data) {
 		if (logger.isDebugEnabled() && setDataByUserID)
@@ -94,7 +94,7 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 		StatusResult sr = new StatusResult();
 		return sr;
 	}
-
+	
 	@Override
 	public StatusResult setDataByUserIDS(Set userIds, Map<String, Object> data) {
 		if (logger.isDebugEnabled() && setDataByUserIDS)
@@ -113,13 +113,13 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 		sr.setResult(lsr.size() == 0 ? StatusResult._SUCCESS : StatusResult._ncriticalAbnormal);
 		return sr;
 	}
-
+	
 	@Override
 	public StatusResult setDataBytokenId(String tokenId, Map<String, Object> data) {
 		Online online = this.onlineService.getOnlineByTokenId(tokenId);
 		return this.setDataByOnline(online, data);
 	}
-
+	
 	@Override
 	public StatusResult setDataByOnline(Online online, Map<String, Object> data) {
 		StatusResult sr = new StatusResult();
@@ -132,108 +132,108 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 		sysmap = (Map) online.getO();
 		if (sysmap != null) {
 			switch (online.getBestType()) {
-			case tcp:
-				List<Session> sessionList = (List<Session>) sysmap.get(OnlineDataField._online_cs_session);
-				if (sessionList != null) {
-					for (Iterator iterator = sessionList.iterator(); iterator.hasNext();) {
-						Session session = (Session) iterator.next();
-						if (session == null) {
-							iterator.remove();
-							sr.setDescription("incept user[" + online.getTokenId() + "] offline !");
-						} else
-							try {
-								if ((boolean) session.getAttribute("binary")) {
-									String rule = this.props.get("message." + MapUtil.get(data, "system_msg_type")) + "";
-									if (logger.isDebugEnabled()) {
-										logger.debug("send msg:" + data + ",rule:" + rule);
+				case tcp:
+					List<Session> sessionList = (List<Session>) sysmap.get(OnlineDataField._online_cs_session);
+					if (sessionList != null) {
+						for (Iterator iterator = sessionList.iterator(); iterator.hasNext();) {
+							Session session = (Session) iterator.next();
+							if (session == null) {
+								iterator.remove();
+								sr.setDescription("incept user[" + online.getTokenId() + "] offline !");
+							} else
+								try {
+									if ((boolean) session.getAttribute("binary")) {
+										String rule = this.props.get("message." + MapUtil.get(data, "system_msg_type")) + "";
+										if (logger.isDebugEnabled()) {
+											logger.debug("send msg:" + data + ",rule:" + rule);
+										}
+										int serial = 0;
+										if (session.getAttribute("serial") != null) {
+											serial = (int) session.getAttribute("serial");
+										}
+										data.put("serial", serial);
+										session.setAttribute("serial", ++serial);
+										data.remove(BytesRuleField.sys_packet_index);
+										byte[] bs = bytesService.encoded(null, rule, data);
+										if (logger.isDebugEnabled()) {
+											logger.debug("send msg:" + ByteUtil.toHexString(bs) + "|" + session);
+										}
+										session.write(bs);
+									} else {
+										session.write(JSONUtil.getJSONString(data));
 									}
-									int serial=0;
-									if (session.getAttribute("serial") != null) {
-										serial = (int) session.getAttribute("serial");
-									}
-									data.put("serial", serial);
-									session.setAttribute("serial", ++serial);
-									data.remove(BytesRuleField.sys_packet_index);
-									byte[] bs = bytesService.encoded(null, rule, data);
-									if (logger.isDebugEnabled()) {
-										logger.debug("send msg:" + ByteUtil.toHexString(bs) + "|" + session);
-									}
-									session.write(bs);
-								} else {
-									session.write(JSONUtil.getJSONString(data));
+									sr.setResult(StatusResult._SUCCESS);
+									return sr;
+								} catch (Throwable e) {
+									String msg = "send data by session is error!" + ExceptionUtil.getCausedBySrcMsg(e);
+									logger.error(msg, e);
+									sr.setDescription("incept user[" + online.getToken() + "] " + msg);
 								}
-								sr.setResult(StatusResult._SUCCESS);
-								return sr;
-							} catch (Throwable e) {
-								String msg = "send data by session is error!" + ExceptionUtil.getCausedBySrcMsg(e);
-								logger.error(msg, e);
-								sr.setDescription("incept user[" + online.getToken() + "] " + msg);
-							}
+						}
+					} else {
+						sr.setDescription("incept user[" + online.getToken() + "] offline or no gateway!2");
 					}
-				} else {
-					sr.setDescription("incept user[" + online.getToken() + "] offline or no gateway!2");
-				}
-				break;
-
-			case webSocket:
-				List<Session> list = (List<Session>) sysmap.get(OnlineDataField._online_cs_session);
-				if (list != null) {
-					for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-						Session session = (Session) iterator.next();
-						if (session == null) {
-							iterator.remove();
-							sr.setDescription("incept user[" + online.getToken() + "] offline !");
-						} else
-							try {
-								if ((boolean) session.getAttribute("binary")) {
-									String rule = this.props.get("message." + MapUtil.get(data, "system_msg_type")) + "";
-									if (logger.isDebugEnabled()) {
-										logger.debug("send msg:" + data + ",rule:" + rule);
+					break;
+				
+				case webSocket:
+					List<Session> list = (List<Session>) sysmap.get(OnlineDataField._online_cs_session);
+					if (list != null) {
+						for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+							Session session = (Session) iterator.next();
+							if (session == null) {
+								iterator.remove();
+								sr.setDescription("incept user[" + online.getToken() + "] offline !");
+							} else
+								try {
+									if ((boolean) session.getAttribute("binary")) {
+										String rule = this.props.get("message." + MapUtil.get(data, "system_msg_type")) + "";
+										if (logger.isDebugEnabled()) {
+											logger.debug("send msg:" + data + ",rule:" + rule);
+										}
+										int serial = 0;
+										if (session.getAttribute("serial") != null) {
+											serial = (int) session.getAttribute("serial");
+										}
+										data.put("serial", serial);
+										session.setAttribute("serial", ++serial);
+										data.remove(BytesRuleField.sys_packet_index);
+										byte[] bs = bytesService.encoded(null, rule, data);
+										if (logger.isDebugEnabled()) {
+											logger.debug("send msg:" + ByteUtil.toHexString(bs) + "|" + session);
+										}
+										session.write(bs);
+									} else {
+										session.write(JSONUtil.getJSONString(data));
 									}
-									int serial=0;
-									if (session.getAttribute("serial") != null) {
-										serial = (int) session.getAttribute("serial");
-									}
-									data.put("serial", serial);
-									session.setAttribute("serial", ++serial);
-									data.remove(BytesRuleField.sys_packet_index);
-									byte[] bs = bytesService.encoded(null, rule, data);
-									if (logger.isDebugEnabled()) {
-										logger.debug("send msg:" + ByteUtil.toHexString(bs) + "|" + session);
-									}
-									session.write(bs);
-								} else {
-									session.write(JSONUtil.getJSONString(data));
+									sr.setResult(StatusResult._SUCCESS);
+									return sr;
+								} catch (Throwable e) {
+									String msg = "send data by session is error!" + ExceptionUtil.getCausedBySrcMsg(e);
+									logger.error(msg, e);
+									sr.setDescription("incept user[" + online.getToken() + "] " + msg);
 								}
-								sr.setResult(StatusResult._SUCCESS);
-								return sr;
-							} catch (Throwable e) {
-								String msg = "send data by session is error!" + ExceptionUtil.getCausedBySrcMsg(e);
-								logger.error(msg, e);
-								sr.setDescription("incept user[" + online.getToken() + "] " + msg);
-							}
+						}
+					} else {
+						sr.setDescription("incept user[" + online.getToken() + "] offline or no gateway!2");
 					}
-				} else {
-					sr.setDescription("incept user[" + online.getToken() + "] offline or no gateway!2");
-				}
-				break;
-
-			case socketIo:
-
-			case udp:
-
-			case http:
-			default:
-				break;
+					break;
+				
+				case socketIo:
+				
+				case udp:
+				
+				case http:
+				default:
+					break;
 			};
 		} else {
 			sr.setDescription("incept user[" + online.getToken() + "] offline or no gateway!1 " + online);
 		}
-
+		
 		sr.setResult(StatusResult._ncriticalAbnormal);
 		return sr;
 	}
-
+	
 	@Override
 	public StatusResult setDataByOnline(Online online, byte[] data) {
 		StatusResult sr = new StatusResult();
@@ -263,14 +263,14 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 		sr.setResult(StatusResult._ncriticalAbnormal);
 		return sr;
 	}
-
+	
 	@Override
 	public void logout(Online online) {
-
+		
 	}
-
+	
 	@Override
 	public void login(Online online) {
-
+		
 	}
 }

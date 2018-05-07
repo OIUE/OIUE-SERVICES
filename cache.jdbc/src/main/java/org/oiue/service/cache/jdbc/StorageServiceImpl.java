@@ -28,18 +28,18 @@ import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.map.MapUtil;
 
 public class StorageServiceImpl implements CacheService, Runnable {
-
+	
 	private Logger logger;
 	private SqlService sqlService;
-
+	
 	private Map<String, LinkedList<Collection<Object>>> storageParamsMap = new HashMap<>();
-
+	
 	public StorageServiceImpl(LogService logService, SqlService sqlService) {
 		logger = logService.getLogger(this.getClass());
 		this.sqlService = sqlService;
-		new Thread(this,"SystemJDBCStorageService").start();
+		new Thread(this, "SystemJDBCStorageService").start();
 	}
-
+	
 	@Override
 	public void put(String name, Object object, Type type) {
 		synchronized (storageParamsMap) {
@@ -48,7 +48,7 @@ public class StorageServiceImpl implements CacheService, Runnable {
 				params = new LinkedList<Collection<Object>>();
 				storageParamsMap.put(name, params);
 			}
-
+			
 			if (object instanceof Collection) {
 				params.add((Collection<Object>) object);
 			} else {
@@ -58,10 +58,10 @@ public class StorageServiceImpl implements CacheService, Runnable {
 			}
 		}
 	}
-
+	
 	public void storage(Map event, Collection<Collection<Object>> paramslist) {
-		if(logger.isDebugEnabled()){
-			logger.debug("Storage [{}] [{}]", event,paramslist);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Storage [{}] [{}]", event, paramslist);
 		}
 		Connection conn = sqlService.getConnection(MapUtil.getString(event, "ds_name"));
 		if (conn == null) {
@@ -87,7 +87,7 @@ public class StorageServiceImpl implements CacheService, Runnable {
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
 			}
-
+			
 			try {
 				conn.close();
 			} catch (Exception ex) {
@@ -95,71 +95,68 @@ public class StorageServiceImpl implements CacheService, Runnable {
 			}
 		}
 	}
-
+	
 	@Override
 	public void put(String name, String key, Object object, Type type) {
-
+		
 	}
-
+	
 	@Override
 	public void put(String name, Object object, Type type, int expire) {
-
+		
 	}
-
+	
 	@Override
 	public void put(String name, String key, Object object, Type type, int expire) {
-
+		
 	}
-
+	
 	@Override
 	public void put(String name, String key, Type type, Object... objects) {
-
+		
 	}
-
+	
 	@Override
 	public Object get(String name) {
 		return null;
 	}
-
+	
 	@Override
 	public boolean contains(String name, String... keys) {
 		return false;
 	}
-
+	
 	@Override
 	public Object get(String name, String key) {
 		return null;
 	}
-
+	
 	@Override
 	public long delete(String name) {
 		return 0;
 	}
-
+	
 	@Override
 	public long delete(String name, String... keys) {
 		return 0;
 	}
-
+	
 	@Override
 	public boolean exists(String name) {
 		return false;
 	}
-
+	
 	@Override
 	public void swap(String nameA, String nameB) {
-
+		
 	}
-
+	
 	/**
 	 * 参JDBCUtil实现 设置prepared的参数
 	 *
-	 * @param column
-	 *            参数的标号
-	 * @param obj
-	 *            Object obj是参数值
-	 * @throws SQLException
-	 *             sql异常
+	 * @param column 参数的标号
+	 * @param obj Object obj是参数值
+	 * @throws SQLException sql异常
 	 */
 	public void setParameter(PreparedStatement pstmt, int column, Object obj) {
 		try {
@@ -188,13 +185,13 @@ public class StorageServiceImpl implements CacheService, Runnable {
 				pstmt.setObject(column, obj);
 			}
 			// else logger.error("不支持的参数类型!");
-
+			
 		} catch (Exception e) {
 			throw new RuntimeException("参数设置出错[" + column + "," + obj + "]：" + e);
 		}
 	}
-
-	public void setQueryParams(PreparedStatement pstmt, Collection queryParams)  {
+	
+	public void setQueryParams(PreparedStatement pstmt, Collection queryParams) {
 		if ((queryParams == null) || (queryParams.isEmpty())) {
 			return;
 		}
@@ -206,7 +203,7 @@ public class StorageServiceImpl implements CacheService, Runnable {
 			i++;
 		}
 	}
-
+	
 	@Override
 	public void run() {
 		String alias = "postgis";
@@ -220,39 +217,38 @@ public class StorageServiceImpl implements CacheService, Runnable {
 			for (String key : tmk) {
 				Map event = events.get(key);
 				try {
-					if(event==null){
+					if (event == null) {
 						List params = new ArrayList();
 						params.add(key);
 						SqlServiceResult sr = sqlService.selectMap(alias, selectEvent, params);
-						if(sr.getData() instanceof List){
-							List datas=(List) sr.getData();
-							if(datas.size()==1)
+						if (sr.getData() instanceof List) {
+							List datas = (List) sr.getData();
+							if (datas.size() == 1)
 								event = (Map) datas.get(0);
-							else{
-								logger.error("query event is error:"+datas);
+							else {
+								logger.error("query event is error:" + datas);
 								synchronized (storageParamsMap) {
 									storageParamsMap.remove(key);
 								}
 							}
 						}
-						if(event!=null){
-							LinkedList<Collection<Object>> list=null;
+						if (event != null) {
+							LinkedList<Collection<Object>> list = null;
 							synchronized (storageParamsMap) {
 								list = storageParamsMap.remove(key);
 							}
-							if(list!=null)
+							if (list != null)
 								storage(event, list);
 						}
 					}
 				} catch (Throwable e) {
-					logger.error("call event is error:"+e.getMessage(), e);
+					logger.error("call event is error:" + e.getMessage(), e);
 				}
 			}
 			try {
 				Thread.sleep(5);
-			} catch (Throwable e) {
-			}
+			} catch (Throwable e) {}
 		}
-
+		
 	}
 }

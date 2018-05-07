@@ -1,4 +1,5 @@
 package org.oiue.service.threadpool.impl;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -28,7 +29,7 @@ public class ExecutorServiceHelper {
 	private ThreadPoolExecutor executor;
 	private DelayQueue<TimeLimitFuture<?>> timeLimitJobQueue = new DelayQueue<TimeLimitFuture<?>>();
 	private ExecutorService delayQueueExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-
+		
 		@Override
 		public Thread newThread(Runnable r) {
 			Thread thread = new Thread(r);
@@ -38,11 +39,11 @@ public class ExecutorServiceHelper {
 	});
 	private final AtomicInteger atomicInteger = new AtomicInteger(0);
 	private boolean stopTimeOutThread = false;
-
+	
 	public static ExecutorServiceHelper buildFixedThreadExecutor() {
 		return new ExecutorServiceHelper((ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_THREAD_COUNT));
 	}
-
+	
 	/**
 	 * 当提及的任务超出capacity的数量时，任务会被直接丢弃并向上抛出异常
 	 *
@@ -55,7 +56,7 @@ public class ExecutorServiceHelper {
 	public static ExecutorServiceHelper buildFixedCountThreadExecutor(String name, int threadCount, int capacity, UncaughtExceptionHandler handler) {
 		return new ExecutorServiceHelper(name, new ThreadPoolExecutor(threadCount, threadCount, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(capacity), new ThreadPoolExecutor.AbortPolicy()), handler);
 	}
-
+	
 	/**
 	 * @param name 用于确定，线程池中每一个线程的名字的前缀
 	 * @param threadCount 最大线程数量
@@ -65,11 +66,11 @@ public class ExecutorServiceHelper {
 	public static ExecutorServiceHelper buildFixedThreadExecutor(String name, int threadCount, UncaughtExceptionHandler handler) {
 		return new ExecutorServiceHelper(name, (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount), handler);
 	}
-
+	
 	public static ExecutorServiceHelper buildCacheThreadExecutor() {
 		return new ExecutorServiceHelper((ThreadPoolExecutor) Executors.newCachedThreadPool());
 	}
-
+	
 	/**
 	 * @param name 用于确定，线程池中每一个线程的名字的前缀
 	 * @param handler 用于接收线程抛出的异常
@@ -78,25 +79,25 @@ public class ExecutorServiceHelper {
 	public static ExecutorServiceHelper buildCacheThreadExecutor(String name, UncaughtExceptionHandler handler) {
 		return new ExecutorServiceHelper(name, (ThreadPoolExecutor) Executors.newCachedThreadPool(), handler);
 	}
-
+	
 	private ExecutorServiceHelper(ThreadPoolExecutor executor) {
 		init(ExecutorServiceHelper.class.getName(), executor, null);
 	}
-
+	
 	private ExecutorServiceHelper(String name, ThreadPoolExecutor executor, UncaughtExceptionHandler handler) {
 		init(name, executor, handler);
 	}
-
+	
 	private void init(String name, ThreadPoolExecutor executor, UncaughtExceptionHandler handler) {
 		this.executor = executor;
 		this.name = name;
 		executor.setThreadFactory(getThreadFactory(handler));
 		initDelayMonitor();
 	}
-
+	
 	private ThreadFactory getThreadFactory(UncaughtExceptionHandler handler) {
 		return new ThreadFactory() {
-
+			
 			@Override
 			public Thread newThread(Runnable r) {
 				Thread thread = new Thread(r);
@@ -108,7 +109,7 @@ public class ExecutorServiceHelper {
 			}
 		};
 	}
-
+	
 	private void initDelayMonitor() {
 		delayQueueExecutor.execute(() -> {
 			while (!Thread.interrupted()) {
@@ -136,7 +137,7 @@ public class ExecutorServiceHelper {
 			}
 		});
 	}
-
+	
 	@SuppressWarnings("deprecation")
 	private void killThread(FutureTask<?> submit) {
 		try {
@@ -152,21 +153,21 @@ public class ExecutorServiceHelper {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
+	
 	public void execute(Runnable job) {
 		executor.execute(job);
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void execute(Runnable job, long limitTime, TimeUnit unit) {
 		Future<?> future = executor.submit(job);
 		timeLimitJobQueue.put(new TimeLimitFuture(future, null, limitTime, unit));
 	}
-
+	
 	public <T> Future<T> submit(Callable<T> timeLimitJob) {
 		return executor.submit(timeLimitJob);
 	}
-
+	
 	/**
 	 * @param timeLimitJob job
 	 * @param callBack 接收返回值的回调
@@ -176,56 +177,56 @@ public class ExecutorServiceHelper {
 		Future<T> future = executor.submit(timeLimitJob);
 		timeLimitJobQueue.put(new TimeLimitFuture<T>(future, new CallBackWarp<T>(callBack), millisecondLimitTime, TimeUnit.MILLISECONDS));
 	}
-
+	
 	public <T> void submit(Callable<T> timeLimitJob, CallBack<T> callBack, long limitTime, TimeUnit unit) {
 		Future<T> future = executor.submit(timeLimitJob);
 		timeLimitJobQueue.put(new TimeLimitFuture<T>(future, new CallBackWarp<T>(callBack), limitTime, unit));
 	}
-
+	
 	public int getWattingCount() {
 		return executor.getQueue().size();
 	}
-
+	
 	public void removeAllWattingJob() {
 		executor.getQueue().clear();
 	}
-
+	
 	public void shutdownNow() {
 		executor.shutdownNow();
 	}
-
+	
 	public boolean isStopTimeOutThread() {
 		return stopTimeOutThread;
 	}
-
+	
 	public void setStopTimeOutThread(boolean stopTimeOutThread) {
 		this.stopTimeOutThread = stopTimeOutThread;
 	}
-
+	
 	public static interface CallBack<T> {
 		void callback(T result);
 	}
-
+	
 	private static class CallBackWarp<T> {
 		private CallBack<T> callBack;
-
+		
 		public CallBackWarp(CallBack<T> callBack) {
 			this.callBack = callBack;
 		}
-
+		
 		@SuppressWarnings("unchecked")
 		public void setResult(Object result) {
 			callBack.callback((T) result);
 		}
-
+		
 	}
-
+	
 	private static class TimeLimitFuture<T> implements Delayed {
 		private Future<T> future;
 		private long limitTime;
 		private long triggerTime;
 		private CallBackWarp<T> callbackWarp;
-
+		
 		public TimeLimitFuture(Future<T> future, CallBackWarp<T> callbackWarp, long limitTime, TimeUnit unit) {
 			this.future = future;
 			this.limitTime = limitTime;
@@ -233,7 +234,7 @@ public class ExecutorServiceHelper {
 			this.triggerTime = TimeUnit.NANOSECONDS.convert(limitTime, unit) + System.nanoTime();
 			this.callbackWarp = callbackWarp;
 		}
-
+		
 		@Override
 		public int compareTo(Delayed o) {
 			if (o == null || !(o instanceof TimeLimitFuture))
@@ -249,11 +250,11 @@ public class ExecutorServiceHelper {
 				return -1;
 			}
 		}
-
+		
 		@Override
 		public long getDelay(TimeUnit unit) {
 			return unit.convert(triggerTime - System.nanoTime(), TimeUnit.NANOSECONDS);
 		}
-
+		
 	}
 }

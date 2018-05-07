@@ -29,14 +29,16 @@ public class SynchronizationDbRefresh implements Task {
 	private Logger logger;
 	private List<String> jobNameList = new ArrayList<String>();
 	private boolean isdebug = false;
-
+	
 	public SynchronizationDbRefresh(CacheServiceManager cacheService, TaskService taskService, FactoryService factoryService, LogService logService) {
 		this.cacheService = cacheService;
 		this.taskService = taskService;
 		this.factoryService = factoryService;
 		this.logger = logService.getLogger(this.getClass());
 	}
+	
 	private String data_source_name;
+	
 	public void updateProps(Dictionary props) {
 		logger.info("update property, props = " + props);
 		if (props == null) {
@@ -44,35 +46,35 @@ public class SynchronizationDbRefresh implements Task {
 			return;
 		}
 		try {
-			isdebug = StringUtil.isTrue(props.get("isdebug")+"");
+			isdebug = StringUtil.isTrue(props.get("isdebug") + "");
 		} catch (Throwable e) {}
-
+		
 		for (String jobName : jobNameList) {
 			taskService.unregister(jobName);
 		}
 		jobNameList.clear();
-
+		
 		try {
 			String event_id = (String) props.get("task_event_id");
 			data_source_name = (String) props.get("data_source_name");
-
-			if(StringUtil.isEmptys(event_id))
+			
+			if (StringUtil.isEmptys(event_id))
 				return;
-
-			if(StringUtil.isEmptys(data_source_name))
-				data_source_name=null;
-
+			
+			if (StringUtil.isEmptys(data_source_name))
+				data_source_name = null;
+			
 			IResource iresource = factoryService.getBmo(IResource.class.getName());
 			List<Map> object = (List) iresource.callEvent(event_id, data_source_name, new HashMap<>());
-
+			
 			for (Map event : object) {
-				if(isdebug){
+				if (isdebug) {
 					this.execute(event);
 					continue;
 				}
 				String quartz = MapUtil.getString(event, "quartz");
 				String task_event_id = MapUtil.getString(event, "task_event_id");
-
+				
 				String jobName = this.getClass().getName() + "_" + task_event_id;
 				if (taskService.registerCron(jobName, quartz, this, event)) {
 					jobNameList.add(jobName);
@@ -82,12 +84,12 @@ public class SynchronizationDbRefresh implements Task {
 				}
 				
 			}
-
+			
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	public void execute(Map context) {
 		synchronized (context) {
@@ -100,7 +102,7 @@ public class SynchronizationDbRefresh implements Task {
 			}
 		}
 	}
-
+	
 	public void shutdown() {
 		logger.info("shutdown");
 		for (String jobName : jobNameList) {
@@ -108,20 +110,20 @@ public class SynchronizationDbRefresh implements Task {
 		}
 		jobNameList.clear();
 	}
-
+	
 	public Object max(Object a, Object b) {
 		if ((a == null) && (b == null)) {
 			return null;
 		}
-
+		
 		if (a == null) {
 			return b;
 		}
-
+		
 		if (b == null) {
 			return a;
 		}
-
+		
 		if (a instanceof Number) {
 			if (((Number) a).doubleValue() > ((Number) b).doubleValue()) {
 				return a;
@@ -149,47 +151,47 @@ public class SynchronizationDbRefresh implements Task {
 		}
 		return b;
 	}
-
+	
 	private void processRefreshTask(Map task) {
 		String event = (String) task.get("task_event");
 		String event_id = (String) task.get("task_event_id");
-
+		
 		Object incrementReference = task.get("task_incrementReference");
 		String incrementEvent_id = (String) task.get("task_incrementEvent_id");
-
-		String cacheName= MapUtil.getString(task, "task_cache_service");
-
-		String cacheKey= MapUtil.getString(task, "task_cachename");
+		
+		String cacheName = MapUtil.getString(task, "task_cache_service");
+		
+		String cacheKey = MapUtil.getString(task, "task_cachename");
 		String command = MapUtil.getString(task, "task_command");
 		String type = MapUtil.getString(task, "task_type");
-
+		
 		boolean isPut = command.equalsIgnoreCase("p");
 		boolean isSwap = command.equalsIgnoreCase("s");
 		String bufferValueKey = (type.length() >= 2 ? type.substring(1, 2) : null);
-
+		
 		String swapCacheKey = null;
 		if (isSwap == true) {
 			isPut = true;
 			swapCacheKey = cacheKey;
 			cacheKey = cacheKey + "_" + UUID.randomUUID().toString().replace("-", "");
 		}
-
+		
 		Type bufferType;
 		switch (type.charAt(0)) {
-		case 'o':
-			bufferType = Type.ONE;
-			break;
-		case 'm':
-			bufferType = Type.MANY;
-			break;
-		case 's':
-			bufferType = Type.SPATIAL;
-			break;
-		default:
-			logger.error("sync action error, refresh = " + event);
-			return;
+			case 'o':
+				bufferType = Type.ONE;
+				break;
+			case 'm':
+				bufferType = Type.MANY;
+				break;
+			case 's':
+				bufferType = Type.SPATIAL;
+				break;
+			default:
+				logger.error("sync action error, refresh = " + event);
+				return;
 		}
-
+		
 		try {
 			String[] incrementReferences = null;
 			if (incrementReference != null)
@@ -201,8 +203,8 @@ public class SynchronizationDbRefresh implements Task {
 					event_id = incrementEvent_id;
 				}
 			IResource iresource = factoryService.getBmo(IResource.class.getName());
-			iresource.callEvent(event_id, this.data_source_name, task,new cb(incrementReferences, incrementReferences, task, isPut, cacheName, isSwap?swapCacheKey:cacheKey,bufferType,bufferValueKey));
-
+			iresource.callEvent(event_id, this.data_source_name, task, new cb(incrementReferences, incrementReferences, task, isPut, cacheName, isSwap ? swapCacheKey : cacheKey, bufferType, bufferValueKey));
+			
 			if (swapCacheKey != null) {
 				cacheService.getCacheService(cacheName).swap(swapCacheKey, cacheKey);
 				cacheService.getCacheService(cacheName).delete(cacheKey);
@@ -210,28 +212,31 @@ public class SynchronizationDbRefresh implements Task {
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
-
+		
 	}
+	
 	class cb extends CallBack {
 		String[] incrementReferences;
 		Object incrementReference;
 		Map task;
-
+		
 		Type bufferType;
 		boolean isPut = true;
-		String bufferValueKey ;
+		String bufferValueKey;
 		String cacheName;
 		String cacheKey;
-		public cb(String[] incrementReferences,Object incrementReference,Map task,boolean isPut,String cacheName,String cacheKey,Type bufferType,String bufferValueKey){
-			this.bufferType=bufferType;
-			this.incrementReferences=incrementReferences;
-			this.incrementReference=incrementReference;
-			this.task=task;
-			this.isPut=isPut;
-			this.cacheKey=cacheKey;
-			this.cacheName=cacheName;
-			this.bufferValueKey=bufferValueKey;
+		
+		public cb(String[] incrementReferences, Object incrementReference, Map task, boolean isPut, String cacheName, String cacheKey, Type bufferType, String bufferValueKey) {
+			this.bufferType = bufferType;
+			this.incrementReferences = incrementReferences;
+			this.incrementReference = incrementReference;
+			this.task = task;
+			this.isPut = isPut;
+			this.cacheKey = cacheKey;
+			this.cacheName = cacheName;
+			this.bufferValueKey = bufferValueKey;
 		}
+		
 		@Override
 		public boolean callBack(Map record) {
 			try {
@@ -240,16 +245,16 @@ public class SynchronizationDbRefresh implements Task {
 						task.put(incrementReferences[i], max(MapUtil.get(task, incrementReferences[i]), MapUtil.get(record, incrementReferences[i])));
 					}
 				}
-
+				
 				if (isPut == true) {
 					if (bufferType == Type.SPATIAL) {
-						//							if (record.containsKey("x")) {
-						//								if (bufferValueKey != null) {
-						//									cacheService.put(bufferName, (String) record.get("k"), (Double) record.get("x"), (Double) record.get("y"), record.get(bufferValueKey));
-						//								} else {
-						//									cacheService.put(bufferName, (String) record.get("k"), (Double) record.get("x"), (Double) record.get("y"), record);
-						//								}
-						//							}
+						// if (record.containsKey("x")) {
+						// if (bufferValueKey != null) {
+						// cacheService.put(bufferName, (String) record.get("k"), (Double) record.get("x"), (Double) record.get("y"), record.get(bufferValueKey));
+						// } else {
+						// cacheService.put(bufferName, (String) record.get("k"), (Double) record.get("x"), (Double) record.get("y"), record);
+						// }
+						// }
 					} else {
 						if (bufferValueKey != null) {
 							cacheService.getCacheService(cacheName).put(cacheKey, (String) record.get("k"), record.get(bufferValueKey), bufferType);
@@ -259,22 +264,22 @@ public class SynchronizationDbRefresh implements Task {
 					}
 				} else {
 					if (bufferType == Type.MANY) {
-						//							if (bufferValueKey != null) {
-						//								cacheService.delete(bufferName, (String) record.get("k"), record.get(bufferValueKey));
-						//							} else {
-						//								cacheService.delete(bufferName, (String) record.get("k"), record);
-						//							}
+						// if (bufferValueKey != null) {
+						// cacheService.delete(bufferName, (String) record.get("k"), record.get(bufferValueKey));
+						// } else {
+						// cacheService.delete(bufferName, (String) record.get("k"), record);
+						// }
 					} else {
 						cacheService.getCacheService(cacheName).delete(cacheKey, (String) record.get("k"));
 					}
 				}
-
+				
 			} catch (Exception e) {
-				logger.error("cacheName:{} cacheKey:{} record:{} error:{}",cacheName,cacheKey,record,e.getMessage());
-				logger.error(e.getMessage(),e);
+				logger.error("cacheName:{} cacheKey:{} record:{} error:{}", cacheName, cacheKey, record, e.getMessage());
+				logger.error(e.getMessage(), e);
 			}
 			return false;
 		}
 	}
-
+	
 }

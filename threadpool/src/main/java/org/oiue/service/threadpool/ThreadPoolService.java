@@ -10,20 +10,20 @@ import java.util.concurrent.TimeUnit;
 
 public interface ThreadPoolService extends Serializable {
 	
-	
 	/**
 	 * 
-	 * @param name  线程池名称
+	 * @param name 线程池名称
 	 * @param corePoolSize 线程池的基本大小
 	 * @param maximumPoolSize 线程池最大大小
 	 * @param keepAliveTime 线程活动保持时间
 	 * @param unit 线程活动保持时间的单位
 	 * @param workQueue 任务队列
 	 */
-	public void registerThreadPool(String name,int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue);
+	public void registerThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue);
+	
 	/**
 	 * 
-	 * @param name  线程池名称
+	 * @param name 线程池名称
 	 * @param corePoolSize 线程池的基本大小
 	 * @param maximumPoolSize 线程池最大大小
 	 * @param keepAliveTime 线程活动保持时间
@@ -32,26 +32,28 @@ public interface ThreadPoolService extends Serializable {
 	 * @param threadFactory 创建线程的工厂
 	 * @param handler 饱和策略
 	 */
-	public void registerThreadPool(String name,int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler);
-
+	public void registerThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler);
+	
 	/**
 	 * 
 	 * @param name
 	 */
 	public void removeThreadPool(String name);
+	
 	/**
 	 * 
 	 * @param name 线程池名称
 	 * @param task 任务
 	 */
-	public void addTask(String name,Runnable task);
+	public void addTask(String name, Runnable task);
 	
 	/**
 	 * 
 	 * @param name 线程池名称
 	 * @param maximumPoolSize 线程池最大线程数量
 	 */
-	public void setMaximumPoolSize(String name,int maximumPoolSize);
+	public void setMaximumPoolSize(String name, int maximumPoolSize);
+	
 	public int getMaximumPoolSize(String name);
 	
 	/**
@@ -59,7 +61,8 @@ public interface ThreadPoolService extends Serializable {
 	 * @param name 线程池名称
 	 * @param corePoolSize 线程池核心数量
 	 */
-	public void setCorePoolSize(String name,int corePoolSize);
+	public void setCorePoolSize(String name, int corePoolSize);
+	
 	public int getCorePoolSize(String name);
 	
 	/**
@@ -82,12 +85,12 @@ public interface ThreadPoolService extends Serializable {
 	 */
 	public BlockingQueue<Runnable> getQueue(String name);
 	
-//	/**
-//	 * 
-//	 * @param name
-//	 * @return
-//	 */
-//	public ThreadPoolExecutor getThreadPool(String name);
+	// /**
+	// *
+	// * @param name
+	// * @return
+	// */
+	// public ThreadPoolExecutor getThreadPool(String name);
 	
 	/**
 	 * 配置变更

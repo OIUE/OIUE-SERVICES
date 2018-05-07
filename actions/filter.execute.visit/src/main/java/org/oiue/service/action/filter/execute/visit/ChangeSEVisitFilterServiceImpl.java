@@ -28,35 +28,35 @@ public class ChangeSEVisitFilterServiceImpl implements ActionResultFilter, Seria
 	private String cacheType;
 	private String cacheName;
 	private ActionService actionService = null;
-	private CacheServiceManager cacheServiceManager= null;
-
+	private CacheServiceManager cacheServiceManager = null;
+	
 	public ChangeSEVisitFilterServiceImpl(LogService logService, ActionService actionService, CacheServiceManager cacheServiceManager) {
 		logger = logService.getLogger(this.getClass());
 		this.actionService = actionService;
 		this.cacheServiceManager = cacheServiceManager;
 	}
-
+	
 	public void updated(Dictionary dict) {
 		actionService.registerActionResultFilter("changeSEVisitFilter", this, 17);
-		cacheType = MapUtil.getString(dict, "cacheType","storage");
-		cacheName = MapUtil.getString(dict, "cacheName","1297676d-7610-4c31-a1e0-841f23de6ea7");
+		cacheType = MapUtil.getString(dict, "cacheType", "storage");
+		cacheName = MapUtil.getString(dict, "cacheName", "1297676d-7610-4c31-a1e0-841f23de6ea7");
 	}
-
+	
 	@Override
 	public StatusResult doFilter(Map per, Object source_data) {
 		String modulename = MapUtil.getString(per, "modulename");
 		String operation = MapUtil.getString(per, "operation");
-
+		
 		modulename = modulename == null ? "" : modulename.trim();
 		operation = operation == null ? "" : operation.trim();
-
+		
 		StatusResult afr = new StatusResult();
-		if("execute".equals(modulename)){
+		if ("execute".equals(modulename)) {
 			List pers = new ArrayList<>();
 			pers.add(operation);
 			cacheServiceManager.getCacheService(cacheType).put(cacheName, pers, Type.MANY);
 		}
-
+		
 		afr.setResult(StatusResult._SUCCESS);
 		afr.setDescription("validate success");
 		per.put("success", true);

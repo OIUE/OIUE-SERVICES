@@ -9,32 +9,33 @@ import org.oiue.service.osgi.FrameActivator;
 import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 
 public class Activator extends FrameActivator {
-
-    @Override
-    public void start()  {
-        this.start(new MulitServiceTrackerCustomizer() {
-        	AuthServiceManagerImpl authServiceManager;
-            @Override
-            public void removedService() {
-            	authServiceManager.unregister();
-            }
-
-            @Override
-            public void addingService() {
-                LogService logService = getService(LogService.class);
-
-                authServiceManager = new AuthServiceManagerImpl(logService);
-                registerService(AuthService.class, authServiceManager);
-                registerService(AuthServiceManager.class, authServiceManager);
-            }
-
-            @Override
-            public void updated(Dictionary<String, ?> props) {
-            	authServiceManager.updated(props);
-            }
-        }, LogService.class);
-    }
-
-    @Override
-    public void stop()  {}
+	
+	@Override
+	public void start() {
+		this.start(new MulitServiceTrackerCustomizer() {
+			AuthServiceManagerImpl authServiceManager;
+			
+			@Override
+			public void removedService() {
+				authServiceManager.unregister();
+			}
+			
+			@Override
+			public void addingService() {
+				LogService logService = getService(LogService.class);
+				
+				authServiceManager = new AuthServiceManagerImpl(logService);
+				registerService(AuthService.class, authServiceManager);
+				registerService(AuthServiceManager.class, authServiceManager);
+			}
+			
+			@Override
+			public void updated(Dictionary<String, ?> props) {
+				authServiceManager.updated(props);
+			}
+		}, LogService.class);
+	}
+	
+	@Override
+	public void stop() {}
 }

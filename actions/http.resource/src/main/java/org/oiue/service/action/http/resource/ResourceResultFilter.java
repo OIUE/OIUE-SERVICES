@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.oiue.tools.StatusResult;
 
-
 public interface ResourceResultFilter extends Serializable {
 	StatusResult doFilter(HttpServletRequest request, HttpServletResponse response);
 }

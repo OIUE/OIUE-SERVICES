@@ -26,42 +26,38 @@
  */
 package org.apache.http.client.fluent;
 
-
 /**
- * This example demonstrates how the he HttpClient fluent API can be used to execute multiple
- * requests within the same security context. The Executor class maintains a common context shared
- * by all requests executed with it. The Executor is thread-safe and can be used to execute
- * requests concurrently from multiple threads of execution.
+ * This example demonstrates how the he HttpClient fluent API can be used to execute multiple requests within the same security context. The Executor class maintains a common context shared by all requests executed with it. The Executor is thread-safe and can be used to execute requests concurrently from multiple threads of execution.
  */
 public class FluentExecutor {
-
-    public static void main(String[] args) {
-//        Executor executor = Executor.newInstance()
-//                .auth(new HttpHost("somehost"), "username", "password")
-//                .auth(new HttpHost("myproxy", 8080), "username", "password")
-//                .authPreemptive(new HttpHost("myproxy", 8080));
-//
-//        // Execute a GET with timeout settings and return response content as String.
-//        executor.execute(Request.Get("http://somehost/")
-//                .connectTimeout(1000)
-//                .socketTimeout(1000)
-//                ).returnContent().asString();
-//
-//        // Execute a POST with the 'expect-continue' handshake, using HTTP/1.1,
-//        // containing a request body as String and return response content as byte array.
-//        executor.execute(Request.Post("http://somehost/do-stuff")
-//                .useExpectContinue()
-//                .version(HttpVersion.HTTP_1_1)
-//                .bodyString("Important stuff", ContentType.DEFAULT_TEXT)
-//                ).returnContent().asBytes();
-//
-//        // Execute a POST with a custom header through the proxy containing a request body
-//        // as an HTML form and save the result to the file
-//        executor.execute(Request.Post("http://somehost/some-form")
-//                .addHeader("X-Custom-header", "stuff")
-//                .viaProxy(new HttpHost("myproxy", 8080))
-//                .bodyForm(Form.form().add("username", "vip").add("password", "secret").build())
-//                ).saveContent(new File("result.dump"));
-    }
-
+	
+	public static void main(String[] args) {
+		// Executor executor = Executor.newInstance()
+		// .auth(new HttpHost("somehost"), "username", "password")
+		// .auth(new HttpHost("myproxy", 8080), "username", "password")
+		// .authPreemptive(new HttpHost("myproxy", 8080));
+		//
+		// // Execute a GET with timeout settings and return response content as String.
+		// executor.execute(Request.Get("http://somehost/")
+		// .connectTimeout(1000)
+		// .socketTimeout(1000)
+		// ).returnContent().asString();
+		//
+		// // Execute a POST with the 'expect-continue' handshake, using HTTP/1.1,
+		// // containing a request body as String and return response content as byte array.
+		// executor.execute(Request.Post("http://somehost/do-stuff")
+		// .useExpectContinue()
+		// .version(HttpVersion.HTTP_1_1)
+		// .bodyString("Important stuff", ContentType.DEFAULT_TEXT)
+		// ).returnContent().asBytes();
+		//
+		// // Execute a POST with a custom header through the proxy containing a request body
+		// // as an HTML form and save the result to the file
+		// executor.execute(Request.Post("http://somehost/some-form")
+		// .addHeader("X-Custom-header", "stuff")
+		// .viaProxy(new HttpHost("myproxy", 8080))
+		// .bodyForm(Form.form().add("username", "vip").add("password", "secret").build())
+		// ).saveContent(new File("result.dump"));
+	}
+	
 }

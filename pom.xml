@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.oiue</groupId>
 		<artifactId>oiue</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 		<relativePath>/work/github/oiue/pom.xml</relativePath>
 	</parent>
 	<groupId>org.oiue.services</groupId>
@@ -29,6 +29,7 @@
 		<module>tcp</module>
 		<module>socketio</module>
 		<module>threadpool</module>
+		<module>terminal</module>
 
 		<module>buffer.impl</module>
 		<module>cache.synchronization.db</module>
@@ -40,6 +41,7 @@
 		<module>file.upload.impl</module>
 		<module>actions</module>
 		<module>bytes</module>
+		<module>terminal.impl</module>
 
 		<module>auth.impl</module>
 		<module>auth.local</module>

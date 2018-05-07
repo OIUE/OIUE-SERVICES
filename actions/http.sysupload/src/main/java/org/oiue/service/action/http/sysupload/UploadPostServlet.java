@@ -58,7 +58,7 @@ public class UploadPostServlet extends HttpServlet {
 	private HttpService httpService;
 	private FactoryService factoryService;
 	private static Online online = null;
-
+	
 	public UploadPostServlet(ActionService actionService, OnlineService onlineService, LogService logService, FileUploadService fileUploadService, FactoryService factoryService, String userDir) {
 		super();
 		this.logger = logService.getLogger(this.getClass());
@@ -68,7 +68,7 @@ public class UploadPostServlet extends HttpServlet {
 		this.factoryService = factoryService;
 		this.userDir = userDir;
 	}
-
+	
 	public void updated(Dictionary props) {
 		logger.info("updateConfigure");
 		properties = props;
@@ -92,20 +92,20 @@ public class UploadPostServlet extends HttpServlet {
 		online.setUser(map);
 		online.setUser_id(map.get("user_id") + "");
 		online.setUser_name(map.get("user_name") + "");
-
+		
 		onlineService.putOnline(online.getTokenId(), online);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<Object, Object> per = new HashMap<Object, Object>();
-		Map<Object, Object> rtn = null;
+		Map<String, Object> per = new HashMap<>();
+		Map<String, Object> rtn = null;
 		String perStr = null;
 		String callBackFn = "";
 		boolean authInHeader = false;
 		try {
-
+			
 			String token = req.getHeader("Authorization");
 			if (!StringUtil.isEmptys(token)) {
 				int index = token.indexOf(" ");
@@ -115,10 +115,13 @@ public class UploadPostServlet extends HttpServlet {
 				per.put("token", token);
 			} else {
 				if (StringUtil.isEmptys(per.get("token") + "")) {
-					per.put("token", online.getToken());
+					token = online.getToken();
+					onlineService.putOnline(online.getTokenId(), online);
+					if (onlineService.isOnlineByToken(token))
+						per.put("token", token);
 				}
 			}
-
+			
 			try {
 				per.put("client_ip", getIpAddr(req));
 			} catch (Exception e) {
@@ -129,27 +132,26 @@ public class UploadPostServlet extends HttpServlet {
 			} catch (Exception e) {
 				logger.error("获取访问域名异常：" + e.getMessage(), e);
 			}
-
+			
 			String path = req.getPathInfo();
 			String[] paths = path.split("/");
 			if (paths.length < 3)
 				throw new OIUEException(StatusResult._url_can_not_found, "请求地址格式不正确（/version/modulename/operation）！" + " /n " + path);
-
+			
 			per.put("version", paths[1]);
 			per.put("modulename", paths[2]);
 			per.put("operation", paths[3]);
-
+			
 			per = this.saveFile(req, per);
-
+			
 			try {
 				callBackFn = per.get("callback") + "";
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
-
+			
 			rtn = actionService.request(per);
-
-			rtn.put("status", StatusResult._SUCCESS);
+			
 		} catch (Throwable ex) {
 			logger.error(ex.getMessage(), ex);
 			rtn = new HashMap();
@@ -162,17 +164,17 @@ public class UploadPostServlet extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 		if (authInHeader)
 			resp.setHeader("Authorization", rtn.remove("token") + "");
-
+		
 		byte bytes[] = (StringUtil.isEmptys(callBackFn) ? JSONUtil.parserToStr(rtn) : (callBackFn + "(" + JSONUtil.parserToStr(rtn) + ")")).getBytes();
 		resp.setContentLength(bytes.length);
-
+		
 		OutputStream out = resp.getOutputStream();
 		out.write(bytes);
-
+		
 		out.flush();
 		out.close();
 	}
-
+	
 	/**
 	 * 处理表单项目.
 	 *
@@ -183,34 +185,34 @@ public class UploadPostServlet extends HttpServlet {
 		String name = item.getFieldName();
 		// NOTE 文件上传统一使用 UTF-8 编码 2005-10-16
 		String value = null;
-
+		
 		try {
 			value = item.getString("UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			logger.error(e.getMessage(), e);
 		}
-
+		
 		// 首先尝试获取原来的值
 		Object oldValue = formFields.get(name);
-
+		
 		if (oldValue == null) {
 			formFields.put(name, value);
 		} else {
 			// 多个值存储为 List
-
+			
 			// 原来为单个值则添加现有的值
 			try {
 				String oldString = (String) oldValue;
-
+				
 				List list = new ArrayList();
 				list.add(oldString);
 				list.add(value);
-
+				
 				formFields.put(name, list);
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
 			}
-
+			
 			// 原来为多个值则添加现有的值
 			try {
 				List list = (List) oldValue;
@@ -221,7 +223,7 @@ public class UploadPostServlet extends HttpServlet {
 			}
 		}
 	}
-
+	
 	@SuppressWarnings({ "unchecked" })
 	public Map saveFile(HttpServletRequest req, Map per) throws FileUploadException {
 		/** 文件域列表 */
@@ -231,13 +233,13 @@ public class UploadPostServlet extends HttpServlet {
 		if (logger.isDebugEnabled()) {
 			logger.debug("----------->start savefile");
 		}
-
+		
 		Map data;
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(req); // 解析request请求
 		Iterator iter = items.iterator();
-
+		
 		List<FileItem> tmpFile = new ArrayList<>();
 		while (iter.hasNext()) {
 			FileItem item = (FileItem) iter.next();
@@ -250,15 +252,15 @@ public class UploadPostServlet extends HttpServlet {
 		String perStr = null;
 		perStr = formFields.get("parameter") + "";
 		if (!StringUtil.isEmptys(perStr)) {
-			per = (JSONUtil.parserStrToMap(perStr));
+			per.putAll(JSONUtil.parserStrToMap(perStr));
 		}
 		String token = per.get("token") + "";
-
+		
 		if (StringUtil.isEmptys(token)) {
 			per.put("status", StatusResult._pleaseLogin);
 			return per;
 		}
-
+		
 		Online online = onlineService.getOnlineByToken(token);
 		if (online == null) {
 			per.put("status", StatusResult._ncriticalAbnormal);
@@ -271,7 +273,7 @@ public class UploadPostServlet extends HttpServlet {
 			throw new OIUEException(StatusResult._url_can_not_found, "请配置存储路径！" + "upload.rootpath." + per.get("modulename"));
 		}
 		dir = StringReplace.replace(dir, "${userid}", 0 + "", false);
-
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("----------->start loop  file");
 		}
@@ -318,20 +320,20 @@ public class UploadPostServlet extends HttpServlet {
 				data = new HashMap();
 				per.put("data", data);
 			}
+			data.putAll(formFields);
 			data.put("upload_file", inputFileM);
-		} catch (Throwable e) {
-		}
-
+		} catch (Throwable e) {}
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("----------->end parse form field");
 		}
-
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("----------->end loop  file" + per);
 		}
 		return per;
 	}
-
+	
 	public String getIpAddr(HttpServletRequest request) {
 		String ip = request.getHeader("x-forwarded-for");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
@@ -340,7 +342,7 @@ public class UploadPostServlet extends HttpServlet {
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("WL-Proxy-Client-IP");
 		}
-
+		
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
@@ -349,12 +351,12 @@ public class UploadPostServlet extends HttpServlet {
 			ip = ips[0];
 		return ip;
 	}
-
+	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		this.doPost(req, resp);
 	}
-
+	
 	private boolean CopyFile(File from, File to) {
 		try {
 			int byteread = 0;

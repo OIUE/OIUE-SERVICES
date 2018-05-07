@@ -26,19 +26,19 @@ public class ServerHandler implements Handler {
 	private ActionService actionService;
 	private Logger logger;
 	private OnlineService onlineService;
-
+	
 	public ServerHandler(LogService logService, ActionService actionService, OnlineService onlineService) {
 		this.actionService = actionService;
 		this.onlineService = onlineService;
 		this.logger = logService.getLogger(this.getClass());
 	}
-
+	
 	@Override
-	public void received(Session session, String line, byte[] bytes)  {
-		Map<Object, Object> per = null;
-		Map<Object, Object> rtn = null;
+	public void received(Session session, String line, byte[] bytes) {
+		Map<String, Object> per = null;
+		Map<String, Object> rtn = null;
 		try {
-			if (line == null||StringUtil.isEmptys(line))
+			if (line == null || StringUtil.isEmptys(line))
 				return;
 			if (null == session.getAttribute("binary"))
 				session.setAttribute("binary", false);
@@ -48,17 +48,17 @@ public class ServerHandler implements Handler {
 				// line = sb.deleteCharAt(0).toString();
 				// }
 				if (!StringUtil.isEmptys(line))
-					per = (Map<Object, Object>) JSONUtil.parserStrToMap(line);
-
+					per = (Map<String, Object>) JSONUtil.parserStrToMap(line);
+				
 				String tag = per.get("tag") + "";
 				Object stag = session.getAttribute("tag");
 				if (stag != null && !tag.equals(stag)) {
-					throw new OIUEException(StatusResult._data_error,"session tag can not change!");
+					throw new OIUEException(StatusResult._data_error, "session tag can not change!");
 				}
 			} catch (Throwable e) {
-				throw new OIUEException(StatusResult._format_error,"参数格式不正确！[" + ExceptionUtil.getCausedBySrcMsg(e) + "]" + " /n " + line + " /n " + per, e);
+				throw new OIUEException(StatusResult._format_error, "参数格式不正确！[" + ExceptionUtil.getCausedBySrcMsg(e) + "]" + " /n " + line + " /n " + per, e);
 			}
-			new Thread(new asynchronismction(session, per),asynchronismction.class.getName()).start();
+			new Thread(new asynchronismction(session, per), asynchronismction.class.getName()).start();
 			// session.write("{\"modulename\":\"systime\",\"tag\":\"exttag\",\"operation\":\"systime\",\"data\":{}}");
 		} catch (Throwable ex) {
 			logger.error("received error：" + ExceptionUtil.getCausedBySrcMsg(ex), ex);
@@ -68,18 +68,18 @@ public class ServerHandler implements Handler {
 			session.write(JSONUtil.parserToStr(rtn));
 		}
 	}
-
+	
 	class asynchronismction implements Runnable {
-
-		Map<Object, Object> rtn = null;
-		Map<Object, Object> per = null;
+		
+		Map<String, Object> rtn = null;
+		Map<String, Object> per = null;
 		Session session = null;
-
-		public asynchronismction(Session session, Map<Object, Object> per) {
+		
+		public asynchronismction(Session session, Map<String, Object> per) {
 			this.session = session;
 			this.per = per;
 		}
-
+		
 		@Override
 		public void run() {
 			try {
@@ -89,16 +89,16 @@ public class ServerHandler implements Handler {
 					logger.debug(Thread.currentThread().getName() + "| per:" + per);
 				}
 				per.put("client_type", Type.tcp);
-
+				
 				rtn = actionService.request(per);
-
+				
 				// /**
 				// * 为适配调度端对状态的特定处理
 				// */
 				// if(Integer.valueOf(rtn.get("status")+"")>1){
 				// rtn.put("status", 1);
 				// }
-
+				
 				if (logger.isDebugEnabled()) {
 					logger.debug(Thread.currentThread().getName() + "," + (System.currentTimeMillis() - startTime) + "|per:" + per + ", rtn:" + rtn);
 				}
@@ -138,20 +138,20 @@ public class ServerHandler implements Handler {
 			} catch (Throwable e) {
 				logger.error("received write to session error：" + ExceptionUtil.getCausedBySrcMsg(e), e);
 			}
-
+			
 		}
-
+		
 	}
-
+	
 	@Override
-	public void closed(Session session)  {
+	public void closed(Session session) {
 		this.logger.info("tcp closed " + session);
 		try {
 			if (session != null) {
 				String tokenid = session.getAttribute("tokenid") + "";
 				if (!StringUtil.isEmptys(tokenid)) {
 					// this.onlineService.removeOnlineByToken(token);
-
+					
 					Online online = onlineService.getOnlineByTokenId(tokenid);
 					if (online != null) {
 						Object o = online.getO();
@@ -162,7 +162,7 @@ public class ServerHandler implements Handler {
 							if (list != null) {
 								list.remove(session);
 							}
-							if(list==null||list.size()==0)
+							if (list == null || list.size() == 0)
 								online.resetStatus(Type.tcp);
 						}
 					}
@@ -172,9 +172,9 @@ public class ServerHandler implements Handler {
 			logger.error("closed session error：" + ExceptionUtil.getCausedBySrcMsg(e), e);
 		}
 	}
-
+	
 	@Override
-	public void opened(Session session)  {
+	public void opened(Session session) {
 		this.logger.info("tcp opened " + session);
 		if (session == null)
 			return;
@@ -187,26 +187,26 @@ public class ServerHandler implements Handler {
 			rtn.put("version", "1.0.1");
 			rtn.put("type", 1);
 			rtn.put("binary", false);
-
+			
 			// Map<String, Object> redirect = new HashMap<>();
 			// rtn.put("redirect",redirect);
 			// redirect.put("domain", "leliao1.leauto.com");
 			// redirect.put("port", 8060);
-
+			
 			session.write(JSONUtil.parserToStr(rtn).toString());
 		} catch (Throwable e) {
 			logger.error("opened session error：" + ExceptionUtil.getCausedBySrcMsg(e), e);
 		}
 	}
-
+	
 	@Override
-	public void idled(Session session)  {
+	public void idled(Session session) {
 		if (session != null)
 			session.close();
 	}
-
+	
 	@Override
-	public void sent(Session session)  {
+	public void sent(Session session) {
 		// this.logger.info("tcp sent");
 		// Thread.sleep(5000);
 		// Map<Object,Object> rtn =new HashMap<Object, Object>();
@@ -214,7 +214,7 @@ public class ServerHandler implements Handler {
 		//
 		// session.write(JsonUtil.parserToStr(rtn).toString());
 	}
-
+	
 	@Override
 	public int getReaderIdleCount() {
 		return 0;

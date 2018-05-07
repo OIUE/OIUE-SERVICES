@@ -33,7 +33,7 @@ import org.pentaho.di.www.SlaveServerJobStatus;
 import org.pentaho.metastore.stores.delegate.DelegatingMetaStore;
 
 public class JobExecutor implements Runnable {
-
+	
 	private String executionId;
 	private JobExecutionConfiguration executionConfiguration;
 	private JobMeta jobMeta = null;
@@ -42,31 +42,31 @@ public class JobExecutor implements Runnable {
 	private Repository repository;
 	private DelegatingMetaStore metaStore;
 	private Logger logger;
-
-	private JobExecutor(JobExecutionConfiguration executionConfiguration, JobMeta jobMeta,Repository repository,DelegatingMetaStore metaStore,LogService logService) {
+	
+	private JobExecutor(JobExecutionConfiguration executionConfiguration, JobMeta jobMeta, Repository repository, DelegatingMetaStore metaStore, LogService logService) {
 		this.executionId = UUID.randomUUID().toString().replaceAll("-", "");
 		this.executionConfiguration = executionConfiguration;
 		this.jobMeta = jobMeta;
-		this.repository=repository;
-		this.metaStore=metaStore;
-		this.logger=logService.getLogger(this.getClass());
+		this.repository = repository;
+		this.metaStore = metaStore;
+		this.logger = logService.getLogger(this.getClass());
 	}
-
+	
 	private static Hashtable<String, JobExecutor> executors = new Hashtable<String, JobExecutor>();
-
-	public static synchronized JobExecutor initExecutor(JobExecutionConfiguration executionConfiguration, JobMeta jobMeta,Repository repository,DelegatingMetaStore metaStore,LogService logService) {
+	
+	public static synchronized JobExecutor initExecutor(JobExecutionConfiguration executionConfiguration, JobMeta jobMeta, Repository repository, DelegatingMetaStore metaStore, LogService logService) {
 		JobExecutor jobExecutor = new JobExecutor(executionConfiguration, jobMeta, repository, metaStore, logService);
 		executors.put(jobExecutor.getExecutionId(), jobExecutor);
 		return jobExecutor;
 	}
-
+	
 	public String getExecutionId() {
 		return executionId;
 	}
-
+	
 	private boolean finished = false;
 	private long errCount = 0;
-
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
@@ -75,33 +75,33 @@ public class JobExecutor implements Runnable {
 				String varValue = executionConfiguration.getVariables().get(varName);
 				jobMeta.setVariable(varName, varValue);
 			}
-
+			
 			for (String paramName : executionConfiguration.getParams().keySet()) {
 				String paramValue = executionConfiguration.getParams().get(paramName);
 				jobMeta.setParameterValue(paramName, paramValue);
 			}
-
+			
 			if (executionConfiguration.isExecutingLocally()) {
-				SimpleLoggingObject spoonLoggingObject = new SimpleLoggingObject( "SPOON", LoggingObjectType.SPOON, null );
-				spoonLoggingObject.setContainerObjectId( executionId );
-				spoonLoggingObject.setLogLevel( executionConfiguration.getLogLevel() );
-				job = new Job( repository, jobMeta, spoonLoggingObject );
-
+				SimpleLoggingObject spoonLoggingObject = new SimpleLoggingObject("SPOON", LoggingObjectType.SPOON, null);
+				spoonLoggingObject.setContainerObjectId(executionId);
+				spoonLoggingObject.setLogLevel(executionConfiguration.getLogLevel());
+				job = new Job(repository, jobMeta, spoonLoggingObject);
+				
 				job.setLogLevel(executionConfiguration.getLogLevel());
 				job.shareVariablesWith(jobMeta);
 				job.setInteractive(true);
 				job.setGatheringMetrics(executionConfiguration.isGatheringMetrics());
 				job.setArguments(executionConfiguration.getArgumentStrings());
-
+				
 				job.getExtensionDataMap().putAll(executionConfiguration.getExtensionOptions());
-
+				
 				// If there is an alternative start job entry, pass it to the job
 				//
-				if ( !Const.isEmpty( executionConfiguration.getStartCopyName() ) ) {
-					JobEntryCopy startJobEntryCopy = jobMeta.findJobEntry( executionConfiguration.getStartCopyName(), executionConfiguration.getStartCopyNr(), false );
-					job.setStartJobEntryCopy( startJobEntryCopy );
+				if (!Const.isEmpty(executionConfiguration.getStartCopyName())) {
+					JobEntryCopy startJobEntryCopy = jobMeta.findJobEntry(executionConfiguration.getStartCopyName(), executionConfiguration.getStartCopyNr(), false);
+					job.setStartJobEntryCopy(startJobEntryCopy);
 				}
-
+				
 				// Set the named parameters
 				Map<String, String> paramMap = executionConfiguration.getParams();
 				Set<String> keys = paramMap.keySet();
@@ -109,56 +109,57 @@ public class JobExecutor implements Runnable {
 					job.getJobMeta().setParameterValue(key, Const.NVL(paramMap.get(key), ""));
 				}
 				job.getJobMeta().activateParameters();
-
+				
 				job.start();
-
-				while(!job.isFinished()) {
+				
+				while (!job.isFinished()) {
 					Thread.sleep(500);
 				}
-
+				
 				errCount = job.getErrors();
 			} else if (executionConfiguration.isExecutingRemotely()) {
-				carteObjectId = Job.sendToSlaveServer( jobMeta, executionConfiguration, repository, metaStore);
+				carteObjectId = Job.sendToSlaveServer(jobMeta, executionConfiguration, repository, metaStore);
 				SlaveServer remoteSlaveServer = executionConfiguration.getRemoteServer();
-
+				
 				boolean running = true;
-				while(running) {
+				while (running) {
 					SlaveServerJobStatus jobStatus = remoteSlaveServer.getJobStatus(jobMeta.getName(), carteObjectId, 0);
 					running = jobStatus.isRunning();
-					if(!running)
+					if (!running)
 						errCount = jobStatus.getResult().getNrErrors();
 					Thread.sleep(500);
 				}
 			}
-
-		} catch(Exception e) {
+			
+		} catch (Exception e) {
 			logger.error("执行失败！", e);
 		} finally {
 			finished = true;
 		}
 	}
-
+	
 	public boolean isFinished() {
 		return finished;
 	}
-
+	
 	public long getErrCount() {
 		return errCount;
 	}
-
+	
 	private String carteObjectId = null;
-
+	
 	public int previousNrItems;
+	
 	@SuppressWarnings("deprecation")
-	public List getJobMeasure()  {
+	public List getJobMeasure() {
 		List jsonArray = new ArrayList<>();
-		if(executionConfiguration.isExecutingLocally()) {
+		if (executionConfiguration.isExecutingLocally()) {
 			JobTracker jobTracker = job.getJobTracker();
 			int nrItems = jobTracker.getTotalNumberOfItems();
-			if ( nrItems != previousNrItems ) {
+			if (nrItems != previousNrItems) {
 				// Re-populate this...
 				String jobName = jobTracker.getJobName();
-
+				
 				if (Const.isEmpty(jobName)) {
 					if (!Const.isEmpty(jobTracker.getJobFilename())) {
 						jobName = jobTracker.getJobFilename();
@@ -166,45 +167,45 @@ public class JobExecutor implements Runnable {
 						jobName = BaseMessages.getString(PKG, "JobLog.Tree.StringToDisplayWhenJobHasNoName");
 					}
 				}
-
+				
 				Map jsonObject = new HashMap();
 				jsonObject.put("name", jobName);
 				jsonObject.put("expanded", true);
-
+				
 				List children = new ArrayList<>();
-				for ( int i = 0; i < jobTracker.nrJobTrackers(); i++ ) {
+				for (int i = 0; i < jobTracker.nrJobTrackers(); i++) {
 					Map jsonObject2 = addTrackerToTree(jobTracker.getJobTracker(i));
-					if(jsonObject2 != null)
+					if (jsonObject2 != null)
 						children.add(jsonObject2);
 				}
 				jsonObject.put("children", children);
 				jsonArray.add(jsonObject);
-
+				
 				previousNrItems = nrItems;
 			}
 		}
 		return jsonArray;
 	}
-
+	
 	@SuppressWarnings("deprecation")
-	private Map addTrackerToTree( JobTracker jobTracker ) {
+	private Map addTrackerToTree(JobTracker jobTracker) {
 		Map jsonObject = new HashMap<>();
-		if ( jobTracker != null ) {
-			if ( jobTracker.nrJobTrackers() > 0 ) {
+		if (jobTracker != null) {
+			if (jobTracker.nrJobTrackers() > 0) {
 				// This is a sub-job: display the name at the top of the list...
-				jsonObject.put("name", BaseMessages.getString( PKG, "JobLog.Tree.JobPrefix" ) + jobTracker.getJobName() );
+				jsonObject.put("name", BaseMessages.getString(PKG, "JobLog.Tree.JobPrefix") + jobTracker.getJobName());
 				jsonObject.put("expanded", true);
 				List children = new ArrayList<>();
 				// then populate the sub-job entries ...
-				for ( int i = 0; i < jobTracker.nrJobTrackers(); i++ ) {
-					Map jsonObject2 = addTrackerToTree( jobTracker.getJobTracker( i ) );
-					if(jsonObject2 != null)
+				for (int i = 0; i < jobTracker.nrJobTrackers(); i++) {
+					Map jsonObject2 = addTrackerToTree(jobTracker.getJobTracker(i));
+					if (jsonObject2 != null)
 						children.add(jsonObject2);
 				}
 				jsonObject.put("children", children);
 			} else {
 				JobEntryResult result = jobTracker.getJobEntryResult();
-				if ( result != null ) {
+				if (result != null) {
 					String jobEntryName = result.getJobEntryName();
 					if (!Const.isEmpty(jobEntryName)) {
 						jsonObject.put("name", jobEntryName);
@@ -217,9 +218,9 @@ public class JobExecutor implements Runnable {
 						jsonObject.put("comment", comment);
 					}
 					Result res = result.getResult();
-					if ( res != null ) {
-						jsonObject.put("result",  res.getResult() ? BaseMessages.getString( PKG, "JobLog.Tree.Success" ) : BaseMessages.getString(PKG, "JobLog.Tree.Failure" ));
-						jsonObject.put("number", Long.toString( res.getEntryNr()));
+					if (res != null) {
+						jsonObject.put("result", res.getResult() ? BaseMessages.getString(PKG, "JobLog.Tree.Success") : BaseMessages.getString(PKG, "JobLog.Tree.Failure"));
+						jsonObject.put("number", Long.toString(res.getEntryNr()));
 					}
 					String reason = result.getReason();
 					if (reason != null) {
@@ -237,17 +238,16 @@ public class JobExecutor implements Runnable {
 			return null;
 		return jsonObject;
 	}
-
-
-	public String getExecutionLog() throws Exception  {
-		if(executionConfiguration.isExecutingLocally()) {
+	
+	public String getExecutionLog() throws Exception {
+		if (executionConfiguration.isExecutingLocally()) {
 			StringBuffer sb = new StringBuffer();
-			KettleLogLayout logLayout = new KettleLogLayout( true );
-			List<String> childIds = LoggingRegistry.getInstance().getLogChannelChildren( job.getLogChannelId() );
-			List<KettleLoggingEvent> logLines = KettleLogStore.getLogBufferFromTo( childIds, true, -1, KettleLogStore.getLastBufferLineNr() );
-			for ( int i = 0; i < logLines.size(); i++ ) {
-				KettleLoggingEvent event = logLines.get( i );
-				String line = logLayout.format( event ).trim();
+			KettleLogLayout logLayout = new KettleLogLayout(true);
+			List<String> childIds = LoggingRegistry.getInstance().getLogChannelChildren(job.getLogChannelId());
+			List<KettleLoggingEvent> logLines = KettleLogStore.getLogBufferFromTo(childIds, true, -1, KettleLogStore.getLastBufferLineNr());
+			for (int i = 0; i < logLines.size(); i++) {
+				KettleLoggingEvent event = logLines.get(i);
+				String line = logLayout.format(event).trim();
 				sb.append(line).append("\n");
 			}
 			return sb.toString();
@@ -256,7 +256,7 @@ public class JobExecutor implements Runnable {
 			SlaveServerJobStatus jobStatus = remoteSlaveServer.getJobStatus(jobMeta.getName(), carteObjectId, 0);
 			return jobStatus.getLoggingString();
 		}
-
+		
 	}
-
+	
 }

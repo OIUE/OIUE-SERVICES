@@ -6,5 +6,5 @@ import org.oiue.tools.StatusResult;
 
 @SuppressWarnings("rawtypes")
 public interface DriverListener {
-    StatusResult receive(Map data);
+	StatusResult receive(Map data);
 }
