@@ -1,6 +1,6 @@
 package org.oiue.service.threadpool.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
@@ -33,7 +33,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				try {
 					threadPoolService.updated(props);
 				} catch (Throwable e) {

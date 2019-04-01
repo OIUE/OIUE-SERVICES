@@ -1,7 +1,7 @@
 package org.oiue.service.cache.hbase;
 
 import java.io.Serializable;
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheService;
 import org.oiue.service.cache.Type;
@@ -19,15 +19,12 @@ public class HBaseCacheService implements CacheService, Serializable {
 	
 	@Override
 	public void put(String name, Object object, Type type) {
-		if (type == Type.ONE) {
-		}
+		if (type == Type.ONE) {}
 	}
 	
 	@Override
 	public void put(String name, String key, Object object, Type type) {
-		if (type == Type.ONE) {
-		} else if (type == Type.MANY) {
-		}
+		if (type == Type.ONE) {} else if (type == Type.MANY) {}
 	}
 	
 	@Override
@@ -65,14 +62,13 @@ public class HBaseCacheService implements CacheService, Serializable {
 		return false;
 	}
 	
-	public void updated(Dictionary<String, ?> dict) {
+	public void updated(Map<String, ?> dict) {
 		try {
 			
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
-	
 	
 	@Override
 	public boolean contains(String name, String... keys) {

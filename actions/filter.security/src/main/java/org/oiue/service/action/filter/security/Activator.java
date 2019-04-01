@@ -1,6 +1,6 @@
 package org.oiue.service.action.filter.security;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.cache.CacheServiceManager;
@@ -34,7 +34,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				actionFilter.updated(props);
 			}
 		}, LogService.class, ActionService.class, CacheServiceManager.class, OnlineService.class);

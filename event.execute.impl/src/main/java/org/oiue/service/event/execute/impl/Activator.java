@@ -1,6 +1,6 @@
 package org.oiue.service.event.execute.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.event.execute.EventExecuteService;
@@ -36,7 +36,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
 		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class);

@@ -2,7 +2,7 @@ package org.oiue.service.cache.mongodb;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheService;
 import org.oiue.service.cache.Type;
@@ -64,7 +64,7 @@ public class mongoCacheService implements CacheService, Serializable {
 	}
 	
 	@SuppressWarnings({ "resource", "unused" })
-	public void updated(Dictionary<String, ?> dict) {
+	public void updated(Map<String, ?> dict) {
 		try {
 			String user = "admin";
 			String pwd = "111111";

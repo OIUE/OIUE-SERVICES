@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.oiue.service.io.mina</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>OIUE TCP service for mina impl  </name>
+	<description>A bundle that network io service by mina</description>
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>imports</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+		<project.dependency>mina-core</project.dependency>
+		<project.import>javax.crypto,
+javax.crypto.spec,
+javax.net.ssl,
+javax.security.sasl,
+org.ietf.jgss,
+org.oiue.service.log,
+org.oiue.service.osgi,
+org.oiue.service.io,
+org.oiue.tools.exception,
+org.slf4j</project.import>
+		<project.export></project.export>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.io</artifactId>
+			<version>${tcp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.mina</groupId>
+			<artifactId>mina-core</artifactId>
+			<version>2.0.10</version>
+		</dependency>
+	</dependencies>
+</project>

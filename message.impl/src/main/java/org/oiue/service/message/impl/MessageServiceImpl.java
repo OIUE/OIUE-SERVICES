@@ -14,6 +14,7 @@ import java.util.Set;
 import org.oiue.service.bytes.api.BytesRuleField;
 import org.oiue.service.bytes.api.BytesService;
 import org.oiue.service.cache.CacheServiceManager;
+import org.oiue.service.io.Session;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.message.MessageService;
@@ -22,7 +23,6 @@ import org.oiue.service.online.Online;
 import org.oiue.service.online.OnlineDataField;
 import org.oiue.service.online.OnlineHandler;
 import org.oiue.service.online.OnlineService;
-import org.oiue.service.tcp.Session;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.bytes.ByteUtil;
 import org.oiue.tools.exception.ExceptionUtil;
@@ -46,10 +46,10 @@ public class MessageServiceImpl implements MessageService, OnlineHandler, Offlin
 	public LogService logService;
 	public OnlineService onlineService;
 	private BytesService bytesService;
-	private Dictionary props;
+	private Map props;
 	
 	@Override
-	public void updated(Dictionary props) {
+	public void updated(Map props) {
 		this.props = props;
 		try {
 			maxMessage = Integer.valueOf(props.get("message.maxMessage") + "");

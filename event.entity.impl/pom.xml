@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.oiue.service.event.entity.impl</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>OIUE EVENT service for entity impl </name>
+	<description>A bundle that res event entity impl </description>
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>services</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${cache.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.res.api</artifactId>
+			<version>${odp.res.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.event.entity</artifactId>
+			<version>${event.execute.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps.events</groupId>
+			<artifactId>org.oiue.service.odp.event.api</artifactId>
+			<version>${odp.event.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.structure.api</artifactId>
+			<version>${odp.structure.api.version}</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+	</properties>
+</project>

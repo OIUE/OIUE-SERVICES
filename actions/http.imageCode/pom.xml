@@ -15,7 +15,7 @@
 
 	<packaging>bundle</packaging>
 
-	<name>OIUE service for http image code action(/check) </name>
+	<name>OIUE service for http image code action(/CheckCodeImage) </name>
 	<description>A bundle that registers a http image code action service</description>
 	<!-- <build>
 		<plugins>

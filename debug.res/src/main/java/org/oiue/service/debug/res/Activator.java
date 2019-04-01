@@ -2,14 +2,15 @@ package org.oiue.service.debug.res;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Dictionary;
+import java.util.Map;
 
+import org.oiue.service.io.TcpService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.odp.base.FactoryService;
 import org.oiue.service.osgi.FrameActivator;
 import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
-import org.oiue.service.tcp.TcpService;
+import org.oiue.service.sql.SqlService;
 
 public class Activator extends FrameActivator {
 	
@@ -18,6 +19,7 @@ public class Activator extends FrameActivator {
 		this.start(new MulitServiceTrackerCustomizer() {
 			private FactoryService factoryService;
 			private TcpService tcpService;
+			private SqlService sqlService;
 			private SocketAddress address;
 			private Logger logger;
 			
@@ -33,12 +35,13 @@ public class Activator extends FrameActivator {
 			public void addingService() {
 				factoryService = getService(FactoryService.class);
 				tcpService = getService(TcpService.class);
+				sqlService = getService(SqlService.class);
 				LogService logService = getService(LogService.class);
 				logger = logService.getLogger(getClass());
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				try {
 					if (props == null)
 						return;
@@ -50,12 +53,12 @@ public class Activator extends FrameActivator {
 					int idleTime = Integer.parseInt(props.get("receiveTimeOut").toString());
 					String charset = props.get("charset").toString();
 					address = new InetSocketAddress(listenAddress, listenPort);
-					tcpService.register(address, new ServerHandler(factoryService), false, idleTime, charset);
+					tcpService.register(address, new ServerHandler(factoryService, sqlService), false, idleTime, charset);
 				} catch (Exception ex) {
 					logger.error(ex.getMessage(), ex);
 				}
 			}
-		}, LogService.class, FactoryService.class, TcpService.class);
+		}, LogService.class, FactoryService.class, TcpService.class, SqlService.class);
 	}
 	
 	@Override

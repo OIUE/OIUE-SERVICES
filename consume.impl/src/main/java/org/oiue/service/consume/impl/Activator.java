@@ -1,6 +1,6 @@
 package org.oiue.service.consume.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.bytes.api.BytesService;
 import org.oiue.service.cache.CacheServiceManager;
@@ -41,7 +41,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				messageService.updated(props);
 			}
 		}, LogService.class, CacheServiceManager.class, OnlineService.class, BytesService.class);

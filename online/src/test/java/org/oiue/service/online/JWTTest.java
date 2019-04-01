@@ -1,0 +1,11 @@
+package org.oiue.service.online;
+
+import org.junit.Test;
+
+public class JWTTest {
+	@Test
+	public void tt(){
+//		String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE1MzgyMTg2MDMsImRhdGEiOiJ7XCJsb2dpbl9uYW1lXCI6XCJscWYxMjNcIixcImdlbmRlclwiOjAsXCJ1c2VyX2lkXCI6XCJjZmY3OWMyNy03MGE1LTRjYWUtOTI5NC0zMzIyYzg4MGEyNTNcIixcInVzZXJfbmFtZVwiOlwiXCIsXCJ1c2VyX29yaWdpbl9pZFwiOlwiZm1fbG9jYWxcIixcInByb2R1Y3RfaWRcIjpcIlwiLFwiZXhwaXJlX3RpbWVcIjpcIlwiLFwic291cmNlX2lkXCI6XCJcIixcInR5cGVcIjpcIlwiLFwiY29ycF9pZFwiOlwibHRfbWFwXCJ9IiwiZXhwIjoxNTM4MjE5MjAzLCJqdGkiOiI2ODgwZTA0ZDcxZTI0ZjU3OGM5OGE5ZjdjNDE5MjVkZiJ9.MCqtDcslrs1vayLyjlEIrOZF3JZWwlcWeYt-5dgB_c4";
+//		System.out.println(JWTUtil.decodeTokenId(token));
+	}
+}

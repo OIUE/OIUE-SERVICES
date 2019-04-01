@@ -1,6 +1,6 @@
 package org.oiue.service.terminal.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.log.LogService;
@@ -23,14 +23,14 @@ public class Activator extends FrameActivator {
 				LogService logService = getService(LogService.class);
 				FactoryService factoryService = getService(FactoryService.class);
 				CacheServiceManager cache = getService(CacheServiceManager.class);
-				registerService(TerminalService.class, new TerminalServiceImpl(logService,factoryService,cache));
+				registerService(TerminalService.class, new TerminalServiceImpl(logService, factoryService, cache));
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
-		}, LogService.class,FactoryService.class,CacheServiceManager.class);
+		}, LogService.class, FactoryService.class, CacheServiceManager.class);
 	}
 	
 	@Override

@@ -1,8 +1,8 @@
 package org.oiue.service.debug.treecache;
 
 import org.oiue.service.cache.tree.script.CacheTreeScriptService;
-import org.oiue.service.tcp.Handler;
-import org.oiue.service.tcp.Session;
+import org.oiue.service.io.Handler;
+import org.oiue.service.io.Session;
 
 public class ServerHandler implements Handler {
 	private CacheTreeScriptService bufferScript = null;

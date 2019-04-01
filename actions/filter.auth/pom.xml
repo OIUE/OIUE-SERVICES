@@ -21,11 +21,6 @@
 			<artifactId>org.oiue.service.auth</artifactId>
 			<version>${auth.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.oiue.services</groupId>
-			<artifactId>org.oiue.service.permission</artifactId>
-			<version>${permission.version}</version>
-		</dependency>
 	</dependencies>
 	<properties>
 		<project.activator>${project.artifactId}.Activator</project.activator>

@@ -1,6 +1,6 @@
 package org.oiue.service.event.etl.table;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.event.etl.impl.InputStepMetaManger;
 import org.oiue.service.log.LogService;
@@ -24,7 +24,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {}
+			public void updatedConf(Map<String, ?> props) {}
 		}, LogService.class);
 	}
 	

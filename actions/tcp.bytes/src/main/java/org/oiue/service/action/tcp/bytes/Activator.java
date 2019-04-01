@@ -2,16 +2,16 @@ package org.oiue.service.action.tcp.bytes;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.bytes.api.BytesService;
+import org.oiue.service.io.TcpService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.online.OnlineService;
 import org.oiue.service.osgi.FrameActivator;
 import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
-import org.oiue.service.tcp.TcpService;
 
 public class Activator extends FrameActivator {
 	
@@ -45,7 +45,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				try {
 					if (address != null) {
 						tcpService.unregister(address);

@@ -13,8 +13,8 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.template.TemplateService;
 import org.osgi.service.http.HttpContext;
-
-public class ResourceContext implements HttpContext {
+//extends ServletContextImpl
+public class ResourceContext  implements HttpContext {
 	HttpContext base;
 	Logger logger;
 	TemplateService templateService;
@@ -25,6 +25,7 @@ public class ResourceContext implements HttpContext {
 		this.base = base;
 		this.templateService = templateService;
 		this.root_path = root_path;
+		
 	}
 	
 	@Override

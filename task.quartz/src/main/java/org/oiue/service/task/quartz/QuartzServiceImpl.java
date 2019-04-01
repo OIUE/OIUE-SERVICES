@@ -5,7 +5,6 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.oiue.service.log.LogService;
@@ -13,12 +12,9 @@ import org.oiue.service.log.Logger;
 import org.oiue.service.task.Task;
 import org.oiue.service.task.TaskService;
 import org.oiue.tools.string.StringUtil;
-import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;

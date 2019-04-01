@@ -1,6 +1,6 @@
 package org.oiue.service.permission.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.log.LogService;
 import org.oiue.service.osgi.FrameActivator;
@@ -26,7 +26,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				permissionServiceManager.updated(props);
 			}
 		}, LogService.class);

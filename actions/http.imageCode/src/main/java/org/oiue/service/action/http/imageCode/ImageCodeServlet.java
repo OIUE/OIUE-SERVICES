@@ -6,7 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Dictionary;
+import java.util.Map;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -125,7 +125,7 @@ public class ImageCodeServlet extends HttpServlet {
 		this.doPost(req, resp);
 	}
 	
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map<String, ?> props) {
 		
 	}
 }

@@ -15,8 +15,13 @@
     <module>api</module>
     <module>parent</module>
     <module>base</module>
+    <module>server</module>
+    <module>client</module>
     <module>filter.impl</module>
     <module>listener.impl</module>
     <module>listener.storage</module>
+    <module>sms.alisms</module>
+    <module>httpaccess</module>
+    <module>filter.convert</module>
   </modules>
 </project>

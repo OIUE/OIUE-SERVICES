@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class SyncDbRefresh implements Task {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public void updateProps(Dictionary props) {
+	public void updateProps(Map props) {
 		logger.info("update property, props = " + props);
 		if (props == null) {
 			logger.error("property is null, please check configure file");

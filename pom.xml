@@ -6,7 +6,6 @@
 		<groupId>org.oiue</groupId>
 		<artifactId>oiue</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
-		<relativePath>/work/github/oiue/pom.xml</relativePath>
 	</parent>
 	<groupId>org.oiue.services</groupId>
 	<artifactId>reactor.services</artifactId>
@@ -17,41 +16,56 @@
 	<modules>
 		<module>buffer</module>
 		<module>online</module>
+		<module>online.filter</module>
 		<module>message</module>
 		<module>permission</module>
 		<module>auth</module>
 		<module>file.upload</module>
 		<module>http.client</module>
 		<module>event.system.time</module>
+		<module>event.system.info</module>
+		<module>event.entity</module>
 		<module>event.execute</module>
 		<module>event.etl</module>
 		<module>task</module>
-		<module>tcp</module>
+		<module>io</module>
 		<module>socketio</module>
 		<module>threadpool</module>
 		<module>terminal</module>
+		<module>consume</module>
+		<module>rectification</module>
+		<module>dataconvert</module>
 
 		<module>buffer.impl</module>
+		<module>buffer.sync.db.refresh</module>
 		<module>cache.synchronization.db</module>
 		<module>cache.buffer</module>
 		<module>cache.jedis</module>
 		<module>cache.jdbc</module>
 		<module>cache.script</module>
+		<module>cache.hbase</module>
+		<module>cache.mongodb</module>
 		<module>cache.tree.script</module>
 		<module>file.upload.impl</module>
 		<module>actions</module>
 		<module>bytes</module>
 		<module>terminal.impl</module>
+		<module>consume.impl</module>
+		<module>rectification.impl</module>
+		<module>dataconvert.impl</module>
 
 		<module>auth.impl</module>
 		<module>auth.local</module>
 		<module>drivers</module>
 
+		<module>event.entity.impl</module>
 		<module>event.execute.impl</module>
 		<module>event.system.time.impl</module>
+		<module>event.system.info.impl</module>
 		<module>event.etl.impl</module>
 		<module>event.etl.table</module>
 		<module>event.etl.csv</module>
+		<module>event.etl.shapfile</module>
 
 		<module>http.client.apache</module>
 
@@ -60,9 +74,15 @@
 		<module>permission.impl</module>
 		<module>permission.verify</module>
 		<module>task.quartz</module>
-		<module>tcp.mina</module>
+		<module>io.impl</module>
+		<module>io.mina</module>
+		<module>io.netty</module>
 
 		<module>threadpool.impl</module>
+		<module>mq</module>
+		<module>mq.impl</module>
+		<module>mq.kafka</module>
+		<module>mq.mqtt</module>
 
 		<module>debug.httpclient</module>
 		<module>debug.insertmodule</module>

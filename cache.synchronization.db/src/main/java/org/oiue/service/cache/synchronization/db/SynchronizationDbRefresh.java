@@ -3,7 +3,6 @@ package org.oiue.service.cache.synchronization.db;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class SynchronizationDbRefresh implements Task {
 	
 	private String data_source_name;
 	
-	public void updateProps(Dictionary props) {
+	public void updateProps(Map props) {
 		logger.info("update property, props = " + props);
 		if (props == null) {
 			logger.error("property is null, please check configure file");

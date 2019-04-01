@@ -15,13 +15,16 @@
     <module>api</module>
     <module>parent</module>
     <module>base</module>
-    <module>http.filter.auth</module>
+    <module>filter.test</module>
     <module>http.action</module>
     <module>http.services</module>
     <module>http.resource</module>
+    <module>http.resource.filter.auth</module>
+    <module>http.resource.filter.fota</module>
     <module>tcp.action</module>
     <module>tcp.bytes</module>
     <module>filter.auth</module>
+    <module>filter.permission</module>
     <module>filter.module2domain</module>
     <module>filter.validate</module>
     <module>filter.changepwd</module>
@@ -31,5 +34,6 @@
     <module>http.upload</module>
     <module>http.sysupload</module>
     <module>http.imageCode</module>
+    <module>http.smsCode</module>
   </modules>
 </project>

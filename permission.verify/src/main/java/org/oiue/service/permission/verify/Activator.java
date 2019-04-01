@@ -1,7 +1,8 @@
 package org.oiue.service.permission.verify;
 
-import java.util.Dictionary;
+import java.util.Map;
 
+import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.log.LogService;
 import org.oiue.service.odp.base.FactoryService;
 import org.oiue.service.osgi.FrameActivator;
@@ -21,17 +22,18 @@ public class Activator extends FrameActivator {
 			@Override
 			public void addingService() {
 				LogService logService = getService(LogService.class);
-				PermissionServiceManager permissionServiceManager = (PermissionServiceManager) getService(PermissionServiceManager.class);
+				PermissionServiceManager permissionServiceManager = getService(PermissionServiceManager.class);
 				FactoryService factoryService = getService(FactoryService.class);
+				CacheServiceManager cacheServiceManager = getService(CacheServiceManager.class);
 				
-				permissionService = new PermissionServiceImpl(logService, permissionServiceManager, factoryService);
+				permissionService = new PermissionServiceImpl(logService, permissionServiceManager, factoryService, cacheServiceManager);
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				permissionService.updated(props);
 			}
-		}, LogService.class, PermissionServiceManager.class, FactoryService.class);
+		}, LogService.class, PermissionServiceManager.class, FactoryService.class, CacheServiceManager.class);
 	}
 	
 	@Override

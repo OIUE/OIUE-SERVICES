@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Test;
 import org.oiue.service.event.etl.utils.DatabaseCodec;
@@ -30,6 +31,7 @@ import org.pentaho.di.core.plugins.RepositoryPluginType;
 import org.pentaho.di.core.plugins.StepPluginType;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMetaInterface;
+import org.pentaho.di.core.row.value.ValueMetaBase;
 import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.repository.RepositoriesMeta;
 import org.pentaho.di.repository.Repository;
@@ -332,7 +334,7 @@ public class ETL {
 	@Test
 	public void testEtl() {
 		EventETLServiceImpl es = new EventETLServiceImpl();
-		String jsonStr = "{\"operation_type\":\"create_entity_table\",\"id_database\":1,\"table_desc\":\"测试\",\"table\":\"test_f\",\"fields\":[{\"name\":\"id\",\"field_desc\":\"ID\",\"ispk\":true},{\"name\":\"test_p_id\",\"field_desc\":\"父ID\",\"ispk\":false},{\"name\":\"test_fname\",\"field_desc\":\"名称\",\"ispk\":false}]}";
+		String jsonStr = "{\"operation_type\":\"create_entity_table\",\"id_database\":1,\"table_desc\":\"测试\",\"table\":\"test_f\",\"fields\":[{\"name\":\"id\",\"column_desc\":\"ID\",\"ispk\":true},{\"name\":\"test_p_id\",\"column_desc\":\"父ID\",\"ispk\":false},{\"name\":\"test_fname\",\"column_desc\":\"名称\",\"ispk\":false}]}";
 		Map data = JSONUtil.parserStrToMap(jsonStr);
 		try {
 			es.setEntityColumns(data, null, null);
@@ -502,7 +504,7 @@ public class ETL {
 			
 			List<String> fieldDatabase = new ArrayList<>();
 			List<String> fieldStream = new ArrayList<>();
-			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,field_desc,field_desc,precision,scale,ispk,sort,user_id
+			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
 				fieldDatabase.add(MapUtil.getString(field, "entity_column_id"));
 				// fieldStream.add(localDatabaseMeta.quoteField(MapUtil.getString(field,"name")));
 				fieldStream.add(MapUtil.getString(field, "name"));
@@ -791,7 +793,7 @@ public class ETL {
 			
 			List<String> fieldDatabase = new ArrayList<>();
 			List<String> fieldStream = new ArrayList<>();
-			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,field_desc,field_desc,precision,scale,ispk,sort,user_id
+			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
 				fieldDatabase.add(MapUtil.getString(field, "entity_id"));
 				// fieldStream.add(localDatabaseMeta.quoteField(MapUtil.getString(field,"name")));
 				fieldStream.add(MapUtil.getString(field, "name"));
@@ -872,5 +874,57 @@ public class ETL {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static String _system_colnum = "system_id";
+	@Test
+	public void testGetDDl() {
+		String jsonStr = "{\"tag\":\"tag\",\"data\":{\"fields\":[{\"type\":1,\"column_desc\":\"字段1\",\"precision\":3,\"scale\":4,\"primary_key\":\"n\",\"null_able\":\"n\",\"sort\":1},{\"type\":2,\"column_desc\":\"字段2\",\"precision\":36,\"scale\":0,\"primary_key\":\"y\",\"null_able\":\"n\",\"sort\":2}],\"entity_desc\":\"测试\" }}";
+		Map data = JSONUtil.parserStrToMap(jsonStr);
+		data=(Map) data.get("data");
+		try {
+			KettleEnvironment.init();
+		} catch (KettleException e1) {
+			e1.printStackTrace();
+		}
+		DatabaseMeta dataMeta = new DatabaseMeta("KettleDBRep", "POSTGRESQL", "Native", "172.17.60.20", "ltmap", "35432", "postgres", "123456");
+		Database db = new Database(loggingObject, dataMeta);
+		try {
+			db.connect();
+			String n_table_name = MapUtil.getString(data, "table_name","t_" + UUID.randomUUID().toString().replace("-", ""));
+			data.put("entity_id", n_table_name);
+			data.put("table_name", n_table_name);
+			data.put("table_type", MapUtil.getString(data, "table_type","user"));
+			data.put("remark", MapUtil.getString(data, "remark"));
+			data.put("short_code", MapUtil.getString(data, "short_code"));
+			data.put("islevel", MapUtil.getInt(data, "islevel",0));
+			
+			RowMetaInterface rmi = db.getQueryFieldsFromPreparedStatement("select");
+			rmi.addValueMeta(new ValueMetaBase(_system_colnum, ValueMetaInterface.TYPE_STRING, 36, 0));
+			List<Map> fields;
+			fields = (List) data.get("fields");
+			for (Map field : fields) {//"entity_id","entity_column_id","column_name","remark","status","sort","encrypt_type","update_user_id","update_time"
+				String n_field_name = MapUtil.getString(field, "column_name","f_" + UUID.randomUUID().toString().replace("-", ""));
+				field.put("entity_column_id", n_field_name);
+				field.put("entity_id", n_table_name);
+				field.put("column_name", n_field_name);
+				field.put("null_able", 1);
+				field.put("status", 1);
+				field.put("scale", MapUtil.getInt(field, "scale"));
+				field.put("precision", MapUtil.getInt(field, "precision"));
+//				field.put("type", MapUtil.getString(field, "type",""));
+				field.put("user_id", data.get("user_id"));
+				String comments = MapUtil.getString(field, "column_desc");
+				ValueMetaInterface tf = new ValueMetaBase(n_field_name, MapUtil.getInt(field, "type"),MapUtil.getInt(field, "precision"), MapUtil.getInt(field, "scale"));
+				tf.setComments(comments);
+				rmi.addValueMeta(tf);
+			}
+			System.out.print(db.getDDL(n_table_name, rmi));
+//			db.execStatement(db.getDDL(n_table_name, rmi));
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 }

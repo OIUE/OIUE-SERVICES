@@ -1,7 +1,6 @@
 package org.oiue.service.threadpool.impl;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -57,7 +56,7 @@ public class ThreadPoolServiceImpl implements ThreadPoolService, Serializable {
 	}
 	
 	@Override
-	public void updated(Dictionary<?, ?> props) {}
+	public void updated(Map<?, ?> props) {}
 	
 	@Override
 	public int getActiveCount(String name) {

@@ -1,6 +1,6 @@
 package org.oiue.service.bytes.int16;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.bytes.api.BytesDecodeEncoded;
 import org.oiue.service.bytes.api.BytesService;
@@ -32,7 +32,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
 		}, LogService.class, BytesService.class);

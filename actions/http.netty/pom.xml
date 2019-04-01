@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.oiue.service.action.http.netty</artifactId>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+
+	<packaging>bundle</packaging>
+
+	<name>OIUE ACTION service for http or websocket by netty</name>
+	<description>A bundle that Action by netty  </description>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.io</artifactId>
+			<version>${tcp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.online</artifactId>
+			<version>${online.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.io.netty</artifactId>
+			<version>${online.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.service.http</artifactId>
+			<version>1.2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.20</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+	</properties>
+</project>

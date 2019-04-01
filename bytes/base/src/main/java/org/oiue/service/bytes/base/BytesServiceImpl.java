@@ -21,7 +21,7 @@ import org.oiue.tools.map.MapUtil;
 public class BytesServiceImpl implements BytesService {
 	
 	Logger logger;
-	private static Map<String, BytesDecodeEncoded> endecodes = new HashMap<>();
+	private static Map<String,BytesDecodeEncoded> endecodes = new HashMap();
 	
 	public BytesServiceImpl(LogService logService) {
 		logger = logService.getLogger(this.getClass());

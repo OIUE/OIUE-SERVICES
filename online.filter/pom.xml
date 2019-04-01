@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.oiue.service.online.filter</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>OIUE service filter for online </name>
+	<description>OIUE service filter for online </description>
+	
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+	
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>services</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services.actions</groupId>
+			<artifactId>org.oiue.service.action.api</artifactId>
+			<version>${action.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.online</artifactId>
+			<version>${online.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${cache.version}</version>
+		</dependency>
+	</dependencies>
+</project>

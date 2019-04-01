@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -65,7 +64,7 @@ public class ActionServiceImpl implements ActionService {
 		logger.info("ActionService init");
 	}
 	
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map props) {
 		String errorStr = props.get("action.msg") + "";
 		try {
 			// defaultErrorMap = new TreeMap();
@@ -91,6 +90,18 @@ public class ActionServiceImpl implements ActionService {
 	public Map request(Map per) {
 		PrintWriter writer = null;
 		OutputStream stream = null;
+//		int a=1;
+//		while (true) {
+//			if(a==2)
+//				break;
+//			logger.debug("执行action业务。。。。。。。。。");
+//			try {
+//				Thread.sleep(300);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			
+//		}
 		
 		try {
 			writer = (PrintWriter) per.remove("PrintWriter");
@@ -116,6 +127,7 @@ public class ActionServiceImpl implements ActionService {
 			}
 		}
 		String component_instance_event_id = null;
+		String data_source = null;
 		String modulename = MapUtil.getString(per, "modulename");
 		String operation = MapUtil.getString(per, "operation");
 		
@@ -123,7 +135,6 @@ public class ActionServiceImpl implements ActionService {
 		boolean run = true;
 		anchor: while (run) {
 			try {
-				
 				long startbfTime = 0l;
 				long startTime = 0l;
 				if (tLogger.isDebugEnabled()) {
@@ -152,6 +163,7 @@ public class ActionServiceImpl implements ActionService {
 					serviceOperation = (Map) temppermission;
 				}
 				component_instance_event_id = MapUtil.getString(serviceOperation, "component_instance_event_id", null);
+				data_source = MapUtil.getString(serviceOperation, "source", null);
 				if (serviceOperation == null) {
 					per.put("status", StatusResult._permissionDenied);
 					per.put("exception", "权限错误！");
@@ -224,25 +236,72 @@ public class ActionServiceImpl implements ActionService {
 					logger.info("action gateway >>>" + (System.currentTimeMillis() - starttime) + "：" + (pers.length() > 1024 ? "too long response data." : pers));
 				}
 				per.put("status", StatusResult._SUCCESS);
+			} catch (OIUEException e) {
+				logger.error(e.getMessage(), e);
+				String ex = ExceptionUtil.getCausedBySrcMsg(e);
+				int status = ((OIUEException) e).getStatus().getResult();
+				per.put("rtn", ((OIUEException) e).getRtnObject());
+				per.put("status", status);
+				if (defaultErrorMap!=null&&defaultErrorMap.containsKey(status + "")) {
+					per.put("msg", defaultErrorMap.get(status + ""));
+					per.put("exception", ex);
+					run = false;
+					break anchor;
+				}else if(status==StatusResult._sql_error) {
+					per.put("msg", "操作失败");
+					per.put("exception", ex);
+					run = false;
+					break anchor;
+					
+				}else {
+					per.put("msg", "操作失败");
+					per.put("exception", ex);
+					run = false;
+					break anchor;
+				}
 			} catch (Throwable e) {
+//				logger.error(e.getMessage(), e);
+				if (e instanceof InvocationTargetException)
+					e = ((InvocationTargetException) e).getTargetException();
+				if (e instanceof UndeclaredThrowableException)
+					e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
 				if (e instanceof InvocationTargetException)
 					e = ((InvocationTargetException) e).getTargetException();
 				if (e instanceof UndeclaredThrowableException)
 					e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
 				
 				String ex = ExceptionUtil.getCausedBySrcMsg(e);
-				logger.error(ex, e);
 				
 				if (e instanceof OIUEException) {
 					int status = ((OIUEException) e).getStatus().getResult();
+					per.put("rtn", ((OIUEException) e).getRtnObject());
 					per.put("status", status);
-					if (defaultErrorMap.containsKey(status + "")) {
+					logger.error(per+"",e);
+					if (defaultErrorMap!=null&&defaultErrorMap.containsKey(status + "")) {
 						per.put("msg", defaultErrorMap.get(status + ""));
 						per.put("exception", ex);
 						run = false;
 						break anchor;
+					}else if(status==StatusResult._sql_error) {
+						Map de = (Map) ((OIUEException) e).getRtnObject();
+						String sqlstate=MapUtil.getString(de, "sqlstate");
+						per.put("msg",sqlstate==null?"操作失败":sqlstate.startsWith("02")?"没有数据": sqlstate.startsWith("03")?"SQL语句尚未结束": sqlstate.startsWith("08000")?"连接异常": sqlstate.startsWith("08003")?"连接不存在":
+							sqlstate.startsWith("08006")?"连接失败": sqlstate.startsWith("08")?"连接异常": sqlstate.startsWith("09")?"触发器动作异常": sqlstate.startsWith("22")?"数据异常":
+								sqlstate.startsWith("23")?"违反完成性约束": sqlstate.startsWith("26")?"非法SQL语句名": sqlstate.startsWith("2F")?"SQL过程异常": sqlstate.startsWith("3D")?"非法数据库名":
+									sqlstate.startsWith("42")?"语法错误或者违反访问规则": sqlstate.startsWith("P0")?"语法错误或者违反访问规则": sqlstate.startsWith("53")?"资源不够":"操作失败");
+						per.put("exception", ex);
+						run = false;
+						break anchor;
+					}else {
+						per.put("msg", "操作失败");
+						per.put("exception", ex);
+						run = false;
+						break anchor;
 					}
+						
 				}
+
+				logger.error(ex, e);
 				if (defaultErrorMap != null && ex != null) {
 					for (Iterator iterator = defaultErrorMap.keySet().iterator(); iterator.hasNext();) {
 						String key = (String) iterator.next();
@@ -253,7 +312,7 @@ public class ActionServiceImpl implements ActionService {
 								try {
 									Map msgn = (Map) msgm.get(modulename);
 									per.put("status", MapUtil.getInt(msgn, "status", -1));
-									per.put("msg", MapUtil.getString(msgn, "msg"));
+									per.put("msg", MapUtil.getString(msgn, "msg",ex));
 									per.put("exception", ex);
 									
 									run = false;
@@ -261,12 +320,12 @@ public class ActionServiceImpl implements ActionService {
 								} catch (Exception e2) {}
 								
 								per.put("status", MapUtil.getInt(msgm, "status", -1));
-								per.put("msg", MapUtil.getString(msgm, "msg"));
+								per.put("msg", MapUtil.getString(msgm, "msg",ex));
 								per.put("exception", ex);
 								
 								run = false;
 								break anchor;
-							}else if(msg instanceof String){
+							} else if (msg instanceof String) {
 								per.put("status", key);
 								per.put("msg", msg);
 								per.put("exception", ex);
@@ -288,6 +347,7 @@ public class ActionServiceImpl implements ActionService {
 			para.put("endTime", System.currentTimeMillis());
 			para.put("user_id", online != null ? online.getUser_id() : null);
 			para.put("component_instance_event_id", component_instance_event_id == null ? "fm_managed_global" : component_instance_event_id);
+			para.put("source", data_source);
 			para.put("desc", modulename + "/" + operation);
 			req_per.remove("token");
 			para.put("para", req_per);
@@ -296,7 +356,8 @@ public class ActionServiceImpl implements ActionService {
 			tLogger.debug(para);
 		}
 		if (logger.isDebugEnabled()) {
-			logger.debug("action response data :" + JSONUtil.parserToStr(per));
+			String pers=JSONUtil.parserToStr(per);
+			logger.debug("action response data :" +  (pers.length() > 1024 ? "too long response data." : pers));
 		}
 		return per;
 	}
@@ -345,6 +406,7 @@ public class ActionServiceImpl implements ActionService {
 			} else if (afr.getResult() < StatusResult._NoncriticalAbnormal) {
 				per.put("status", afr.getResult());
 				per.put(afr.getResult() <= StatusResult._permissionDenied ? "exception" : "msg", afr.getDescription());
+				per.put("msg", afr.getDescription());
 				break;
 			}
 		}
@@ -397,6 +459,7 @@ public class ActionServiceImpl implements ActionService {
 			} else if (afr.getResult() < StatusResult._NoncriticalAbnormal) {
 				per.put("status", afr.getResult());
 				per.put(afr.getResult() <= StatusResult._permissionDenied ? "exception" : "msg", afr.getDescription());
+				per.put("msg", afr.getDescription());
 				break;
 			}
 		}
@@ -428,7 +491,7 @@ public class ActionServiceImpl implements ActionService {
 	@Override
 	public synchronized boolean registerActionFilter(String requestAction, ActionFilter actionFilter, int index) {
 		if (beforeFilterSort.get(index) != null) {
-			throw new OIUEException(StatusResult._blocking_errors, "index conflict! name=" + requestAction + ", old index is " + beforeFilterSort.get(index));
+			throw new OIUEException(StatusResult._blocking_errors, "index conflict! name=" + requestAction + ", old index is " + beforeFilterSort.get(index)+",list:"+beforeFilterSort);
 		}
 		if (beforeActionFilter.get(requestAction) == null) {
 			beforeActionFilter.put(requestAction, actionFilter);
@@ -510,5 +573,8 @@ public class ActionServiceImpl implements ActionService {
 			sortedMap.put(entry.getKey(), entry.getValue());
 		}
 		return sortedMap;
+	}
+	public void finalize(){
+		logger.debug("回收资源了。。。。。");
 	}
 }

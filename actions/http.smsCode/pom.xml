@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.oiue.services.actions</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>org.oiue.service.action.http.smsCode</artifactId>
+
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+	</properties>
+
+	<packaging>bundle</packaging>
+
+	<name>OIUE service for http sms code</name>
+	<description>A bundle that registers a http sms code action service</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services.drivers</groupId>
+			<artifactId>org.oiue.service.driver.api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.res.api</artifactId>
+			<version>${odp.res.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${online.version}</version>
+		</dependency>
+	</dependencies>
+</project>

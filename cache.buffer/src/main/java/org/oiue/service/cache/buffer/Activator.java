@@ -1,6 +1,6 @@
 package org.oiue.service.cache.buffer;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.buffer.BufferService;
 import org.oiue.service.cache.CacheService;
@@ -32,7 +32,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
 		}, LogService.class, CacheServiceManager.class, BufferService.class);

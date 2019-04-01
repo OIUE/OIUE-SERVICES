@@ -3,7 +3,6 @@ package org.oiue.service.driver.base;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +99,7 @@ public class DriverServiceImpl implements DriverService, DriverListener {
 					}
 					
 					if (sr.getResult() <= StatusResult._pleaseLogin || sr.getResult() == StatusResult._SUCCESS_OVER) {
+						logger.info("driver filter over:{} {}",driverFilterService, sr);
 						return sr;
 					}
 				} catch (Throwable e) {
@@ -130,6 +130,7 @@ public class DriverServiceImpl implements DriverService, DriverListener {
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("filter over>" + data);
+			logger.debug("listener start>" + driverListenerSList+driverListenerSMap);
 		}
 		
 		if (driverListenerSList != null) {
@@ -144,6 +145,9 @@ public class DriverServiceImpl implements DriverService, DriverListener {
 			for (DriverListenerService driverListenerService : driverListenerList) {
 				new listenerListData(driverListenerService, data).start();
 			}
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("listener over>" + data);
 		}
 		sr = new StatusResult();
 		sr.setResult(StatusResult._SUCCESS);
@@ -254,6 +258,7 @@ public class DriverServiceImpl implements DriverService, DriverListener {
 		
 		if (driver == null) {
 			sr = new StatusResult();
+
 			logger.warn("send error, can't get driver from driver name, driver name = " + driverName);
 			sr.setResult(StatusResult._ncriticalAbnormal);
 			sr.setDescription("send error, can't get driver from driver name, driver name = " + driverName);
@@ -323,7 +328,7 @@ public class DriverServiceImpl implements DriverService, DriverListener {
 		this.unregisterListenerService(driverListener.get(listenerName));
 	}
 	
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map<String, ?> props) {
 		logger.info("update property");
 	}
 	

@@ -12,8 +12,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.oiue.services</groupId>
-			<artifactId>org.oiue.service.tcp</artifactId>
+			<artifactId>org.oiue.service.io</artifactId>
 			<version>${tcp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.sql</artifactId>
+			<version>${sql.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oiue.services.odps</groupId>

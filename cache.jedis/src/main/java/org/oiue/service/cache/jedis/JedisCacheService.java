@@ -1,8 +1,8 @@
 package org.oiue.service.cache.jedis;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -10,6 +10,7 @@ import org.oiue.service.cache.CacheService;
 import org.oiue.service.cache.Type;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
+import org.oiue.service.osgi.FrameActivator;
 import org.oiue.tools.string.StringUtil;
 
 import redis.clients.jedis.HostAndPort;
@@ -163,10 +164,10 @@ public class JedisCacheService implements CacheService, Serializable {
 			}
 		}
 	}
-	
-	public void updated(Dictionary<String, ?> dict) {
+	public void updated(Map<String, ?> dicts, FrameActivator tracker) {
+		logger.info("updated config:{}", dicts);
 		try {
-			isCluster = StringUtil.isTrue(dict.get("redis.isCluster") + "");
+			isCluster = StringUtil.isTrue(tracker.getProperty("redis.isCluster"));
 		} catch (Throwable e) {
 			logger.error("redis.isCluster config error:" + e.getMessage(), e);
 		}
@@ -196,13 +197,13 @@ public class JedisCacheService implements CacheService, Serializable {
 			// 是否启用后进先出, 默认true
 			config.setLifo(true);
 			// 最大空闲连接数, 默认8个
-			config.setMaxIdle(Integer.valueOf(dict.get("redis.maxIdle") + ""));
+			config.setMaxIdle(Integer.valueOf(tracker.getProperty("redis.maxIdle") + ""));
 			// 最小空闲连接数, 默认0
-			config.setMinIdle(Integer.valueOf(dict.get("redis.minIdle") + ""));
+			config.setMinIdle(Integer.valueOf(tracker.getProperty("redis.minIdle") + ""));
 			// 最大连接数, 默认8个
-			config.setMaxTotal(Integer.valueOf(dict.get("redis.maxTotal") + ""));
+			config.setMaxTotal(Integer.valueOf(tracker.getProperty("redis.maxTotal") + ""));
 			// 获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,默认-1
-			config.setMaxWaitMillis(Integer.valueOf(dict.get("redis.maxWaitMillis") + ""));
+			config.setMaxWaitMillis(Integer.valueOf(tracker.getProperty("redis.maxWaitMillis") + ""));
 			// 逐出连接的最小空闲时间 默认1800000毫秒(30分钟)
 			config.setMinEvictableIdleTimeMillis(1800000);
 			// 每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3
@@ -210,16 +211,16 @@ public class JedisCacheService implements CacheService, Serializable {
 			// 对象空闲多久后逐出, 当空闲时间>该值 且 空闲连接>最大空闲数时直接逐出,不再根据MinEvictableIdleTimeMillis判断 (默认逐出策略)
 			config.setSoftMinEvictableIdleTimeMillis(1800000);
 			// 在获取连接的时候检查有效性, 默认false
-			config.setTestOnBorrow(StringUtil.isFalse(dict.get("redis.testOnBorrow") + ""));
+			config.setTestOnBorrow(StringUtil.isFalse(tracker.getProperty("redis.testOnBorrow") + ""));
 			// 在空闲时检查有效性, 默认false
 			config.setTestWhileIdle(true);
 			// 逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
 			config.setTimeBetweenEvictionRunsMillis(5000);
 			
-			int maxRedirections = Integer.valueOf(dict.get("redis.maxRedirections") + "");
-			int timeout = Integer.valueOf(dict.get("redis.timeout") + "");
-			String password = dict.get("redis.password") + "";
-			String nodes = dict.get("redis.nodes") + "";
+			int maxRedirections = Integer.valueOf(tracker.getProperty("redis.maxRedirections") + "");
+			int timeout = Integer.valueOf(tracker.getProperty("redis.timeout") + "");
+			String password = tracker.getProperty("redis.password") + "";
+			String nodes = tracker.getProperty("redis.nodes") + "";
 			
 			if (isCluster) {
 				String[] strs = nodes.split(",");

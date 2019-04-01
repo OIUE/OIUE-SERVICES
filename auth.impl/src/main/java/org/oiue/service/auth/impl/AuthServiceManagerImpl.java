@@ -1,7 +1,6 @@
 package org.oiue.service.auth.impl;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ import org.oiue.tools.string.StringUtil;
 import org.osgi.service.cm.ManagedService;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class AuthServiceManagerImpl implements AuthServiceManager, ManagedService, Serializable {
+public class AuthServiceManagerImpl implements AuthServiceManager, Serializable {
 	private Logger logger;
 	private String login_type = "type";
 	
@@ -76,8 +75,7 @@ public class AuthServiceManagerImpl implements AuthServiceManager, ManagedServic
 			return false;
 	}
 	
-	@Override
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map<String, ?> props) {
 		String login_type = props.get("loginType") + "";
 		if (!StringUtil.isEmptys(login_type)) {
 			this.login_type = login_type;

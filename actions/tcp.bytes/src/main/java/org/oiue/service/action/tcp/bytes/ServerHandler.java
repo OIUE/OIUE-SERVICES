@@ -11,14 +11,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.bytes.api.BytesRuleField;
 import org.oiue.service.bytes.api.BytesService;
+import org.oiue.service.io.Handler;
+import org.oiue.service.io.Session;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.online.Online;
 import org.oiue.service.online.OnlineDataField;
 import org.oiue.service.online.OnlineService;
 import org.oiue.service.online.Type;
-import org.oiue.service.tcp.Handler;
-import org.oiue.service.tcp.Session;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.bytes.ByteUtil;
 import org.oiue.tools.bytes.Crc;
@@ -43,7 +43,7 @@ public class ServerHandler implements Handler {
 	private boolean runReceived = true;
 	private String bf_charset = "ISO-8859-1";
 	private String charset = "UTF-8";
-	private Dictionary props;
+	private Map props;
 	
 	private int anonymous_count = 3;
 	
@@ -58,7 +58,7 @@ public class ServerHandler implements Handler {
 		this.bytesService = bytesService;
 	}
 	
-	public void updated(Dictionary props) {
+	public void updated(Map props) {
 		this.props = props;
 		try {
 			anonymous_count = Integer.valueOf(this.props.get("anonymousCount") + "");

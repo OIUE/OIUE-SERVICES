@@ -1,6 +1,6 @@
 package org.oiue.service.auth.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.auth.AuthService;
 import org.oiue.service.auth.AuthServiceManager;
@@ -30,7 +30,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				authServiceManager.updated(props);
 			}
 		}, LogService.class);

@@ -1,6 +1,6 @@
 package org.oiue.service.cache.jdbc;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheService;
 import org.oiue.service.cache.CacheServiceManager;
@@ -18,7 +18,7 @@ public class Activator extends FrameActivator {
 			
 			@Override
 			public void removedService() {
-				cacheServiceManager.unRegisterCacheService("buffer");
+				cacheServiceManager.unRegisterCacheService("storage");
 			}
 			
 			@Override
@@ -27,12 +27,12 @@ public class Activator extends FrameActivator {
 				SqlService sqlService = getService(SqlService.class);
 				cacheServiceManager = getService(CacheServiceManager.class);
 				
-				CacheService cacheService = new StorageServiceImpl(logService, sqlService);
+				CacheService cacheService = new StorageServiceImpl(logService, sqlService,cacheServiceManager);
 				cacheServiceManager.registerCacheService("storage", cacheService);
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
 		}, LogService.class, CacheServiceManager.class, SqlService.class);

@@ -1,6 +1,6 @@
 package org.oiue.service.cache.mongodb;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.log.LogService;
@@ -17,7 +17,7 @@ public class Activator extends FrameActivator {
 			
 			@Override
 			public void removedService() {
-				cacheServiceManager.unRegisterCacheService("redis");
+				cacheServiceManager.unRegisterCacheService("mongodb");
 			}
 			
 			@Override
@@ -26,11 +26,11 @@ public class Activator extends FrameActivator {
 				cacheServiceManager = getService(CacheServiceManager.class);
 				
 				cacheService = new mongoCacheService(logService);
-				cacheServiceManager.registerCacheService("redis", cacheService);
+				cacheServiceManager.registerCacheService("mongodb", cacheService);
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				cacheService.updated(props);
 			}
 		}, LogService.class, CacheServiceManager.class);

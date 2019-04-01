@@ -28,7 +28,7 @@ public class DriverFilterServiceImpl implements DriverFilterService {
 	private HashMap<String, ArrayList<DriverFilter>> sendFilterMap = new HashMap<String, ArrayList<DriverFilter>>();
 	
 	private Logger logger;
-	private Dictionary props;
+	private Map props;
 	
 	public DriverFilterServiceImpl(LogService logService) {
 		logger = logService.getLogger(this.getClass());
@@ -367,7 +367,7 @@ public class DriverFilterServiceImpl implements DriverFilterService {
 		return sr;
 	}
 	
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map<String, ?> props) {
 		logger.info("update property");
 		this.props = props;
 		

@@ -1,6 +1,6 @@
 package org.oiue.service.action.http.sysupload;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.file.upload.FileUploadService;
@@ -47,7 +47,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				try {
 					upload.updated(props);
 				} catch (Throwable e) {

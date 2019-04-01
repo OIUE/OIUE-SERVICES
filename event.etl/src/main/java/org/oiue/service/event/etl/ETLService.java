@@ -2,9 +2,11 @@ package org.oiue.service.event.etl;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Dictionary;
 import java.util.Map;
 
+import org.oiue.service.osgi.FrameActivator;
+
+@SuppressWarnings("rawtypes")
 public interface ETLService extends Serializable {
 	Object getRepository(Map data, Map event, String tokenid);
 	
@@ -34,14 +36,17 @@ public interface ETLService extends Serializable {
 	
 	Object result(Map data, Map event, String tokenid);
 	
-	Object convertToGeometry(Map data, Map event, String tokenid) throws SQLException;
-	
 	void readAndInsertEntiry(Map data, Map event, String tokenid) throws Exception;
 	
-	void updated(Dictionary<String, ?> props);
+	void updated(Map<String, ?> props, FrameActivator tracker);
+	
 	Object createApi(Map data, Map event, String tokenid) throws Throwable;
+	
 	Object testServiceEvent(Map data, Map event, String tokenid) throws Throwable;
-	Object convertColumnType(Map data, Map event, String tokenid) throws Throwable;
+	
 	Object getMaxMinValue(Map data, Map event, String tokenid) throws Throwable;
+	
 	Object getCountValue(Map data, Map event, String tokenid) throws Throwable;
+	
+	Object getCount(Map data, Map event, String tokenid) throws Throwable;
 }

@@ -1,6 +1,6 @@
 package org.oiue.service.rectification.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.log.LogService;
 import org.oiue.service.osgi.FrameActivator;
@@ -28,7 +28,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				rectificationServiceManager.updated(props);
 			}
 		}, LogService.class);

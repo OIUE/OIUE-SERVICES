@@ -15,27 +15,30 @@ import org.oiue.tools.map.MapUtil;
 public class TerminalServiceImpl implements TerminalService, Serializable {
 	private Logger logger;
 	private CacheServiceManager cache;
-
+	
 	public TerminalServiceImpl(LogService logService, FactoryService factoryService, CacheServiceManager cache) {
 		logger = logService.getLogger(this.getClass());
 		this.cache = cache;
 	}
-
+	
 	@Override
 	public String getNewVersion(Map data, Map event, String tokenid) {
 		logger.debug("getNewVersion data:{}", data);
-		Object c = cache.get("system_terminal_fota", MapUtil.getString(data,DriverDataField.type)+":"+MapUtil.getString(data,DriverDataField.TERMINAL_SN));
-		if(c instanceof Map){
+		Object c = cache.get("system_terminal_fota", MapUtil.getString(data, DriverDataField.type) + ":" + MapUtil.getString(data, DriverDataField.TERMINAL_SN));
+		if (c instanceof Map) {
 			return MapUtil.getString((Map<String, Object>) c, "version");
 		}
 		return null;
 	}
-
+	
 	@Override
 	public Map getFOTAInfo(Map data, Map event, String tokenid) {
 		logger.debug("getFOTAInfo data:{}", data);
-		Object c = cache.get("system_terminal_fota", MapUtil.getString(data,DriverDataField.type)+":"+MapUtil.getString(data,DriverDataField.TERMINAL_SN));
-		if(c instanceof Map){
+		Object c = cache.get("system_terminal_fota", MapUtil.getString(data, DriverDataField.type) + ":" + MapUtil.getString(data, DriverDataField.TERMINAL_SN));
+		if(c==null)
+			c=cache.get("system_terminal_fota", MapUtil.getString(data, DriverDataField.type) + ":default");
+		logger.debug("c:{}", c);
+		if (c instanceof Map) {
 			return (Map) c;
 		}
 		return null;

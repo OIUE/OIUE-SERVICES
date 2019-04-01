@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.online.Online;
 import org.oiue.service.online.OnlineService;
+import org.oiue.service.osgi.FrameActivator;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.ExceptionUtil;
 import org.oiue.tools.exception.OIUEException;
@@ -47,11 +47,12 @@ public class UploadPostServlet extends HttpServlet {
 	private ActionService actionService;
 	private OnlineService onlineService;
 	private Logger logger;
-	private Dictionary properties;
+//	private Dictionary properties;
 	private FileUploadService fileUploadService;
 	private String userDir = null;
 	private boolean isMultipart = false;
 	private HttpService httpService;
+	private FrameActivator tracker;
 	
 	public UploadPostServlet(ActionService actionService, OnlineService onlineService, LogService logService, FileUploadService fileUploadService, String userDir) {
 		super();
@@ -62,9 +63,10 @@ public class UploadPostServlet extends HttpServlet {
 		this.userDir = userDir;
 	}
 	
-	public void updated(Dictionary props) {
+	public void updated(Map props, FrameActivator tracker) {
 		logger.info("updateConfigure");
-		properties = props;
+//		properties = props;
+		this.tracker=tracker;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -276,16 +278,16 @@ public class UploadPostServlet extends HttpServlet {
 			return per;
 		}
 		// 如果是文件上传表单
-		String dir = properties.get("upload.rootpath." + per.get("modulename")) + "";// File
+		String dir = tracker.getProperty("upload.rootpath." + per.get("modulename")) + "";// File
 		// dir
 		if (StringUtil.isEmptys(dir)) {
 			throw new OIUEException(StatusResult._url_can_not_found, "请配置存储路径！" + "upload.rootpath." + per.get("modulename"));
 		}
-		dir = StringReplace.replace(dir, "${userid}", online.getUser_id(), false);
-		Collection<String> pers = StringUtil.analyzeStringPer(dir, "${", "}");
-		if(pers!=null&&pers.size()>0){
+		dir = StringReplace.replace(dir, "{userid}", online.getUser_id(), false);
+		Collection<String> pers = StringUtil.analyzeStringPer(dir, "{", "}");
+		if (pers != null && pers.size() > 0) {
 			for (String key : pers) {
-				dir = StringReplace.replace(dir, "${"+key+"}", MapUtil.getString(data, key,""), false);
+				dir = StringReplace.replace(dir, "{" + key + "}", MapUtil.getString(data, key, ""), false);
 			}
 		}
 		
@@ -307,11 +309,15 @@ public class UploadPostServlet extends HttpServlet {
 					if (!f.exists()) { // 判断文件是否存在
 						logger.debug("文件不存在");
 					} else {
-						boolean rs = f.delete(); // 调用delete()方法
-						if (rs)
-							logger.debug("文件删除成功");
-						else
-							logger.debug("文件删除失败");
+						if(StringUtil.isTrue(per.get("forceDelete")+"")){
+							boolean rs = f.delete(); // 调用delete()方法
+							if (rs)
+								logger.debug("文件删除成功");
+							else
+								throw new OIUEException(StatusResult._ncriticalAbnormal,"文件删除失败");
+						}else{
+							f = new File(dir, System.currentTimeMillis()+"_"+FileStringUtil.getShortFileName(item.getName()));
+						}
 					}
 					logger.debug(f.getAbsolutePath());
 					java.io.FileOutputStream fout = new FileOutputStream(f);

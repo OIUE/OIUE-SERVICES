@@ -1,6 +1,7 @@
 package org.oiue.service.action.http.resource;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,11 +28,13 @@ public class FileVisit implements Visit {
 	@Override
 	public void visit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String domain_path = (String) request.getAttribute("domain_path");
-		if(StringUtil.isEmptys(domain_path)){
+		String resName = (String) request.getAttribute("resName");
+		if (StringUtil.isEmptys(domain_path)) {
+			logger.error("domain_path not found ! [{}] {} ", domain_path,resName);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
+			// throw new FileNotFoundException("domain_path not found !");
 		}
-		String resName = (String) request.getAttribute("resName");
 		
 		resName = resName.startsWith("/") ? resName : "/" + resName;
 		
@@ -39,7 +42,9 @@ public class FileVisit implements Visit {
 		final URL url = httpContext.getResource(domain_path + resName);
 		
 		if (url == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			// logger.error("resource not found ! [{}{}]", domain_path, resName);
+			// response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			throw new FileNotFoundException("resource [" + domain_path + resName + "] not found !");
 		} else {
 			response.setContentType(httpContext.getMimeType(resName));
 			handle(request, response, url, resName);

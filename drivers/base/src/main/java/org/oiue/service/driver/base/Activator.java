@@ -1,6 +1,6 @@
 package org.oiue.service.driver.base;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.driver.api.DriverService;
 import org.oiue.service.log.LogService;
@@ -27,7 +27,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				driverService.updated(props);
 			}
 		}, LogService.class);

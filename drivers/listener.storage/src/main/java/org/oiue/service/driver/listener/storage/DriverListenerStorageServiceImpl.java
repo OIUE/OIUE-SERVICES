@@ -30,12 +30,13 @@ public class DriverListenerStorageServiceImpl implements DriverListener {
 	private HashMap<String, List<DriverListener>> receiveListenerMap = new HashMap<>();
 	
 	private Logger logger;
-	private Dictionary props;
+	private Map props;
 	
 	public DriverListenerStorageServiceImpl(LogService logService, IResource iResource, AnalyzerService analyzerService, CacheServiceManager cacheService) {
 		logger = logService.getLogger(this.getClass());
 		this.iResource = iResource;
 		this.analyzerService = analyzerService;
+		this.cacheService=cacheService;
 	}
 	
 	@SuppressWarnings({ "unchecked" })
@@ -61,6 +62,7 @@ public class DriverListenerStorageServiceImpl implements DriverListener {
 		if (StringUtil.isEmptys(event)) {
 			sr = new StatusResult();
 			sr.setResult(StatusResult._SUCCESS);
+			logger.info("cannot read storage :storage." + driverName + "." + type+"|data>"+data);
 			return sr;
 		}
 		
@@ -80,7 +82,7 @@ public class DriverListenerStorageServiceImpl implements DriverListener {
 		return sr;
 	}
 	
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map<String, ?> props) {
 		this.props = props;
 	}
 }

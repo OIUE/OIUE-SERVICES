@@ -4,7 +4,6 @@
 package org.oiue.service.action.filter.module2domain;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		this.actionService = actionService;
 	}
 	
-	public void updated(Dictionary dict) {
+	public void updated(Map dict) {
 		String convert_url = (String) dict.get("convert");
 		if (!StringUtil.isEmptys(convert_url)) {
 			convert = StringUtil.parStr2Map(convert_url, ";", ":");
@@ -38,7 +37,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 		if (logger.isDebugEnabled()) {
 			logger.debug("updateConfigure: convert_url  = " + convert_url);
 		}
-		actionService.registerActionFilter("convertFilter", this, -1);
+		actionService.registerActionFilter("convertFilter", this, -500);
 	}
 	
 	@Override

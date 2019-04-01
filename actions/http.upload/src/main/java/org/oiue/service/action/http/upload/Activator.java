@@ -1,6 +1,6 @@
 package org.oiue.service.action.http.upload;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.file.upload.FileUploadService;
@@ -15,6 +15,7 @@ public class Activator extends FrameActivator {
 	
 	@Override
 	public void start() {
+		FrameActivator tracker = this;
 		this.start(new MulitServiceTrackerCustomizer() {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/upload";
 			private HttpService httpService;
@@ -44,8 +45,8 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
-				upload.updated(props);
+			public void updatedConf(Map<String, ?> props) {
+				upload.updated(props,tracker);
 			}
 		}, HttpService.class, ActionService.class, LogService.class, FileUploadService.class, OnlineService.class);
 	}

@@ -55,7 +55,7 @@
 								<if>
 									<contains string="${project.packaging}" substring="config" />
 									<then>
-										<copy todir="${project.build.exportdir}">
+										<copy todir="${project.build.exportdir}/bundle">
 											<fileset dir="${project.basedir}/target">
 												<include name="*.?.config" />
 											</fileset>

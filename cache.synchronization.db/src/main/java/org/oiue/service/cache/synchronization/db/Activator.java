@@ -1,6 +1,6 @@
 package org.oiue.service.cache.synchronization.db;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.log.LogService;
@@ -36,7 +36,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				refreshDb.updateProps(props);
 			}
 		}, LogService.class, FactoryService.class, TaskService.class, CacheServiceManager.class, IResource.class);

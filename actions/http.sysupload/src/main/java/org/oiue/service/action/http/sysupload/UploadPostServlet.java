@@ -51,7 +51,7 @@ public class UploadPostServlet extends HttpServlet {
 	private ActionService actionService;
 	private OnlineService onlineService;
 	private Logger logger;
-	private Dictionary properties;
+	private Map properties;
 	private FileUploadService fileUploadService;
 	private String userDir = null;
 	private boolean isMultipart = false;
@@ -69,7 +69,7 @@ public class UploadPostServlet extends HttpServlet {
 		this.userDir = userDir;
 	}
 	
-	public void updated(Dictionary props) {
+	public void updated(Map props) {
 		logger.info("updateConfigure");
 		properties = props;
 		String tokenid = null;

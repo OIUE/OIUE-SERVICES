@@ -2,9 +2,11 @@ package org.oiue.service.event.execute.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.event.execute.EventExecuteService;
@@ -15,8 +17,11 @@ import org.oiue.service.odp.event.api.EventField;
 import org.oiue.service.odp.res.api.IResource;
 import org.oiue.service.online.OnlineService;
 import org.oiue.service.system.analyzer.AnalyzerService;
+import org.oiue.tools.StatusResult;
+import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.list.ListUtil;
 import org.oiue.tools.map.MapUtil;
+import org.oiue.tools.string.StringUtil;
 
 @SuppressWarnings("serial")
 public class EventExecuteServiceImpl implements EventExecuteService {
@@ -66,7 +71,7 @@ public class EventExecuteServiceImpl implements EventExecuteService {
 							// wr.write(ListUtil.ListJoin(MapUtil.toList(paramMap, keys), ","));
 							try {
 								stream.write("\r\n".getBytes("GBK"));
-								stream.write(ListUtil.ListJoin(MapUtil.toList(paramMap, keys), ",").getBytes("GBK"));
+								stream.write(ListUtil.ListJoinCsv(MapUtil.toList(paramMap, keys)).getBytes("GBK"));
 							} catch (IOException e) {
 								logger.error(e.getMessage(), e);
 							}
@@ -87,8 +92,22 @@ public class EventExecuteServiceImpl implements EventExecuteService {
 					// wr.flush();
 				}
 			} else {
-				iresource = factoryService.getBmo(IResource.class.getName());
-				return iresource.callEvent(MapUtil.getString(event, EventField.service_event_id), data_source_name, data);
+				if (!StringUtil.isTrue(MapUtil.getString(data, "system_test_execute", "n"))) {
+					iresource = factoryService.getBmo(IResource.class.getName());
+					return iresource.callEvent(MapUtil.getString(event, EventField.service_event_id), data_source_name, data);
+				} else {
+					String processKey = UUID.randomUUID().toString().replaceAll("-", "");
+					try {
+						iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+						return iresource.callEvent(MapUtil.getString(event, EventField.service_event_id), data_source_name, data);
+					} finally {
+						try {
+							factoryService.RollbackByProcess(processKey);
+						} catch (SQLException e) {
+							throw new OIUEException(StatusResult._data_error, e.getMessage());
+						}
+					}
+				}
 			}
 		}
 		throw new RuntimeException("service can not init！");

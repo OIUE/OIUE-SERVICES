@@ -25,7 +25,7 @@ public class PostServlet extends HttpServlet {
 	private static final long serialVersionUID = -6327347468651806863L;
 	private ActionService actionService;
 	private Logger logger;
-	private Dictionary properties;
+	private Map properties;
 	private boolean refererGrant = false;
 	
 	public PostServlet(ActionService actionService, LogService logService) {
@@ -34,7 +34,7 @@ public class PostServlet extends HttpServlet {
 		this.actionService = actionService;
 	}
 	
-	public void updated(Dictionary props) {
+	public void updated(Map props) {
 		logger.info("updateConfigure");
 		properties = props;
 		String c_referer = properties.get("Referer") + "";

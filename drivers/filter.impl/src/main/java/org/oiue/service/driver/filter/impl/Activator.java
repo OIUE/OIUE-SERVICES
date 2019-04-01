@@ -1,6 +1,6 @@
 package org.oiue.service.driver.filter.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.driver.api.DriverFilterService;
 import org.oiue.service.driver.api.DriverService;
@@ -34,7 +34,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				driverFilterService.updated(props);
 			}
 		}, LogService.class, DriverService.class);

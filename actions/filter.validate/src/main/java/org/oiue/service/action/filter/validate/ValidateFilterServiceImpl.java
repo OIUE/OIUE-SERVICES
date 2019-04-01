@@ -4,7 +4,6 @@
 package org.oiue.service.action.filter.validate;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class ValidateFilterServiceImpl implements ActionFilter, Serializable {
 		this.actionService = actionService;
 	}
 	
-	public void updated(Dictionary dict) {
+	public void updated(Map dict) {
 		String validatesStr = (String) dict.get("validates");
 		
 		if (!StringUtil.isEmptys(validatesStr))

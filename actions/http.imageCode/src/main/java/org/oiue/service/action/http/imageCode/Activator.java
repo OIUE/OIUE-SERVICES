@@ -1,6 +1,6 @@
 package org.oiue.service.action.http.imageCode;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.log.LogService;
@@ -17,19 +17,21 @@ public class Activator extends FrameActivator {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/CheckCodeImage";
 			private HttpService httpService;
 			private ImageCodeServlet imageCode;
+			private ActionService actionService;
 			
 			@Override
 			public void removedService() {
 				httpService.unregister(url);
+				actionService.unregisterActionFilter("imageCode");
 			}
 			
-			@SuppressWarnings("unused")
 			@Override
 			public void addingService() {
 				httpService = getService(HttpService.class);
 				LogService logService = getService(LogService.class);
-				ActionService actionService = getService(ActionService.class);
+				actionService = getService(ActionService.class);
 				
+				actionService.registerActionFilter("imageCode", new ImageCodeFilter(), -502);
 				imageCode = new ImageCodeServlet(logService);
 				Logger log = logService.getLogger(this.getClass());
 				log.debug("绑定url：" + url);
@@ -41,7 +43,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				imageCode.updated(props);
 			}
 		}, HttpService.class, ActionService.class, LogService.class);

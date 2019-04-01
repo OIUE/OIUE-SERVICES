@@ -22,11 +22,12 @@ public class TableInputStepMeta implements InputStepMeta {
 	private static final long serialVersionUID = 1L;
 	private LogService logService;
 	private Logger logger;
+	
 	public TableInputStepMeta(LogService logService) {
 		this.logService = logService;
-		logger= this.logService.getLogger(getClass());
+		logger = this.logService.getLogger(getClass());
 	}
-
+	
 	@Override
 	public StepMeta ConvertToStepMeta(Map data, TransMeta transMeta) {
 		String instepid = "TableInput";

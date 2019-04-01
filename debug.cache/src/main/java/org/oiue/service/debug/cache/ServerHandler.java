@@ -1,12 +1,16 @@
 package org.oiue.service.debug.cache;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.oiue.service.cache.script.CacheScriptResult;
 import org.oiue.service.cache.script.CacheScriptService;
-import org.oiue.service.tcp.Handler;
-import org.oiue.service.tcp.Session;
+import org.oiue.service.io.Handler;
+import org.oiue.service.io.Session;
 import org.oiue.tools.list.ListUtil;
 import org.oiue.tools.map.MapUtil;
 
@@ -20,6 +24,7 @@ public class ServerHandler implements Handler {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void received(Session session, String line, byte[] bytes) {
+		System.out.println("line :"+line);
 		if ("help".equals(line)) {
 			session.write("po cache,name,key,value");
 			session.write("poj cache,name,key,value");
@@ -52,6 +57,35 @@ public class ServerHandler implements Handler {
 			session.close();
 		} else if (line.startsWith("k")) {
 			session.write("k");
+		} else if (line.startsWith("w")) {
+			session.write("w");
+			String[] s = line.split(" ");
+			if(s.length==3) {
+				try{
+					System.out.println("System.getProperty(“file.encoding”):"+System.getProperty("file.encoding"));
+					System.out.println("System.getProperty(“sun.jnu.encoding”):"+System.getProperty("sun.jnu.encoding"));
+//					System.setProperty("sun.jnu.encoding","UTF-8");
+					File file = new File(s[1]);
+					java.io.FileOutputStream fout = new FileOutputStream(file);
+					fout.write(s[2].getBytes());
+					fout.close();
+					session.write(file.getAbsolutePath());
+					File tf = new File(file.getAbsolutePath());
+					File f = new File(tf.getParent());
+					File[] listFiles = f.listFiles();
+					
+					for (File file2 : listFiles) {
+						session.write(file2.getName());
+					}
+				}catch(Throwable e){
+					e.printStackTrace();
+				}
+			}else if(s.length==2) {
+				File file = new File(s[1]);
+				session.write(file.canRead()+"");
+				
+			}
+			
 		} else {
 			CacheScriptResult result = cacheScript.eval(line);
 			if (result.getResult() != CacheScriptResult.OK) {

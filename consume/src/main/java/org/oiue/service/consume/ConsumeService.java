@@ -1,7 +1,6 @@
 package org.oiue.service.consume;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,5 +76,5 @@ public interface ConsumeService extends Serializable {
 	 * 配置文件变更
 	 * @param props 配置信息
 	 */
-	public void updated(Dictionary<?, ?> props);
+	public void updated(Map<?, ?> props);
 }

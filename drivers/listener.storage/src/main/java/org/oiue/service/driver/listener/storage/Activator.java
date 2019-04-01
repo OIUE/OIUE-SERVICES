@@ -1,6 +1,6 @@
 package org.oiue.service.driver.listener.storage;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.driver.api.DriverListenerService;
@@ -36,7 +36,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				driverListener.updated(props);
 			}
 		}, LogService.class, IResource.class, AnalyzerService.class, DriverListenerService.class, CacheServiceManager.class);

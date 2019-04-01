@@ -1,6 +1,6 @@
 package org.oiue.service.action.filter.auth;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.action.api.ActionService;
 import org.oiue.service.auth.AuthServiceManager;
@@ -8,7 +8,6 @@ import org.oiue.service.log.LogService;
 import org.oiue.service.online.OnlineService;
 import org.oiue.service.osgi.FrameActivator;
 import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
-import org.oiue.service.permission.PermissionServiceManager;
 
 public class Activator extends FrameActivator {
 	
@@ -27,18 +26,17 @@ public class Activator extends FrameActivator {
 			public void addingService() {
 				LogService logService = getService(LogService.class);
 				actionService = getService(ActionService.class);
-				AuthServiceManager authService = getService(AuthServiceManager.class);
-				PermissionServiceManager permissionService = getService(PermissionServiceManager.class);
 				OnlineService onlineService = getService(OnlineService.class);
+				AuthServiceManager auth = getService(AuthServiceManager.class);
 				
-				actionFilter = new AuthFilterServiceImpl(logService, onlineService, permissionService, authService, actionService);
+				actionFilter = new AuthFilterServiceImpl(logService, onlineService, auth, actionService);
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				actionFilter.updated(props);
 			}
-		}, LogService.class, ActionService.class, AuthServiceManager.class, PermissionServiceManager.class, OnlineService.class);
+		}, LogService.class, ActionService.class, OnlineService.class, AuthServiceManager.class);
 	}
 	
 	@Override

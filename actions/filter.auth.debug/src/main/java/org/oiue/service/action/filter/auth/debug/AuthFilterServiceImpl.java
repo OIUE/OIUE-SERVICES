@@ -31,7 +31,7 @@ public class AuthFilterServiceImpl implements ActionFilter, Serializable {
 	public AuthFilterServiceImpl(LogService logService, OnlineService onlineService, ActionService actionService, FactoryService factoryService) {
 		this.onlineService = onlineService;
 		this.factoryService = factoryService;
-		actionService.registerActionFilter("debugAuthFilter", this, 0);
+		actionService.registerActionFilter("debugAuthFilter", this, -10);
 	}
 	
 	@Override

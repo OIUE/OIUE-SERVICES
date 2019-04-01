@@ -1,6 +1,5 @@
 package org.oiue.service.consume.impl;
 
-import java.util.Dictionary;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,7 +74,7 @@ public class ConsumeServiceImpl implements ConsumeService {
 	}
 	
 	@Override
-	public void updated(Dictionary<?, ?> props) {
+	public void updated(Map<?, ?> props) {
 		
 	}
 }

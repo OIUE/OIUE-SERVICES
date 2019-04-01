@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.oiue.service.event.system.info.impl</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>OIUE EVENT service for res system info impl </name>
+	<description>A bundle that res event system info impl</description>
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>services</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.event.system.info</artifactId>
+			<version>${event.system.time.version}</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${project.artifactId}.Activator</project.activator>
+	</properties>
+</project>

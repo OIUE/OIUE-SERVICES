@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.oiue.services.drivers</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>org.oiue.service.driver.server</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>OIUE IOT DRIVER service for server</name>
+	<description>A bundle that IOT Driver Server </description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.io</artifactId>
+			<version>${tcp.version}</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+	</properties>
+</project>

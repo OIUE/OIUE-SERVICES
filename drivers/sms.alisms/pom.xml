@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.oiue.service.driver.sms.alisms</artifactId>
+	<parent>
+		<groupId>org.oiue.services</groupId>
+		<artifactId>imports</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+	</parent>
+	<packaging>bundle</packaging>
+
+	<name>A service for ali sms service impl </name>
+	<description>A bundle that sms service impl</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.oiue.services.drivers</groupId>
+			<artifactId>org.oiue.service.driver.api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>2.4.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-sms</artifactId>
+			<version>3.0.0-rc1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.activator>${artifactId}.Activator</project.activator>
+		<project.dependency>aliyun-java-sdk-core,aliyun-java-sdk-sms,aliyun-java-sdk-dysmsapi</project.dependency>
+		<project.import>
+org.oiue.service.log,
+org.oiue.service.osgi,
+org.oiue.service.driver.api,
+org.oiue.tools,org.oiue.tools.map,org.xml.sax,org.w3c.dom,javax.xml,javax.xml.transform,javax.xml.parsers,javax.crypto,javax.crypto.spec,
+org.oiue.tools.exception</project.import>
+		<project.export></project.export>
+	</properties>
+</project>

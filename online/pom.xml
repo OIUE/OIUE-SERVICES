@@ -19,6 +19,7 @@
 			org.oiue.service.log,
 			org.oiue.service.osgi,
 			org.oiue.tools.json,
+			org.oiue.tools.exception,
 			javax.crypto,
 			javax.crypto.spec</project.import>
 	</properties>

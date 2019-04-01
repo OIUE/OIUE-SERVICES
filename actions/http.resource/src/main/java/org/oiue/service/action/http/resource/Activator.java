@@ -1,7 +1,7 @@
 package org.oiue.service.action.http.resource;
 
 import java.io.IOException;
-import java.util.Dictionary;
+import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -24,6 +24,7 @@ public class Activator extends FrameActivator {
 	
 	@Override
 	public void start() {
+		FrameActivator tracker = this;
 		this.start(new MulitServiceTrackerCustomizer() {
 			private String url = getProperty("org.oiue.service.action.http.root") + "/";
 			private HttpService httpService;
@@ -47,18 +48,19 @@ public class Activator extends FrameActivator {
 				FactoryService factoryService = getService(FactoryService.class);
 				CacheServiceManager cacheService = getService(CacheServiceManager.class);
 				OnlineService onlineService = getService(OnlineService.class);
-				
 				log = logService.getLogger(this.getClass());
 				servlet = new ResourceServlet(cacheService, onlineService, factoryService, logService, templateService, httpService);
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 				try {
 					servlet.updated(props);
 					log.info("绑定url：" + url);
-					httpContext = new ResourceContext(templateService, logService, httpService.createDefaultHttpContext(), (String) props.get("root_path"));
-					httpService.registerServlet(url, servlet, props, httpContext);
+					httpContext = new ResourceContext(templateService, logService, httpService.createDefaultHttpContext(), tracker.getProperty("root_site_path"));
+					httpService.registerServlet(url, servlet, null, httpContext);
+
+					registerService(ResourceFilterManger.class, servlet);
 					httpService.registerServlet("/storefront/track", new Servlet() {
 						
 						@Override

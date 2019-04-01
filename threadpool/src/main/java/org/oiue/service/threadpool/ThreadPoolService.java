@@ -1,8 +1,8 @@
 package org.oiue.service.threadpool;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
@@ -96,5 +96,5 @@ public interface ThreadPoolService extends Serializable {
 	 * 配置变更
 	 * @param props
 	 */
-	public void updated(Dictionary<?, ?> props);
+	public void updated(Map<?, ?> props);
 }

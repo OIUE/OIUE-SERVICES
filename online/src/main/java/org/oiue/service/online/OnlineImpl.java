@@ -43,6 +43,9 @@ public class OnlineImpl implements Online {
 	@Override
 	public void setStatus(Type type) {
 		switch (type) {
+			case apikey:
+				status = status | 31; // 1 1111
+				break;
 			case tcp:
 				status = status | 16; // 1 0000
 				break;
@@ -64,6 +67,9 @@ public class OnlineImpl implements Online {
 	@Override
 	public void resetStatus(Type type) {
 		switch (type) {
+			case apikey:
+				status = status ^ 31; // 1 1111
+				break;
 			case tcp:
 				status = status ^ 16; // 1 0000
 				break;

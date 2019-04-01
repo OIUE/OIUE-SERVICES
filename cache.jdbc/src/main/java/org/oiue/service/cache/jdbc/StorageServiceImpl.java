@@ -19,24 +19,27 @@ import java.util.Map;
 import java.util.Set;
 
 import org.oiue.service.cache.CacheService;
+import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.cache.Type;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.sql.SqlService;
-import org.oiue.service.sql.SqlServiceResult;
 import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.map.MapUtil;
+import org.oiue.tools.string.StringUtil;
 
 public class StorageServiceImpl implements CacheService, Runnable {
 	
 	private Logger logger;
 	private SqlService sqlService;
+	private CacheServiceManager cacheServiceManager;
 	
 	private Map<String, LinkedList<Collection<Object>>> storageParamsMap = new HashMap<>();
 	
-	public StorageServiceImpl(LogService logService, SqlService sqlService) {
+	public StorageServiceImpl(LogService logService, SqlService sqlService, CacheServiceManager cacheServiceManager) {
 		logger = logService.getLogger(this.getClass());
 		this.sqlService = sqlService;
+		this.cacheServiceManager=cacheServiceManager;
 		new Thread(this, "SystemJDBCStorageService").start();
 	}
 	
@@ -71,9 +74,30 @@ public class StorageServiceImpl implements CacheService, Runnable {
 		PreparedStatement pstmt = null;
 		try {
 			pstmt = conn.prepareStatement(MapUtil.getString(event, "content"));
+			String expression = MapUtil.getString(event, "expression");
 			for (Collection<Object> params : paramslist) {
-				this.setQueryParams(pstmt, params);
-				pstmt.addBatch();
+				try {
+					if(params.size()==1){
+						Object v = params.iterator().next();
+						if(v instanceof Map){
+							if (expression != null && !StringUtil.isEmptys(expression)) {
+								String[] expressions = expression.split(",");
+								Collection per=new ArrayList<>(expressions.length);
+								for (String ep : expressions) {
+									if (ep != null)
+										ep = ep.trim();
+									per.add(MapUtil.get((Map)v, ep));
+								}
+								params=per;
+							}
+						}
+					}
+					
+					this.setQueryParams(pstmt, params);
+					pstmt.addBatch();
+				} catch (Exception e) {
+					logger.error("event:{} params:{} msg:{}", event,params,e.getMessage());
+				}
 			}
 			pstmt.executeBatch();
 		} catch (Exception ex) {
@@ -206,8 +230,8 @@ public class StorageServiceImpl implements CacheService, Runnable {
 	
 	@Override
 	public void run() {
-		String alias = "postgis";
-		String selectEvent = "select se.service_event_id,sep.rule as ds_name,sep.content from fm_service_event se,fm_service_event_parameters sep where se.service_event_id=? and se.service_event_id=sep.service_event_id and se.type='storage' ";
+//		String alias = "postgis";
+//		String selectEvent = "select se.service_event_id,sep.rule as ds_name,sep.content,sep.expression from oiue.fm_service_event se,oiue.fm_service_event_parameters sep where se.service_event_id=? and se.service_event_id=sep.service_event_id and se.type='storage' ";
 		Map<String, Map> events = new HashMap<>();
 		while (true) {
 			Set<String> tmk = new HashSet();
@@ -219,19 +243,20 @@ public class StorageServiceImpl implements CacheService, Runnable {
 				try {
 					if (event == null) {
 						List params = new ArrayList();
-						params.add(key);
-						SqlServiceResult sr = sqlService.selectMap(alias, selectEvent, params);
-						if (sr.getData() instanceof List) {
-							List datas = (List) sr.getData();
-							if (datas.size() == 1)
-								event = (Map) datas.get(0);
-							else {
-								logger.error("query event is error:" + datas);
-								synchronized (storageParamsMap) {
-									storageParamsMap.remove(key);
-								}
-							}
-						}
+//						params.add(key);
+//						SqlServiceResult sr = sqlService.selectMap(alias, selectEvent, params);
+//						if (sr.getData() instanceof List) {
+//							List datas = (List) sr.getData();
+//							if (datas.size() == 1)
+//								event = (Map) datas.get(0);
+//							else {
+//								logger.error("query event is error:" + datas+"|event:"+key);
+//								synchronized (storageParamsMap) {
+//									storageParamsMap.remove(key);
+//								}
+//							}
+//						}
+						event=(Map) cacheServiceManager.get("system_storage_jdbc",key);
 						if (event != null) {
 							LinkedList<Collection<Object>> list = null;
 							synchronized (storageParamsMap) {

@@ -1,11 +1,11 @@
 package org.oiue.service.buffer.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
+import org.oiue.service.buffer.BufferService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.osgi.FrameActivator;
 import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
-import org.oiue.service.buffer.*;
 
 public class Activator extends FrameActivator {
 	
@@ -23,7 +23,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
 		}, LogService.class);

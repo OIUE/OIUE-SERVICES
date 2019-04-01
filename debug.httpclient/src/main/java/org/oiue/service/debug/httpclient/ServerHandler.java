@@ -3,8 +3,8 @@ package org.oiue.service.debug.httpclient;
 import java.util.Map;
 
 import org.oiue.service.http.client.HttpClientService;
-import org.oiue.service.tcp.Handler;
-import org.oiue.service.tcp.Session;
+import org.oiue.service.io.Handler;
+import org.oiue.service.io.Session;
 import org.oiue.tools.json.JSONUtil;
 
 public class ServerHandler implements Handler {

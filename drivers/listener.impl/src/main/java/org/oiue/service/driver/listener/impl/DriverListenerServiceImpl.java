@@ -19,28 +19,28 @@ import org.oiue.tools.string.StringUtil;
 @SuppressWarnings({ "rawtypes", "unused" })
 public class DriverListenerServiceImpl implements DriverListenerService {
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<DriverListener> receiveListenerList = new ArrayList<>();
 	private HashMap<String, List<DriverListener>> receiveListenerMap = new HashMap<>();
-	
+
 	private Logger logger;
-	private Dictionary props;
-	
+	private Map props;
+
 	public DriverListenerServiceImpl(LogService logService) {
 		logger = logService.getLogger(this.getClass());
 	}
-	
+
 	@Override
 	public String getListenerName() {
 		return "DriverListener";
 	}
-	
+
 	@Override
 	public boolean registerListener(DriverListener listener) {
 		receiveListenerList.add(listener);
 		return false;
 	}
-	
+
 	@Override
 	public boolean registerListener(String driverName, DriverListener listener) {
 		if (StringUtil.isEmptys(driverName)) {
@@ -55,7 +55,7 @@ public class DriverListenerServiceImpl implements DriverListenerService {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void unregisterListener(DriverListener listener) {
 		receiveListenerList.remove(listener);
@@ -66,18 +66,18 @@ public class DriverListenerServiceImpl implements DriverListenerService {
 			}
 		}
 	}
-	
+
 	@Override
 	public void unregisterListener(String listenerName) {
-		
+
 	}
-	
+
 	@Override
 	public void unregisterAllListener() {
 		receiveListenerList.clear();
 		receiveListenerMap.clear();
 	}
-	
+
 	@Override
 	public void unregisterAllListener(String driverName) {
 		List<DriverListener> receiveListenerList = receiveListenerMap.get(driverName);
@@ -87,7 +87,7 @@ public class DriverListenerServiceImpl implements DriverListenerService {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public StatusResult receive(Map data) {
@@ -103,6 +103,12 @@ public class DriverListenerServiceImpl implements DriverListenerService {
 			if (logger.isWarnEnabled())
 				logger.warn("driverName is null:" + data);
 		} else {
+
+			long startListener = 0l;
+			if (logger.isDebugEnabled()) {
+				startListener = System.currentTimeMillis();
+				logger.debug("listener receive start>" + receiveListenerList + receiveListenerList);
+			}
 			List<DriverListener> receiveListenerList = receiveListenerMap.get(driverName);
 			if (receiveListenerList != null) {
 				for (Iterator iterator = receiveListenerList.iterator(); iterator.hasNext();) {
@@ -112,28 +118,33 @@ public class DriverListenerServiceImpl implements DriverListenerService {
 					ld.start();
 				}
 			}
-			
+
 			for (Iterator iterator = this.receiveListenerList.iterator(); iterator.hasNext();) {
 				DriverListener driverListener = (DriverListener) iterator.next();
 				new listenerListData(driverListener, data).start();
+			}
+
+			if (logger.isDebugEnabled()) {
+				long longtime = System.currentTimeMillis() - startListener;
+				logger.debug(">>>>>>>>>> listener receive over time-consuming:" + longtime);
 			}
 		}
 		sr = new StatusResult();
 		sr.setResult(StatusResult._SUCCESS);
 		return sr;
 	}
-	
+
 	class listenerListData extends Thread {
 		DriverListener e;
 		Map data;
-		
+
 		public listenerListData(DriverListener e, Map data) {
 			this.e = e;
 			this.data = data;
 		}
-		
+
 		public void run() {
-			
+
 			long startListener = 0l;
 			if (logger.isDebugEnabled()) {
 				startListener = System.currentTimeMillis();
@@ -152,8 +163,8 @@ public class DriverListenerServiceImpl implements DriverListenerService {
 			}
 		}
 	}
-	
-	public void updated(Dictionary<String, ?> props) {
+
+	public void updated(Map<String, ?> props) {
 		this.props = props;
 	}
 }

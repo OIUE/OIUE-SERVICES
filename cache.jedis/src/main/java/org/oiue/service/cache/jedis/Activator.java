@@ -1,6 +1,6 @@
 package org.oiue.service.cache.jedis;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
 import org.oiue.service.log.LogService;
@@ -11,6 +11,7 @@ public class Activator extends FrameActivator {
 	
 	@Override
 	public void start() {
+		FrameActivator tracker = this;
 		this.start(new MulitServiceTrackerCustomizer() {
 			private CacheServiceManager cacheServiceManager;
 			private JedisCacheService cacheService;
@@ -30,8 +31,8 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
-				cacheService.updated(props);
+			public void updatedConf(Map<String, ?> props) {
+				cacheService.updated(props,tracker);
 			}
 		}, LogService.class, CacheServiceManager.class);
 	}

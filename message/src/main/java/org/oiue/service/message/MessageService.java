@@ -1,7 +1,6 @@
 package org.oiue.service.message;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,5 +41,5 @@ public interface MessageService extends Serializable {
 	 * 配置文件变更
 	 * @param props
 	 */
-	public void updated(Dictionary<?, ?> props);
+	public void updated(Map<?, ?> props);
 }

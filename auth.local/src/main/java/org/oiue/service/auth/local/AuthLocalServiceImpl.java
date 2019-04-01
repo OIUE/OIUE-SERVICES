@@ -1,7 +1,6 @@
 package org.oiue.service.auth.local;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -18,6 +17,7 @@ import org.oiue.service.online.OnlineImpl;
 import org.oiue.service.online.Type;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.OIUEException;
+import org.oiue.tools.map.MapUtil;
 import org.oiue.tools.string.StringUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -30,6 +30,7 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 	protected String type = "local";
 	private String name = "userName";
 	private String pass = "userPass";
+	private String corp_id = "corp_id";
 	
 	public AuthLocalServiceImpl(LogService logService, FactoryService iresource, AuthServiceManager authServiceManager) {
 		logger = logService.getLogger(this.getClass().getName());
@@ -37,11 +38,12 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 		this.authServiceManager = authServiceManager;
 	}
 	
-	public void updated(Dictionary dict) {
+	public void updated(Map dict) {
 		try {
 			event_id = (String) dict.get("login.local.auth.eventId");
 			name = (String) dict.get("login.local.key.name");
 			pass = (String) dict.get("login.local.key.pass");
+			corp_id = (String) dict.get("login.local.key.corp_id");
 			String type = (String) dict.get("login.sso.type");
 			if (!StringUtil.isEmptys(type) && !type.equals(this.type)) {
 				authServiceManager.unRegisterAuthService(this.type);
@@ -62,6 +64,7 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 	public Online login(Map per) {
 		String username = (String) per.remove(name);
 		String password = (String) per.remove(pass);
+		String corp_no = (String) per.remove(corp_id);
 		String tokenId = null;
 		Online online = new OnlineImpl();
 		if (!StringUtil.isEmptys(username) && !StringUtil.isEmptys(password)) {
@@ -69,10 +72,14 @@ public class AuthLocalServiceImpl implements AuthService, Serializable {
 			map.put("origin_name", type);
 			map.put("user_name", username);
 			map.put("password", password);
+			map.put("corp_id", corp_no);
 			IResource iResource = factoryService.getBmo(IResource.class.getName());
 			map = (Map<String, Object>) iResource.callEvent(event_id, null, map);
 			if (map == null || map.size() == 0) {
-				throw new OIUEException(StatusResult._login_error, "login error,username or password is error!");
+				if(MapUtil.getString(map, "corp_id")!=null) {
+					throw new OIUEException(StatusResult._login_error, "组织编码、用户名或密码不正确!");
+				}else
+					throw new OIUEException(StatusResult._login_error, "用户名或密码不正确!");
 			}
 			tokenId = UUID.randomUUID().toString().replaceAll("-", "");
 			online.setO(new ConcurrentHashMap<>());

@@ -1,6 +1,6 @@
 package org.oiue.service.bytes.base;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.bytes.api.BytesService;
 import org.oiue.service.log.LogService;
@@ -26,9 +26,10 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map props) {
 			
 			}
+
 		}, LogService.class);
 	}
 	

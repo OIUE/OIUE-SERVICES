@@ -5,7 +5,6 @@ package org.oiue.service.action.filter.security;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,7 @@ import sun.misc.BASE64Encoder;
 /**
  * @author Every
  */
-@SuppressWarnings({ "serial", "rawtypes", "unchecked", "unused"})
+@SuppressWarnings({ "serial", "rawtypes", "unchecked", "unused" })
 public class SecurityFilterServiceImpl implements ActionFilter, ActionResultFilter, Serializable {
 	private Logger logger;
 	private List<String> unFilter_modulename = null;
@@ -48,7 +47,7 @@ public class SecurityFilterServiceImpl implements ActionFilter, ActionResultFilt
 		this.onlineService = onlineService;
 	}
 	
-	public void updated(Dictionary dict) {
+	public void updated(Map dict) {
 		cacheService.put("security", "global", keys, Type.ONE);
 		try {
 			unFilter_modulename = new ArrayList<String>();

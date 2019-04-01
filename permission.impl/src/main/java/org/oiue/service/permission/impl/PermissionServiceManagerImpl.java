@@ -1,7 +1,6 @@
 package org.oiue.service.permission.impl;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class PermissionServiceManagerImpl implements PermissionServiceManager, S
 		logger = logService.getLogger(this.getClass());
 	}
 	
-	public void updated(Dictionary<String, ?> props) {
+	public void updated(Map<String, ?> props) {
 		try {
 			String def_permission = props.get("defaultPermission") + "";
 			if (!StringUtil.isEmptys(def_permission)) {
@@ -63,7 +62,7 @@ public class PermissionServiceManagerImpl implements PermissionServiceManager, S
 			afr.setDescription("verify error!");
 			return afr;
 		}
-		
+		logger.debug("verify online:{}", online);
 		Object data = per.get("data");
 		if (data instanceof Map) {
 			((Map) data).put("user_id", online.getUser_id());
@@ -74,7 +73,6 @@ public class PermissionServiceManagerImpl implements PermissionServiceManager, S
 				da.put("domain", per.get("domain"));
 			}
 			per.put("user_id", online.getUser_id());
-			per.put("domain", per.get("domain"));
 		}
 		logger.debug("token time {}", System.currentTimeMillis());
 		per.put("token", online.getToken());
@@ -94,9 +92,8 @@ public class PermissionServiceManagerImpl implements PermissionServiceManager, S
 	
 	@Override
 	public StatusResult convert(Map per) {
-		Map data = (Map) per.get("data");
-		
-		String type = (String) data.remove(permission_convert_type);
+		String type = null;
+		type = (String) per.remove(permission_convert_type);
 		
 		if (StringUtil.isEmptys(type)) {
 			String msg = "the key[" + permission_convert_type + "] con't null or empty!";

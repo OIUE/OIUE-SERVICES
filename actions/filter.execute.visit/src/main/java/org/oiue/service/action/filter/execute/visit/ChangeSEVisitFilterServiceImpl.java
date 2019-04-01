@@ -5,7 +5,6 @@ package org.oiue.service.action.filter.execute.visit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public class ChangeSEVisitFilterServiceImpl implements ActionResultFilter, Seria
 		this.cacheServiceManager = cacheServiceManager;
 	}
 	
-	public void updated(Dictionary dict) {
+	public void updated(Map dict) {
 		actionService.registerActionResultFilter("changeSEVisitFilter", this, 17);
 		cacheType = MapUtil.getString(dict, "cacheType", "storage");
 		cacheName = MapUtil.getString(dict, "cacheName", "1297676d-7610-4c31-a1e0-841f23de6ea7");

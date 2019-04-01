@@ -1,8 +1,9 @@
 package org.oiue.service.event.etl.impl;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
+import org.oiue.service.event.entity.EntityService;
 import org.oiue.service.event.etl.ETLService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.odp.base.FactoryService;
@@ -17,6 +18,7 @@ public class Activator extends FrameActivator {
 	
 	@Override
 	public void start() {
+		FrameActivator tracker = this;
 		this.start(new MulitServiceTrackerCustomizer() {
 			private ETLService eventExecuteService;
 			
@@ -28,6 +30,7 @@ public class Activator extends FrameActivator {
 				LogService logService = getService(LogService.class);
 				EventETLServiceImpl.cache = getService(CacheServiceManager.class);
 				EventETLServiceImpl.analyzerService = getService(AnalyzerService.class);
+				EventETLServiceImpl.entityService = getService(EntityService.class);
 				EventETLServiceImpl.factoryService = getService(FactoryService.class);
 				EventETLServiceImpl.onlineService = getService(OnlineService.class);
 				EventETLServiceImpl.logger = logService.getLogger(this.getClass());
@@ -43,16 +46,16 @@ public class Activator extends FrameActivator {
 					}
 					registerService(ETLService.class, eventExecuteService);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					EventETLServiceImpl.logger.error(e.getMessage(), e);
 				}
 				
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
-				eventExecuteService.updated(props);
+			public void updatedConf(Map<String, ?> props) {
+				eventExecuteService.updated(props,tracker);
 			}
-		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class, IResource.class, IServicesEvent.class);
+		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class, IResource.class, IServicesEvent.class,EntityService.class);
 	}
 	
 	@Override

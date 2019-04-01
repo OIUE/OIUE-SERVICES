@@ -4,7 +4,6 @@
 package org.oiue.service.action.filter.changepwd;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 import java.util.Map;
 
 import org.oiue.service.action.api.ActionResultFilter;
@@ -28,7 +27,7 @@ public class ChangePwdFilterServiceImpl implements ActionResultFilter, Serializa
 		this.actionService = actionService;
 	}
 	
-	public void updated(Dictionary dict) {
+	public void updated(Map dict) {
 		actionService.registerActionResultFilter("changePwdFilter", this, 10);
 	}
 	

@@ -1,6 +1,6 @@
 package org.oiue.service.cache.tree.script;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import org.oiue.service.cache.tree.CacheTreeService;
 import org.oiue.service.log.LogService;
@@ -23,7 +23,7 @@ public class Activator extends FrameActivator {
 			}
 			
 			@Override
-			public void updated(Dictionary<String, ?> props) {
+			public void updatedConf(Map<String, ?> props) {
 			
 			}
 		}, LogService.class, CacheTreeService.class);
