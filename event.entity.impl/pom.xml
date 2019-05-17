@@ -33,8 +33,23 @@
 			<version>${odp.event.api.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.threadpool</artifactId>
+			<version>${threadpool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.http.client</artifactId>
+			<version>${http.client.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.oiue.services.odps</groupId>
 			<artifactId>org.oiue.service.odp.structure.api</artifactId>
+			<version>${odp.structure.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lingtu.services</groupId>
+			<artifactId>user.tasks</artifactId>
 			<version>${odp.structure.api.version}</version>
 		</dependency>
 	</dependencies>

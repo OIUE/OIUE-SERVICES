@@ -289,8 +289,7 @@ public class EventETLServiceImpl implements ETLService {
 			String nodeId = MapUtil.getString(data, "node_id");
 			iresource = factoryService.getBmo(IResource.class.getName());
 			// String repositoryId = MapUtil.getString(data, "repository_id");
-			DatabaseMeta databaseMeta = DatabaseCodec
-					.decode((Map) iresource.callEvent("148bfb77-35ae-408f-915e-291c7a83f279", data_source_name, data));
+			DatabaseMeta databaseMeta = DatabaseCodec.decode((Map) iresource.callEvent("148bfb77-35ae-408f-915e-291c7a83f279", data_source_name, data));
 
 			if (!StringUtil.isEmptys(nodeId)) {
 				if ("schema".equals(nodeId)) {
@@ -302,8 +301,7 @@ public class EventETLServiceImpl implements ETLService {
 						if (dbmd.supportsSchemasInTableDefinitions()) {
 							ArrayList<String> list = new ArrayList<String>();
 
-							String schemaFilterKey = databaseMeta.getPluginId() + "."
-									+ DatabaseMetaInformation.FILTER_SCHEMA_LIST;
+							String schemaFilterKey = databaseMeta.getPluginId() + "." + DatabaseMetaInformation.FILTER_SCHEMA_LIST;
 							if ((connectionExtraOptions != null)
 									&& connectionExtraOptions.containsKey(schemaFilterKey)) {
 								String schemasFilterCommaList = connectionExtraOptions.get(schemaFilterKey);
@@ -621,6 +619,7 @@ public class EventETLServiceImpl implements ETLService {
 	@Override
 	public Object setEntityColumns(Map data, Map event, String tokenid) throws Exception {
 		String type = MapUtil.getString(data, "operation_type");
+		long startutc = System.currentTimeMillis();
 
 		DatabaseMeta databaseMeta;
 		Database db;
@@ -643,23 +642,25 @@ public class EventETLServiceImpl implements ETLService {
 			try {
 				db.connect();
 				rfields = db.getTableFields(table);
-				List tf = new ArrayList<>();
 				temp_fields = new HashMap<>();
 				if (rfields != null) {
 					for (int i = 0; i < rfields.size(); i++) {
 						ValueMetaInterface field = rfields.getValueMeta(i);
 						temp_fields.put(field.getName(), field);
-						tf.add(localDatabaseMeta.quoteField(field.getName()));
 					}
-					if (tf.size() > 0)
+					if (rfields.size() > 0)
 						data.put("sql", "select * from " + table);
 					// data.put("sql", "select "+ListUtil.ArrayJoin(tf.toArray(), ",") + " from "+ table );
 				}
+				logger.debug("》1、elapsed time:{} ", System.currentTimeMillis()-startutc);
 //				insertAndCreateEntity(data, temp_fields, processKey);
 				entityService.userDefinedEntity(data, event, tokenid);
+				logger.debug("》2、elapsed time:{} ", System.currentTimeMillis()-startutc);
 				Object ro = null;
 				ro = insertEntitySource(data, processKey);
+				logger.debug("》3、elapsed time:{} ", System.currentTimeMillis()-startutc);
 				factoryService.CommitByProcess(processKey);
+				logger.debug("》4、elapsed time:{} ", System.currentTimeMillis()-startutc);
 				return ro;
 			} catch (OIUEException e) {
 				factoryService.RollbackByProcess(processKey);
@@ -690,7 +691,8 @@ public class EventETLServiceImpl implements ETLService {
 						temp_fields.put(field.getName(), field);
 					}
 				}
-				insertAndCreateEntity(data, temp_fields, processKey);
+//				insertAndCreateEntity(data, temp_fields, processKey);
+				entityService.userDefinedEntity(data, event, tokenid);
 
 				Object ro = null;
 				ro = insertEntitySource(data, processKey);
@@ -734,429 +736,429 @@ public class EventETLServiceImpl implements ETLService {
 
 	public static String _system_colnum = "system_id";
 
-	private void insertAndCreateEntity(Map data, Map<String, ValueMetaInterface> src_fields, String processKey) {
-		IResource iresource;
-
-		List<Map> fields;
-		fields = (List) data.get("fields");
-		Database localdb = new Database(loggingObject, localDatabaseMeta);
-		try {
-			localdb.connect();
-			String n_table_name = "t_" + UUID.randomUUID().toString().replace("-", "");
-			data.put("entity_id", n_table_name);
-			data.put("table_type", "table");
-			data.put("table_name", n_table_name);
-			data.put("typecode", 0);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
-
-			RowMetaInterface rmi = localdb.getQueryFieldsFromPreparedStatement("select");
-			rmi.addValueMeta(new ValueMetaBase(_system_colnum, ValueMetaInterface.TYPE_STRING, 36, 0));
-			int i = 0;
-
-			List unique = new ArrayList<>();
-			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
-				ValueMetaInterface tf = src_fields.get(MapUtil.getString(field, "name"));
-				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
-				field.put("entity_column_id", n_field_name);
-				field.put("column_name", n_field_name);
-				field.put("entity_id", n_table_name);
-				field.put("type", tf.getType() + "");
-				field.put("precision", tf.getLength());
-				field.put("scale", tf.getPrecision());
-				field.put("sort", i++);
-				field.put("null_able", 1);
-				field.put("status", 1);
-				field.put("user_id", data.get("user_id"));
-				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
-				tf.setName(n_field_name);
-				if (MapUtil.getBoolean(field, "isunique", false)) {
-					unique.add(n_field_name);
-				}
-				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
-				rmi.addValueMeta(tf);
-			}
-
-			// add system_pk
-			Map field = new HashMap<>();
-			String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
-			field.put("entity_column_id", n_field_name);
-			field.put("entity_id", n_table_name);
-			field.put("column_name", _system_colnum);
-			field.put("name", _system_colnum);
-			field.put("alias", _system_colnum);
-			field.put("column_desc", _system_colnum);
-			field.put("sort", i++);
-			field.put("null_able", 1);
-			field.put("scale", 0);
-			field.put("status", 0);
-			field.put("precision", 36);
-			field.put("type", ValueMetaInterface.TYPE_STRING);
-			field.put("user_id", data.get("user_id"));
-			field.put("ispk", true);
-			field.put("primary_key", 1);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
-			fields.add(field);
-
-			data.put("relation", JSONUtil.parserToStr(fields));
-			localdb.execStatement(localdb.getDDL(n_table_name, rmi));
-			// CREATE UNIQUE INDEX
-			// "t_e8c9b200625146869af7a53404b7264e_f_e50163be09904a2e8052204ec5c6da81_idx"
-			// ON
-			// "public"."t_e8c9b200625146869af7a53404b7264e"("f_e50163be09904a2e8052204ec5c6da81");
-			// CREATE UNIQUE INDEX
-			// "t_e8c9b200625146869af7a53404b7264e_f_e50163be09904a2e8052204ec5c6da81_f_b077e8a039c9479f825e6029ab91b64f_idx"
-			// ON
-			// "public"."t_e8c9b200625146869af7a53404b7264e"("f_e50163be09904a2e8052204ec5c6da81","f_b077e8a039c9479f825e6029ab91b64f");
-			if (unique.size() > 0) {
-				StringBuilder sb = new StringBuilder("create unique index ");
-				sb.append(n_table_name).append("_unique_idx on ").append(n_table_name).append("(")
-						.append(ListUtil.ListJoin(unique, ",")).append(")");
-				localdb.execStatement(sb.toString());
-			}
-			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
-			se.insertServiceEvent(data);
-		} catch (OIUEException e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, data, e);
-		} finally {
-			localdb.disconnect();
-		}
-	}
-
-	private void insertAndCreateFileEntity(Map data, String processKey) {
-		IResource iresource;
-
-		List<Map> fields;
-		fields = (List) data.get("fields");
-		Database localdb = new Database(loggingObject, localDatabaseMeta);
-		try {
-			localdb.connect();
-			String n_table_name = "t_" + UUID.randomUUID().toString().replace("-", "");
-			data.put("entity_id", n_table_name);
-			data.put("table_type", "table");
-			data.put("table_name", n_table_name);
-			data.put("typecode", 0);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
-
-			RowMetaInterface rmi = localdb.getQueryFieldsFromPreparedStatement("select");
-			rmi.addValueMeta(new ValueMetaBase(_system_colnum, ValueMetaInterface.TYPE_STRING, 36, 0));
-			int i = 0;
-
-			List unique = new ArrayList<>();
-			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
-				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
-				field.put("entity_column_id", n_field_name);
-				field.put("entity_id", n_table_name);
-				field.put("column_name", n_field_name);
-				field.put("sort", i++);
-				field.put("null_able", 1);
-				field.put("status", 1);
-				field.put("scale", MapUtil.getInt(field, "precision"));
-				field.put("precision", MapUtil.getInt(field, "length"));
-				field.put("type", MapUtil.getString(field, "type"));
-				field.put("user_id", data.get("user_id"));
-				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
-				if (MapUtil.getBoolean(field, "isunique", false)) {
-					unique.add(n_field_name);
-				}
-				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
-				ValueMetaInterface tf = new ValueMetaBase(n_field_name, MapUtil.getInt(field, "type"),
-						MapUtil.getInt(field, "precision"), MapUtil.getInt(field, "scale"));
-				rmi.addValueMeta(tf);
-			}
-			// add system_pk
-			Map field = new HashMap<>();
-			String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
-			field.put("entity_column_id", n_field_name);
-			field.put("entity_id", n_table_name);
-			field.put("column_name", _system_colnum);
-			field.put("name", _system_colnum);
-			field.put("alias", _system_colnum);
-			field.put("column_desc", _system_colnum);
-			field.put("sort", i++);
-			field.put("null_able", 1);
-			field.put("scale", 0);
-			field.put("status", 0);
-			field.put("precision", 36);
-			field.put("type", ValueMetaInterface.TYPE_STRING);
-			field.put("user_id", data.get("user_id"));
-			field.put("ispk", true);
-			field.put("primary_key", 1);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey); // type,entity_id,entity_column_id,column_name,column_desc,precision,scale,primary_key,sort,user_id
-			iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
-			fields.add(field);
-
-			data.put("relation", JSONUtil.parserToStr(fields));
-			data.put("id_database", MapUtil.getInt(data, "id_database", 0));
-			localdb.execStatement(localdb.getDDL(n_table_name, rmi));
-			if (unique.size() > 0) {
-				StringBuilder sb = new StringBuilder("create unique index ");
-				sb.append(n_table_name).append("_unique_idx on ").append(n_table_name).append("(")
-						.append(ListUtil.ListJoin(unique, ",")).append(")");
-				localdb.execStatement(sb.toString());
-			}
-			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
-			se.insertServiceEvent(data);
-		} catch (OIUEException e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, data, e);
-		} finally {
-			localdb.disconnect();
-		}
-	}
-
-	private void insertAndCreateView(Map data, String processKey) {
-		IResource iresource;
-		String relation_service_event_id = MapUtil.getString(data, "relation_service_event_id");
-		String service_event_id = MapUtil.getString(data, "service_event_id");
-
-		Map relation_entity = null;
-		String relation_entity_name = null;
-		if (!StringUtil.isEmptys(relation_service_event_id)) {
-			Map<String, Object> dp = new HashMap<>();
-			dp.put("service_event_id", relation_service_event_id);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
-			relation_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
-			relation_entity_name = MapUtil.getString(relation_entity, "name");
-		}
-
-		Map source_entity = null;
-		String source_entity_name = null;
-		if (!StringUtil.isEmptys(service_event_id)) {
-			Map<String, Object> dp = new HashMap<>();
-			dp.put("service_event_id", service_event_id);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
-			source_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
-			source_entity_name = MapUtil.getString(source_entity, "name");
-		}
-
-		List<Map> fields;
-		fields = (List) data.get("fields");
-		Database localdb = new Database(loggingObject, localDatabaseMeta);
-		try {
-			localdb.connect();
-			String n_table_name = "v_" + UUID.randomUUID().toString().replace("-", "");
-			data.put("entity_id", n_table_name);
-			data.put("table_type", "view");
-			data.put("table_name", n_table_name);
-			data.put("typecode", 0);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
-
-			List<String> rtnField = new ArrayList<>();
-			List<String> whereStr = new ArrayList<>();
-			int i = 0;
-			for (Map<String, Object> field : fields) {// entity_id,entity_column_id,entity_column_id,column_desc,primary_key,sort,user_id,o_entity_column_id
-
-				String old_field_name = MapUtil.getString(field, "name");
-				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
-				field.put("entity_id", n_table_name);
-
-				field.put("o_entity_column_id", old_field_name);
-				field.put("entity_column_id", n_field_name);
-				field.put("column_name", n_field_name);
-				field.put("sort", i++);
-				field.put("user_id", data.get("user_id"));
-				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
-				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				Map<String, Object> rf = (Map) iresource.callEvent("478925a7-3ce3-42dc-ae11-653e61a2a14c",
-						data_source_name, field);// insert entity column
-
-				rf = ((List<Map>) rf.get("root")).get(0);
-				String fname = MapUtil.getString(rf, "remark", old_field_name);
-				String data_type_id = MapUtil.getString(rf, "data_type_id");
-				if ("postgres_point".equals(data_type_id)) {
-					data.put("geo_type", 10);
-					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-					iresource.callEvent("b22417ae-2e0e-42ba-98fe-b3af0fde1c6b", data_source_name, data);
-				} else if ("postgres_line".equals(data_type_id)) {
-					data.put("geo_type", 20);
-					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-					iresource.callEvent("b22417ae-2e0e-42ba-98fe-b3af0fde1c6b", data_source_name, data);
-				} else if ("postgres_polygon".equals(data_type_id)) {
-					data.put("geo_type", 30);
-					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-					iresource.callEvent("b22417ae-2e0e-42ba-98fe-b3af0fde1c6b", data_source_name, data);
-				}
-				MapUtil.mergeDifference(field, rf);
-				String relation_entity_column_id = MapUtil.getString(field, "relation_entity_column_id");
-
-				if (!StringUtil.isEmptys(relation_entity_column_id) && relation_entity != null) {
-					Map<String, Object> dp = new HashMap<>();
-					dp.put("entity_column_id", relation_entity_column_id);
-					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// query entity
-																										// column
-					dp = (Map<String, Object>) iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27",
-							data_source_name, dp);
-					whereStr.add("r." + fname + " = l." + MapUtil.getString(dp, "name", relation_entity_column_id));
-					rtnField.add(
-							"l." + MapUtil.getString(dp, "name", relation_entity_column_id) + " as " + n_field_name);
-				} else {
-					rtnField.add(fname + " as " + n_field_name);
-				}
-
-			}
-			data.put("relation", JSONUtil.parserToStr(fields));
-
-			StringBuffer sql = new StringBuffer("select ").append(ListUtil.ListJoin(rtnField, ",")).append(" from ");
-			if (relation_entity_name != null) {
-				sql.append(relation_entity_name).append(" as l left join ").append(source_entity_name)
-						.append(" as r on ").append(ListUtil.ListJoin(whereStr, " and "));
-			} else {
-				sql.append(source_entity_name);
-			}
-			String createView = null;
-			EventConvertService convert = null;
-			try {
-				convert = factoryService.getDmo(EventConvertService.class.getName(),
-						MapUtil.getString(source_entity, "dbtype"));
-				Map event = new HashMap<>();
-				event.put("content", sql.toString());
-				event.put("event_type", "select");
-				event.put("rule", "_intelligent");
-				List<Map<?, ?>> events = convert.convert(event, data);
-				convert.setConn(localdb.getConnection());
-				createView = events.get(0).get(EventField.content) + "";
-				PreparedStatement pstmt = convert.getConn().prepareStatement(createView);
-				convert.getIdmo().setPstmt(pstmt);
-				List pers = (List) events.get(0).get(EventField.contentList);
-				convert.getIdmo().setQueryParams(pers);
-
-				createView = "CREATE OR REPLACE VIEW " + n_table_name + " as " + pstmt.toString();
-			} finally {
-				if (convert != null)
-					convert.close();
-				localdb.disconnect();
-				localdb.connect();
-			}
-			localdb.execStatement(createView);
-			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
-			data.put("addOperation", false);
-			se.insertServiceEvent(data);
-		} catch (OIUEException e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new OIUEException(StatusResult._conn_error, data, e);
-		} finally {
-			localdb.disconnect();
-		}
-	}
-
-	// table,entity_desc
-	@Override
-	public void readAndInsertEntiry(Map data, Map event, String tokenid) throws Exception {
-
-		Database db;
-		List columns = new ArrayList<>();
-		IResource iresource;
-		String schema = MapUtil.getString(data, "schema");
-		String table = MapUtil.getString(data, "table");
-		List pkcolumn = (List) MapUtil.get(data, "pkcolumn");
-
-		if (schema == null)
-			schema = "public";
-
-		DatabaseMeta databaseMeta;
-
-		iresource = factoryService.getBmo(IResource.class.getName());
-		if (data.get("id_database") != null) {
-			databaseMeta = DatabaseCodec.decode((Map) iresource.callEvent("148bfb77-35ae-408f-915e-291c7a83f279", data_source_name, data));
-		} else {
-			databaseMeta = localDatabaseMeta;
-		}
-		db = new Database(loggingObject, databaseMeta);
-		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
-		try {
-			db.connect();
-			String n_table_name = table.startsWith("t_") ? table : ("sys_" + table);
-			if (n_table_name.length() > 36)
-				n_table_name = n_table_name.substring(0, 36);
-
-			List<Map> list;
-			if (event == null) {
-				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				list = iresource.callEvent("e5816295-c25e-4010-aa52-f5bf47d68220", null, data);
-			} else {
-				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				list = iresource.executeEvent(event, null, data, null);
-			}
-			logger.debug("query geo type event:{} data:{} list:{}", event, data, list);
-			List<String> getfield = new ArrayList<>();
-			int typecode = 0;
-			if (list.size() > 0) {
-				try {
-					typecode = Integer.valueOf(list.get(0).get("typecode") + "");
-					getfield.add(list.get(0).get("name") + "");
-				} catch (Throwable e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-			data.put("typecode", typecode);
-
-			data.put("entity_id", n_table_name);
-			data.put("table_type", table.startsWith("t_") ? "table" : "systemtable");
-			data.put("table_name", table);
-			data.put("entity_desc", MapUtil.getString(data, "entity_desc", table));
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
-
-			String schemaTable = localDatabaseMeta.getQuotedSchemaTableCombination(schema, table);
-			RowMetaInterface fields = db.getTableFields(schemaTable);
-			String[] pkfields = db.getPrimaryKeyColumnNames(table);
-
-			if (fields != null) {
-
-				for (int i = 0; i < fields.size(); i++) {
-					ValueMetaInterface field = fields.getValueMeta(i);
-
-					Map column = new HashMap();
-					String n_field_name = (table.startsWith("t_") ? "f_" : "sys_") + UUID.randomUUID().toString().replace("-", "");
-					// String n_field_name = "sys_" + field.getName();
-					column.put("entity_column_id", n_field_name);
-					column.put("column_name", localDatabaseMeta.quoteField(field.getName()));
-					column.put("name", field.getName());
-					column.put("alias", field.getName());
-					column.put("entity_id", n_table_name);
-					column.put("type", getfield.contains(field.getName()) ? typecode == 10 ? 21 : typecode == 20 ? 22 : 23 : field.getType() + "");
-					column.put("column_desc", field.getComments());
-					column.put("precision", field.getLength());
-					column.put("scale", field.getPrecision());
-					column.put("sort", i);
-					column.put("user_id", data.get("user_id"));
-					column.put("null_able", 1);
-					column.put("status", 1);
-					column.put("ispk", pkcolumn != null ? pkcolumn.contains(field.getName()) ? true
-							: pkfields != null ? Arrays.asList(pkfields).contains(field.getName()) ? true : false : false : false);
-					column.put("primary_key", (boolean) column.get("ispk") ? 1 : 0);
-					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-					iresource.callEvent(insert_entity_column, data_source_name, column);// insert entity column
-					columns.add(column);
-				}
-			}
-			data.put("fields", columns);
-
-			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
-			se.insertServiceEvent(data);
-
-			factoryService.CommitByProcess(processKey);
-		} catch (OIUEException e) {
-			factoryService.RollbackByProcess(processKey);
-			throw e;
-		} catch (Throwable e) {
-			factoryService.RollbackByProcess(processKey);
-			throw new OIUEException(StatusResult._conn_error, data, e);
-		} finally {
-			db.disconnect();
-		}
-	}
-
+//	private void insertAndCreateEntity(Map data, Map<String, ValueMetaInterface> src_fields, String processKey) {
+//		IResource iresource;
+//
+//		List<Map> fields;
+//		fields = (List) data.get("fields");
+//		Database localdb = new Database(loggingObject, localDatabaseMeta);
+//		try {
+//			localdb.connect();
+//			String n_table_name = "t_" + UUID.randomUUID().toString().replace("-", "");
+//			data.put("entity_id", n_table_name);
+//			data.put("table_type", "table");
+//			data.put("table_name", n_table_name);
+//			data.put("typecode", 0);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
+//
+//			RowMetaInterface rmi = localdb.getQueryFieldsFromPreparedStatement("select");
+//			rmi.addValueMeta(new ValueMetaBase(_system_colnum, ValueMetaInterface.TYPE_STRING, 36, 0));
+//			int i = 0;
+//
+//			List unique = new ArrayList<>();
+//			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
+//				ValueMetaInterface tf = src_fields.get(MapUtil.getString(field, "name"));
+//				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
+//				field.put("entity_column_id", n_field_name);
+//				field.put("column_name", n_field_name);
+//				field.put("entity_id", n_table_name);
+//				field.put("type", tf.getType() + "");
+//				field.put("precision", tf.getLength());
+//				field.put("scale", tf.getPrecision());
+//				field.put("sort", i++);
+//				field.put("null_able", 1);
+//				field.put("status", 1);
+//				field.put("user_id", data.get("user_id"));
+//				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
+//				tf.setName(n_field_name);
+//				if (MapUtil.getBoolean(field, "isunique", false)) {
+//					unique.add(n_field_name);
+//				}
+//				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//				iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
+//				rmi.addValueMeta(tf);
+//			}
+//
+//			// add system_pk
+//			Map field = new HashMap<>();
+//			String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
+//			field.put("entity_column_id", n_field_name);
+//			field.put("entity_id", n_table_name);
+//			field.put("column_name", _system_colnum);
+//			field.put("name", _system_colnum);
+//			field.put("alias", _system_colnum);
+//			field.put("column_desc", _system_colnum);
+//			field.put("sort", i++);
+//			field.put("null_able", 1);
+//			field.put("scale", 0);
+//			field.put("status", 0);
+//			field.put("precision", 36);
+//			field.put("type", ValueMetaInterface.TYPE_STRING);
+//			field.put("user_id", data.get("user_id"));
+//			field.put("ispk", true);
+//			field.put("primary_key", 1);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//			iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
+//			fields.add(field);
+//
+//			data.put("relation", JSONUtil.parserToStr(fields));
+//			localdb.execStatement(localdb.getDDL(n_table_name, rmi));
+//			// CREATE UNIQUE INDEX
+//			// "t_e8c9b200625146869af7a53404b7264e_f_e50163be09904a2e8052204ec5c6da81_idx"
+//			// ON
+//			// "public"."t_e8c9b200625146869af7a53404b7264e"("f_e50163be09904a2e8052204ec5c6da81");
+//			// CREATE UNIQUE INDEX
+//			// "t_e8c9b200625146869af7a53404b7264e_f_e50163be09904a2e8052204ec5c6da81_f_b077e8a039c9479f825e6029ab91b64f_idx"
+//			// ON
+//			// "public"."t_e8c9b200625146869af7a53404b7264e"("f_e50163be09904a2e8052204ec5c6da81","f_b077e8a039c9479f825e6029ab91b64f");
+//			if (unique.size() > 0) {
+//				StringBuilder sb = new StringBuilder("create unique index ");
+//				sb.append(n_table_name).append("_unique_idx on ").append(n_table_name).append("(")
+//						.append(ListUtil.ListJoin(unique, ",")).append(")");
+//				localdb.execStatement(sb.toString());
+//			}
+//			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+//			se.insertServiceEvent(data);
+//		} catch (OIUEException e) {
+//			throw e;
+//		} catch (Throwable e) {
+//			throw new OIUEException(StatusResult._conn_error, data, e);
+//		} finally {
+//			localdb.disconnect();
+//		}
+//	}
+//
+//	private void insertAndCreateFileEntity(Map data, String processKey) {
+//		IResource iresource;
+//
+//		List<Map> fields;
+//		fields = (List) data.get("fields");
+//		Database localdb = new Database(loggingObject, localDatabaseMeta);
+//		try {
+//			localdb.connect();
+//			String n_table_name = "t_" + UUID.randomUUID().toString().replace("-", "");
+//			data.put("entity_id", n_table_name);
+//			data.put("table_type", "table");
+//			data.put("table_name", n_table_name);
+//			data.put("typecode", 0);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
+//
+//			RowMetaInterface rmi = localdb.getQueryFieldsFromPreparedStatement("select");
+//			rmi.addValueMeta(new ValueMetaBase(_system_colnum, ValueMetaInterface.TYPE_STRING, 36, 0));
+//			int i = 0;
+//
+//			List unique = new ArrayList<>();
+//			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
+//				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
+//				field.put("entity_column_id", n_field_name);
+//				field.put("entity_id", n_table_name);
+//				field.put("column_name", n_field_name);
+//				field.put("sort", i++);
+//				field.put("null_able", 1);
+//				field.put("status", 1);
+//				field.put("scale", MapUtil.getInt(field, "precision"));
+//				field.put("precision", MapUtil.getInt(field, "length"));
+//				field.put("type", MapUtil.getString(field, "type"));
+//				field.put("user_id", data.get("user_id"));
+//				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
+//				if (MapUtil.getBoolean(field, "isunique", false)) {
+//					unique.add(n_field_name);
+//				}
+//				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//				iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
+//				ValueMetaInterface tf = new ValueMetaBase(n_field_name, MapUtil.getInt(field, "type"),
+//						MapUtil.getInt(field, "precision"), MapUtil.getInt(field, "scale"));
+//				rmi.addValueMeta(tf);
+//			}
+//			// add system_pk
+//			Map field = new HashMap<>();
+//			String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
+//			field.put("entity_column_id", n_field_name);
+//			field.put("entity_id", n_table_name);
+//			field.put("column_name", _system_colnum);
+//			field.put("name", _system_colnum);
+//			field.put("alias", _system_colnum);
+//			field.put("column_desc", _system_colnum);
+//			field.put("sort", i++);
+//			field.put("null_able", 1);
+//			field.put("scale", 0);
+//			field.put("status", 0);
+//			field.put("precision", 36);
+//			field.put("type", ValueMetaInterface.TYPE_STRING);
+//			field.put("user_id", data.get("user_id"));
+//			field.put("ispk", true);
+//			field.put("primary_key", 1);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey); // type,entity_id,entity_column_id,column_name,column_desc,precision,scale,primary_key,sort,user_id
+//			iresource.callEvent(insert_entity_column, data_source_name, field);// insert entity column
+//			fields.add(field);
+//
+//			data.put("relation", JSONUtil.parserToStr(fields));
+//			data.put("id_database", MapUtil.getInt(data, "id_database", 0));
+//			localdb.execStatement(localdb.getDDL(n_table_name, rmi));
+//			if (unique.size() > 0) {
+//				StringBuilder sb = new StringBuilder("create unique index ");
+//				sb.append(n_table_name).append("_unique_idx on ").append(n_table_name).append("(")
+//						.append(ListUtil.ListJoin(unique, ",")).append(")");
+//				localdb.execStatement(sb.toString());
+//			}
+//			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+//			se.insertServiceEvent(data);
+//		} catch (OIUEException e) {
+//			throw e;
+//		} catch (Throwable e) {
+//			throw new OIUEException(StatusResult._conn_error, data, e);
+//		} finally {
+//			localdb.disconnect();
+//		}
+//	}
+//
+//	private void insertAndCreateView(Map data, String processKey) {
+//		IResource iresource;
+//		String relation_service_event_id = MapUtil.getString(data, "relation_service_event_id");
+//		String service_event_id = MapUtil.getString(data, "service_event_id");
+//
+//		Map relation_entity = null;
+//		String relation_entity_name = null;
+//		if (!StringUtil.isEmptys(relation_service_event_id)) {
+//			Map<String, Object> dp = new HashMap<>();
+//			dp.put("service_event_id", relation_service_event_id);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
+//			relation_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
+//			relation_entity_name = MapUtil.getString(relation_entity, "name");
+//		}
+//
+//		Map source_entity = null;
+//		String source_entity_name = null;
+//		if (!StringUtil.isEmptys(service_event_id)) {
+//			Map<String, Object> dp = new HashMap<>();
+//			dp.put("service_event_id", service_event_id);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
+//			source_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
+//			source_entity_name = MapUtil.getString(source_entity, "name");
+//		}
+//
+//		List<Map> fields;
+//		fields = (List) data.get("fields");
+//		Database localdb = new Database(loggingObject, localDatabaseMeta);
+//		try {
+//			localdb.connect();
+//			String n_table_name = "v_" + UUID.randomUUID().toString().replace("-", "");
+//			data.put("entity_id", n_table_name);
+//			data.put("table_type", "view");
+//			data.put("table_name", n_table_name);
+//			data.put("typecode", 0);
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
+//
+//			List<String> rtnField = new ArrayList<>();
+//			List<String> whereStr = new ArrayList<>();
+//			int i = 0;
+//			for (Map<String, Object> field : fields) {// entity_id,entity_column_id,entity_column_id,column_desc,primary_key,sort,user_id,o_entity_column_id
+//
+//				String old_field_name = MapUtil.getString(field, "name");
+//				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
+//				field.put("entity_id", n_table_name);
+//
+//				field.put("o_entity_column_id", old_field_name);
+//				field.put("entity_column_id", n_field_name);
+//				field.put("column_name", n_field_name);
+//				field.put("sort", i++);
+//				field.put("user_id", data.get("user_id"));
+//				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
+//				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//				Map<String, Object> rf = (Map) iresource.callEvent("478925a7-3ce3-42dc-ae11-653e61a2a14c",
+//						data_source_name, field);// insert entity column
+//
+//				rf = ((List<Map>) rf.get("root")).get(0);
+//				String fname = MapUtil.getString(rf, "remark", old_field_name);
+//				String data_type_id = MapUtil.getString(rf, "data_type_id");
+//				if ("postgres_point".equals(data_type_id)) {
+//					data.put("geo_type", 10);
+//					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//					iresource.callEvent("b22417ae-2e0e-42ba-98fe-b3af0fde1c6b", data_source_name, data);
+//				} else if ("postgres_line".equals(data_type_id)) {
+//					data.put("geo_type", 20);
+//					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//					iresource.callEvent("b22417ae-2e0e-42ba-98fe-b3af0fde1c6b", data_source_name, data);
+//				} else if ("postgres_polygon".equals(data_type_id)) {
+//					data.put("geo_type", 30);
+//					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//					iresource.callEvent("b22417ae-2e0e-42ba-98fe-b3af0fde1c6b", data_source_name, data);
+//				}
+//				MapUtil.mergeDifference(field, rf);
+//				String relation_entity_column_id = MapUtil.getString(field, "relation_entity_column_id");
+//
+//				if (!StringUtil.isEmptys(relation_entity_column_id) && relation_entity != null) {
+//					Map<String, Object> dp = new HashMap<>();
+//					dp.put("entity_column_id", relation_entity_column_id);
+//					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// query entity
+//																										// column
+//					dp = (Map<String, Object>) iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27",
+//							data_source_name, dp);
+//					whereStr.add("r." + fname + " = l." + MapUtil.getString(dp, "name", relation_entity_column_id));
+//					rtnField.add(
+//							"l." + MapUtil.getString(dp, "name", relation_entity_column_id) + " as " + n_field_name);
+//				} else {
+//					rtnField.add(fname + " as " + n_field_name);
+//				}
+//
+//			}
+//			data.put("relation", JSONUtil.parserToStr(fields));
+//
+//			StringBuffer sql = new StringBuffer("select ").append(ListUtil.ListJoin(rtnField, ",")).append(" from ");
+//			if (relation_entity_name != null) {
+//				sql.append(relation_entity_name).append(" as l left join ").append(source_entity_name)
+//						.append(" as r on ").append(ListUtil.ListJoin(whereStr, " and "));
+//			} else {
+//				sql.append(source_entity_name);
+//			}
+//			String createView = null;
+//			EventConvertService convert = null;
+//			try {
+//				convert = factoryService.getDmo(EventConvertService.class.getName(),
+//						MapUtil.getString(source_entity, "dbtype"));
+//				Map event = new HashMap<>();
+//				event.put("content", sql.toString());
+//				event.put("event_type", "select");
+//				event.put("rule", "_intelligent");
+//				List<Map<?, ?>> events = convert.convert(event, data);
+//				convert.setConn(localdb.getConnection());
+//				createView = events.get(0).get(EventField.content) + "";
+//				PreparedStatement pstmt = convert.getConn().prepareStatement(createView);
+//				convert.getIdmo().setPstmt(pstmt);
+//				List pers = (List) events.get(0).get(EventField.contentList);
+//				convert.getIdmo().setQueryParams(pers);
+//
+//				createView = "CREATE OR REPLACE VIEW " + n_table_name + " as " + pstmt.toString();
+//			} finally {
+//				if (convert != null)
+//					convert.close();
+//				localdb.disconnect();
+//				localdb.connect();
+//			}
+//			localdb.execStatement(createView);
+//			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+//			data.put("addOperation", false);
+//			se.insertServiceEvent(data);
+//		} catch (OIUEException e) {
+//			throw e;
+//		} catch (Throwable e) {
+//			throw new OIUEException(StatusResult._conn_error, data, e);
+//		} finally {
+//			localdb.disconnect();
+//		}
+//	}
+//
+//	// table,entity_desc
+//	@Override
+//	public void readAndInsertEntiry(Map data, Map event, String tokenid) throws Exception {
+//
+//		Database db;
+//		List columns = new ArrayList<>();
+//		IResource iresource;
+//		String schema = MapUtil.getString(data, "schema");
+//		String table = MapUtil.getString(data, "table");
+//		List pkcolumn = (List) MapUtil.get(data, "pkcolumn");
+//
+//		if (schema == null)
+//			schema = "public";
+//
+//		DatabaseMeta databaseMeta;
+//
+//		iresource = factoryService.getBmo(IResource.class.getName());
+//		if (data.get("id_database") != null) {
+//			databaseMeta = DatabaseCodec.decode((Map) iresource.callEvent("148bfb77-35ae-408f-915e-291c7a83f279", data_source_name, data));
+//		} else {
+//			databaseMeta = localDatabaseMeta;
+//		}
+//		db = new Database(loggingObject, databaseMeta);
+//		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
+//		try {
+//			db.connect();
+//			String n_table_name = table.startsWith("t_") ? table : ("sys_" + table);
+//			if (n_table_name.length() > 36)
+//				n_table_name = n_table_name.substring(0, 36);
+//
+//			List<Map> list;
+//			if (event == null) {
+//				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//				list = iresource.callEvent("e5816295-c25e-4010-aa52-f5bf47d68220", null, data);
+//			} else {
+//				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//				list = iresource.executeEvent(event, null, data, null);
+//			}
+//			logger.debug("query geo type event:{} data:{} list:{}", event, data, list);
+//			List<String> getfield = new ArrayList<>();
+//			int typecode = 0;
+//			if (list.size() > 0) {
+//				try {
+//					typecode = Integer.valueOf(list.get(0).get("typecode") + "");
+//					getfield.add(list.get(0).get("name") + "");
+//				} catch (Throwable e) {
+//					logger.error(e.getMessage(), e);
+//				}
+//			}
+//			data.put("typecode", typecode);
+//
+//			data.put("entity_id", n_table_name);
+//			data.put("table_type", table.startsWith("t_") ? "table" : "systemtable");
+//			data.put("table_name", table);
+//			data.put("entity_desc", MapUtil.getString(data, "entity_desc", table));
+//			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//			iresource.callEvent(insert_entity, data_source_name, data);// insert entity
+//
+//			String schemaTable = localDatabaseMeta.getQuotedSchemaTableCombination(schema, table);
+//			RowMetaInterface fields = db.getTableFields(schemaTable);
+//			String[] pkfields = db.getPrimaryKeyColumnNames(table);
+//
+//			if (fields != null) {
+//
+//				for (int i = 0; i < fields.size(); i++) {
+//					ValueMetaInterface field = fields.getValueMeta(i);
+//
+//					Map column = new HashMap();
+//					String n_field_name = (table.startsWith("t_") ? "f_" : "sys_") + UUID.randomUUID().toString().replace("-", "");
+//					// String n_field_name = "sys_" + field.getName();
+//					column.put("entity_column_id", n_field_name);
+//					column.put("column_name", localDatabaseMeta.quoteField(field.getName()));
+//					column.put("name", field.getName());
+//					column.put("alias", field.getName());
+//					column.put("entity_id", n_table_name);
+//					column.put("type", getfield.contains(field.getName()) ? typecode == 10 ? 21 : typecode == 20 ? 22 : 23 : field.getType() + "");
+//					column.put("column_desc", field.getComments());
+//					column.put("precision", field.getLength());
+//					column.put("scale", field.getPrecision());
+//					column.put("sort", i);
+//					column.put("user_id", data.get("user_id"));
+//					column.put("null_able", 1);
+//					column.put("status", 1);
+//					column.put("ispk", pkcolumn != null ? pkcolumn.contains(field.getName()) ? true
+//							: pkfields != null ? Arrays.asList(pkfields).contains(field.getName()) ? true : false : false : false);
+//					column.put("primary_key", (boolean) column.get("ispk") ? 1 : 0);
+//					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+//					iresource.callEvent(insert_entity_column, data_source_name, column);// insert entity column
+//					columns.add(column);
+//				}
+//			}
+//			data.put("fields", columns);
+//
+//			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+//			se.insertServiceEvent(data);
+//
+//			factoryService.CommitByProcess(processKey);
+//		} catch (OIUEException e) {
+//			factoryService.RollbackByProcess(processKey);
+//			throw e;
+//		} catch (Throwable e) {
+//			factoryService.RollbackByProcess(processKey);
+//			throw new OIUEException(StatusResult._conn_error, data, e);
+//		} finally {
+//			db.disconnect();
+//		}
+//	}
+//
 	private Object insertEntitySource(Map data, String processKey) {
 		IResource iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
 
@@ -1534,7 +1536,7 @@ public class EventETLServiceImpl implements ETLService {
 	public Object split(Map data, Map event, String tokenid) throws Throwable {
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
 		try {
-			insertAndCreateView(data, processKey);
+//			insertAndCreateView(data, processKey);
 			factoryService.CommitByProcess(processKey);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
@@ -1547,7 +1549,7 @@ public class EventETLServiceImpl implements ETLService {
 	public Object unite(Map data, Map event, String tokenid) throws Throwable {
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
 		try {
-			insertAndCreateView(data, processKey);
+//			insertAndCreateView(data, processKey);
 			factoryService.CommitByProcess(processKey);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);

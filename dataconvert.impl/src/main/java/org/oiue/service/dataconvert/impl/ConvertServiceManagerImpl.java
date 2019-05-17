@@ -1,15 +1,25 @@
 package org.oiue.service.dataconvert.impl;
 
 import java.io.Serializable;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.oiue.service.dataconvert.ConvertService;
 import org.oiue.service.dataconvert.ConvertServiceManager;
 import org.oiue.service.driver.api.DriverDataField;
+import org.oiue.service.http.client.HttpClientService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
+import org.oiue.service.odp.base.FactoryService;
+import org.oiue.service.odp.dmo.CallBack;
+import org.oiue.service.odp.res.api.IResource;
+import org.oiue.service.threadpool.ThreadPoolService;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.map.MapUtil;
@@ -25,11 +35,18 @@ public class ConvertServiceManagerImpl implements ConvertServiceManager, Seriali
 	private Logger logger;
 	private String convert_type = "rectificationType";
 	private String convert_default = "buffer";
-	
+	private FactoryService factoryService;
+	private LogService logService;
+	private HttpClientService httpClientService;
+	private ThreadPoolService taskService;
 	private Map<String, ConvertService> converts = new HashMap<>();
 	
-	public ConvertServiceManagerImpl(LogService logService) {
+	public ConvertServiceManagerImpl(LogService logService, FactoryService factoryService, HttpClientService httpClientService, ThreadPoolService taskService) {
 		logger = logService.getLogger(getClass());
+		this.factoryService=factoryService;
+		this.logService=logService;
+		this.taskService=taskService;
+		this.httpClientService=httpClientService;
 	}
 
 	private Map props;
@@ -131,5 +148,7 @@ public class ConvertServiceManagerImpl implements ConvertServiceManager, Seriali
 	public Object convert(List data, Map event, String tokenid) {
 		return null;
 	}
+	
+
 	
 }

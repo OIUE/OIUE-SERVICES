@@ -36,7 +36,7 @@ public interface ETLService extends Serializable {
 	
 	Object result(Map data, Map event, String tokenid);
 	
-	void readAndInsertEntiry(Map data, Map event, String tokenid) throws Exception;
+//	void readAndInsertEntiry(Map data, Map event, String tokenid) throws Exception;
 	
 	void updated(Map<String, ?> props, FrameActivator tracker);
 	

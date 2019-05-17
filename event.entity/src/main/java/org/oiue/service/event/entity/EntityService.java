@@ -6,10 +6,20 @@ import java.util.Map;
 
 @SuppressWarnings("rawtypes")
 public interface EntityService extends Serializable {
+	/**
+	 * 自定义数据源
+	 * @param data
+	 * @param event
+	 * @param tokenid
+	 * @throws Throwable
+	 */
 	void userDefinedEntity(Map data, Map event, String tokenid)throws Throwable;
 	void createEntity(Map data, Map event, String tokenid);
+	void createEntityView(Map data, Map event, String tokenid);
 	void insertEntity(Map data, Map event, String tokenid);
 	void loadEntity(Map data, Map event, String tokenid);
+	
+	void tm(Map data, Map event, String tokenid) throws SQLException;
 	
 	Object convertToGeometry(Map data, Map event, String tokenid) throws SQLException;
 	Object convertColumnType(Map data, Map event, String tokenid) throws Throwable;

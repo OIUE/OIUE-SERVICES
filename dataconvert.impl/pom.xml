@@ -25,5 +25,25 @@
 			<artifactId>org.oiue.service.dataconvert</artifactId>
 			<version>${cache.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.oiue.services.odps</groupId>
+			<artifactId>org.oiue.service.odp.res.api</artifactId>
+			<version>${odp.res.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.threadpool</artifactId>
+			<version>${threadpool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.http.client</artifactId>
+			<version>${http.client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.oiue.services</groupId>
+			<artifactId>org.oiue.service.cache</artifactId>
+			<version>${cache.version}</version>
+		</dependency>
 	</dependencies>
 </project>
