@@ -3,7 +3,6 @@ package org.oiue.service.event.etl.impl;
 import java.util.Map;
 
 import org.oiue.service.cache.CacheServiceManager;
-import org.oiue.service.event.entity.EntityService;
 import org.oiue.service.event.etl.ETLService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.odp.base.FactoryService;
@@ -30,7 +29,6 @@ public class Activator extends FrameActivator {
 				LogService logService = getService(LogService.class);
 				EventETLServiceImpl.cache = getService(CacheServiceManager.class);
 				EventETLServiceImpl.analyzerService = getService(AnalyzerService.class);
-				EventETLServiceImpl.entityService = getService(EntityService.class);
 				EventETLServiceImpl.factoryService = getService(FactoryService.class);
 				EventETLServiceImpl.onlineService = getService(OnlineService.class);
 				EventETLServiceImpl.logger = logService.getLogger(this.getClass());
@@ -55,7 +53,7 @@ public class Activator extends FrameActivator {
 			public void updatedConf(Map<String, ?> props) {
 				eventExecuteService.updated(props,tracker);
 			}
-		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class, IResource.class, IServicesEvent.class,EntityService.class);
+		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class, IResource.class, IServicesEvent.class);
 	}
 	
 	@Override

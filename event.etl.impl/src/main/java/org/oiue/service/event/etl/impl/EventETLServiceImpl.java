@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.oiue.service.cache.CacheServiceManager;
-import org.oiue.service.event.entity.EntityService;
 import org.oiue.service.event.etl.ETLService;
 import org.oiue.service.event.etl.utils.DatabaseCodec;
 import org.oiue.service.event.etl.utils.JSONObject;
@@ -122,7 +121,6 @@ public class EventETLServiceImpl implements ETLService {
 	}
 
 	public static String path = null;
-	protected static EntityService entityService;
 	protected static AnalyzerService analyzerService;
 	protected static Logger logger;
 	protected static LogService logService;
@@ -655,8 +653,7 @@ public class EventETLServiceImpl implements ETLService {
 						data.put("sql", "select * from " + table);
 					// data.put("sql", "select "+ListUtil.ArrayJoin(tf.toArray(), ",") + " from "+ table );
 				}
-//				insertAndCreateEntity(data, temp_fields, processKey);
-				entityService.userDefinedEntity(data, event, tokenid);
+				insertAndCreateEntity(data, temp_fields, processKey);
 				Object ro = null;
 				ro = insertEntitySource(data, processKey);
 				factoryService.CommitByProcess(processKey);
@@ -711,8 +708,7 @@ public class EventETLServiceImpl implements ETLService {
 		case "create_entity_csv":
 			try {
 				data.put("type", 100);
-//				insertAndCreateFileEntity(data, processKey);
-				entityService.userDefinedEntity(data, event, tokenid);
+				insertAndCreateFileEntity(data, processKey);
 				data.put("input_type", MapUtil.getString(data, "input_type", "csv"));
 				Object ro = null;
 				data.put("id_database", MapUtil.getInt(data, "id_database", 0));
@@ -955,22 +951,21 @@ public class EventETLServiceImpl implements ETLService {
 			int i = 0;
 			for (Map<String, Object> field : fields) {// entity_id,entity_column_id,entity_column_id,column_desc,primary_key,sort,user_id,o_entity_column_id
 
-				String old_field_name = MapUtil.getString(field, "name");
+				String old_entity_column_id = MapUtil.getString(field, "entity_column_id");
 				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
 				field.put("entity_id", n_table_name);
 
-				field.put("o_entity_column_id", old_field_name);
+				field.put("o_entity_column_id", old_entity_column_id);
 				field.put("entity_column_id", n_field_name);
 				field.put("column_name", n_field_name);
 				field.put("sort", i++);
 				field.put("user_id", data.get("user_id"));
 				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
 				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				Map<String, Object> rf = (Map) iresource.callEvent("478925a7-3ce3-42dc-ae11-653e61a2a14c",
-						data_source_name, field);// insert entity column
+				Map<String, Object> rf = (Map) iresource.callEvent("478925a7-3ce3-42dc-ae11-653e61a2a14c",data_source_name, field);// insert entity column
 
 				rf = ((List<Map>) rf.get("root")).get(0);
-				String fname = MapUtil.getString(rf, "remark", old_field_name);
+				String fname = MapUtil.getString(rf, "remark", old_entity_column_id);
 				String data_type_id = MapUtil.getString(rf, "data_type_id");
 				if ("postgres_point".equals(data_type_id)) {
 					data.put("geo_type", 10);
@@ -991,13 +986,10 @@ public class EventETLServiceImpl implements ETLService {
 				if (!StringUtil.isEmptys(relation_entity_column_id) && relation_entity != null) {
 					Map<String, Object> dp = new HashMap<>();
 					dp.put("entity_column_id", relation_entity_column_id);
-					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// query entity
-																										// column
-					dp = (Map<String, Object>) iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27",
-							data_source_name, dp);
+					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// query entity column
+					dp = (Map<String, Object>) iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27",data_source_name, dp);
 					whereStr.add("r." + fname + " = l." + MapUtil.getString(dp, "name", relation_entity_column_id));
-					rtnField.add(
-							"l." + MapUtil.getString(dp, "name", relation_entity_column_id) + " as " + n_field_name);
+					rtnField.add("l." + MapUtil.getString(dp, "name", relation_entity_column_id) + " as " + n_field_name);
 				} else {
 					rtnField.add(fname + " as " + n_field_name);
 				}
@@ -1171,7 +1163,7 @@ public class EventETLServiceImpl implements ETLService {
 				directory = repository.findDirectory(MapUtil.getString(data, "user_id"));
 
 				if (directory == null)
-					directory = repository.createRepositoryDirectory(repository.getUserHomeDirectory(),MapUtil.getString(data, "user_id"));
+					directory = repository.createRepositoryDirectory(repository.getUserHomeDirectory(), MapUtil.getString(data, "user_id"));
 				// directory = repository.createRepositorySchema(monitor, upgrade, statements, dryRun);
 			} catch (Throwable e) {
 				try {
