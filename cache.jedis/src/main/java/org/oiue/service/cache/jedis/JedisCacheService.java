@@ -2,6 +2,7 @@ package org.oiue.service.cache.jedis;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.oiue.service.cache.Type;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.osgi.FrameActivator;
+import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.string.StringUtil;
 
 import redis.clients.jedis.HostAndPort;
@@ -29,15 +31,19 @@ public class JedisCacheService implements CacheService, Serializable {
 		logger = logService.getLogger(this.getClass());
 	}
 	
+	private String convertToString(Object object) {
+		return object == null ? null : object instanceof Map? JSONUtil.parserToStr((Map)object):object instanceof List? JSONUtil.parserToStr((List)object): object.toString();
+	}
+	
 	@Override
 	public void put(String name, Object object, Type type) {
 		if (type == Type.ONE) {
 			if (isCluster) {
-				getJedis().set(name, object == null ? null : object.toString());
+				getJedis().set(name, convertToString(object));
 			} else {
 				Jedis jedis = (Jedis) getJedis();
 				try {
-					jedis.set(name, object == null ? null : object.toString());
+					jedis.set(name, convertToString(object));
 				} finally {
 					jedis.close();
 				}
@@ -51,12 +57,12 @@ public class JedisCacheService implements CacheService, Serializable {
 			try {
 				if (isCluster) {
 					synchronized (getJedis()) {
-						getJedis().hset(name, key, object == null ? null : object.toString());
+						getJedis().hset(name, key, convertToString(object));
 					}
 				} else {
 					Jedis jedis = (Jedis) getJedis();
 					try {
-						jedis.hset(name, key, object == null ? null : object.toString());
+						jedis.hset(name, key, convertToString(object));
 					} finally {
 						jedis.close();
 					}
@@ -67,7 +73,7 @@ public class JedisCacheService implements CacheService, Serializable {
 		} else if (type == Type.MANY) {
 			if (isCluster) {
 				synchronized (getJedis()) {
-					getJedis().hset(name, key, object == null ? null : object.toString());
+					getJedis().hset(name, key, convertToString(object));
 				}
 			} else {
 				Jedis jedis = (Jedis) getJedis();
@@ -77,7 +83,7 @@ public class JedisCacheService implements CacheService, Serializable {
 						db = Integer.valueOf(name);
 					} catch (Throwable e) {}
 					jedis.select(db);
-					jedis.sadd(key, object == null ? null : object.toString());
+					jedis.sadd(key, convertToString(object));
 				} finally {
 					jedis.close();
 				}

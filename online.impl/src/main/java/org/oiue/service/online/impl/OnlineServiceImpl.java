@@ -145,7 +145,7 @@ public class OnlineServiceImpl implements OnlineService {
 					try {
 						lasttime = MapUtil.getLong(onlineStr, "lastTime");
 					} catch (Throwable e) {
-						lasttime = MapUtil.getLong(onlineStr, "lasttime", System.currentTimeMillis());
+						lasttime = MapUtil.getLong(onlineStr, "lasttime", System.currentTimeMillis()/1000);
 					}
 					if (lasttime < timeout) {
 						return false;
@@ -154,8 +154,7 @@ public class OnlineServiceImpl implements OnlineService {
 					online.setTokenId(MapUtil.getString(onlineStr, "tokenId"));
 					online.setUser_id(MapUtil.getString(onlineStr, "user_id"));
 					try {
-						online.setType(
-								org.oiue.service.online.Type.valueOf(MapUtil.getString(onlineStr, "type", "apikey")));
+						online.setType(org.oiue.service.online.Type.valueOf(MapUtil.getString(onlineStr, "type", "apikey")));
 					} catch (Throwable e) {
 					}
 
@@ -163,8 +162,7 @@ public class OnlineServiceImpl implements OnlineService {
 					online.setUser((Map) onlineStr.get("user"));
 					try {
 						((OnlineImpl) online).setAccessIp(MapUtil.getString(onlineStr, "accessIp"));
-					} catch (Throwable e) {
-					}
+					} catch (Throwable e) {}
 
 					if (lasttime < System.currentTimeMillis() + OnlineDataField.online_timeout)
 						online.setLastTime(System.currentTimeMillis());

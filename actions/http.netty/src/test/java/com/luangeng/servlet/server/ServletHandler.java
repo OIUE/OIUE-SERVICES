@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
 
 import com.luangeng.servlet.impl.HttpRequest;
 import com.luangeng.servlet.impl.HttpResponse;
@@ -68,8 +69,8 @@ public class ServletHandler extends SimpleChannelInboundHandler<FullHttpRequest>
             return;
         }
 
-        SerConfig config = new SerConfig();
-        servlet.init(config);
+//        ServletConfig config = new ServletConfig();
+//        servlet.init(config);
 
         HttpRequest request = new HttpRequest(httpRequest);
         HttpResponse response = new HttpResponse();

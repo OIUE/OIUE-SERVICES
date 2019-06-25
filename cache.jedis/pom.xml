@@ -13,7 +13,7 @@
 	<properties>
 		<project.activator>${project.artifactId}.Activator</project.activator>
 		<project.dependency>jedis,commons-pool2</project.dependency>
-		<project.import>org.osgi.framework,org.osgi.service.cm,org.oiue.service.log,org.oiue.service.osgi,org.oiue.service.cache,org.oiue.tools.string,javax.management,javax.net.ssl</project.import>
+		<project.import>org.osgi.framework,org.osgi.service.cm,org.oiue.service.log,org.oiue.service.osgi,org.oiue.service.cache,org.oiue.tools.string,org.oiue.tools.json,javax.management,javax.net.ssl</project.import>
 	</properties>
 	<dependencies>
 		<dependency>

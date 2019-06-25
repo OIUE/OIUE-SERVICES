@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.security.Principal;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Created by LG on 2017/12/4.
@@ -20,9 +21,9 @@ public class HttpRequest implements HttpServletRequest {
 
     private io.netty.handler.codec.http.HttpRequest request;
 
-//    private Map<String, String> heads = new HashMap<>();
+    private Map<String, String> heads = new HashMap<>();
 
-//    private String uri;
+    private String uri;
 
     private Hashtable attributes = new Hashtable();
 
@@ -42,16 +43,16 @@ public class HttpRequest implements HttpServletRequest {
 
     public HttpRequest(FullHttpRequest request) {
         this.request = request;
-//        uri = request.uri();
+        uri = request.uri();
 
         HttpMethod method = request.method();
         HttpVersion version = request.protocolVersion();
         String uri = request.uri();
         HttpHeaders headers = request.headers();
 
-//        for (Map.Entry<String, String> entry : headers.entries()) {
-//            heads.put(entry.getKey(), entry.getValue());
-//        }
+        for (Entry<CharSequence, CharSequence> entry : headers.entries()) {
+            heads.put(entry.getKey().toString(), entry.getValue().toString());
+        }
         parameters = UrlHelper.getParams(uri);
 
         contentType = headers.get("CONTENT-TYPE").toString();
@@ -502,6 +503,24 @@ public class HttpRequest implements HttpServletRequest {
         public void close() throws IOException {
             _stream.close();
         }
+
+		@Override
+		public boolean isFinished() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isReady() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void setReadListener(ReadListener readListener) {
+			// TODO Auto-generated method stub
+			
+		}
     }
 
 

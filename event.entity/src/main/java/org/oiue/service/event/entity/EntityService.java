@@ -14,14 +14,14 @@ public interface EntityService extends Serializable {
 	 * @throws Throwable
 	 */
 	void userDefinedEntity(Map data, Map event, String tokenid)throws Throwable;
-	void createEntity(Map data, Map event, String tokenid);
 	void createEntityView(Map data, Map event, String tokenid);
-	void insertEntity(Map data, Map event, String tokenid);
 	void loadEntity(Map data, Map event, String tokenid);
 	
-	void tm(Map data, Map event, String tokenid) throws SQLException;
+	void geo(Map data, Map event, String tokenid) throws SQLException;
+	void regeo(Map data, Map event, String tokenid) throws SQLException;
 	
 	Object convertToGeometry(Map data, Map event, String tokenid) throws SQLException;
 	Object convertColumnType(Map data, Map event, String tokenid) throws Throwable;
 	public static String _system_colnum = "system_id";
+	void updatedConf(Map<String, ?> props);
 }

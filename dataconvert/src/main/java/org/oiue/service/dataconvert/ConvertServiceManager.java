@@ -12,6 +12,9 @@ public interface ConvertServiceManager extends ConvertService {
 	ConvertService getConvertService(String name);
 	
 	Object convert(Map data, Map event, String tokenid);
+	Object entityConvert(Map data, Map event, String tokenid);
 	
 	Object convert(List data, Map event, String tokenid);
+	
+	
 }

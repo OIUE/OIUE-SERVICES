@@ -43,7 +43,7 @@ public class Activator extends FrameActivator {
 			
 			@Override
 			public void updatedConf(Map<String, ?> props) {
-			
+				eventExecuteService.updatedConf(props);
 			}
 		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class,HttpClientService.class,ThreadPoolService.class,ITaskDataService.class);
 	}

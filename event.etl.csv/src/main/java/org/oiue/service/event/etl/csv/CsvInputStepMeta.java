@@ -45,7 +45,7 @@ public class CsvInputStepMeta implements InputStepMeta {
 			fields = (List) data.get("fields");
 			
 			int nrNonEmptyFields = fields.size();
-			inputMeta.allocate(nrNonEmptyFields - 1);
+			inputMeta.allocate(nrNonEmptyFields);
 			int i = 0;
 			for (Map field : fields) {
 				if (EventETLServiceImpl._system_colnum.equals(MapUtil.getString(field, "column_name"))) {} else {

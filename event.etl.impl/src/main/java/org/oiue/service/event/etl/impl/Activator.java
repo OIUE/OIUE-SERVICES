@@ -14,6 +14,8 @@ import org.oiue.service.osgi.FrameActivator;
 import org.oiue.service.osgi.MulitServiceTrackerCustomizer;
 import org.oiue.service.system.analyzer.AnalyzerService;
 
+import com.lingtu.services.user.task.data.ITaskDataService;
+
 public class Activator extends FrameActivator {
 	
 	@Override
@@ -35,6 +37,7 @@ public class Activator extends FrameActivator {
 				EventETLServiceImpl.onlineService = getService(OnlineService.class);
 				EventETLServiceImpl.logger = logService.getLogger(this.getClass());
 				EventETLServiceImpl.logService = logService;
+				EventETLServiceImpl.taskDataService = getService(ITaskDataService.class);
 				
 				ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 				Thread.currentThread().setContextClassLoader(Runnable.class.getClassLoader());
@@ -55,7 +58,7 @@ public class Activator extends FrameActivator {
 			public void updatedConf(Map<String, ?> props) {
 				eventExecuteService.updated(props,tracker);
 			}
-		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class, IResource.class, IServicesEvent.class,EntityService.class);
+		}, LogService.class, CacheServiceManager.class, AnalyzerService.class, FactoryService.class, OnlineService.class, IResource.class, IServicesEvent.class,EntityService.class,ITaskDataService.class);
 	}
 	
 	@Override

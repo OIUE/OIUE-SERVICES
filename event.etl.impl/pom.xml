@@ -54,6 +54,11 @@
 			<artifactId>org.oiue.service.online</artifactId>
 			<version>${online.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.lingtu.services</groupId>
+			<artifactId>user.tasks</artifactId>
+			<version>${odp.structure.api.version}</version>
+		</dependency>
 		<!-- with pentaho-kettle -->
 		<dependency>
 			<groupId>pentaho</groupId>
@@ -253,7 +258,7 @@
 		<!-- <kettle-version>8.0-SNAPSHOT</kettle-version> -->
 		<kettle-version>8.0.0.0-28</kettle-version>
 		<project.dependency>jug-lgpl,metastore,javacsv,kettle-core,kettle-engine,encoder,kettle-dbdialog,commons-vfs2,guava,commons-logging,commons-lang,commons-io,scannotation,javassist,jackson-core,jackson-core-asl,jackson-mapper-asl,postgresql,postgis-jdbc,mysql-connector-java,neo4j-java-driver</project.dependency>
-		<project.import>org.oiue.service.event.etl,org.oiue.service.event.entity,org.oiue.service.odp.structure.api,org.oiue.service.odp.event.api,org.oiue.service.odp.dmo,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.list,org.w3c.dom,org.xml.sax,javax.xml.parsers,javax.net,javax.xml.transform,javax.naming,org.oiue.service.cache;version="[1.0,2)",org.oiue.service.event.execute;version="[1.0,2)",org.oiue.service.log;version="[1.0,2)",org.oiue.service.odp.base;version="[1.0,2)",org.oiue.service.odp.res.api;version="[1.0,2)",org.oiue.service.online;version="[1.0,2)",org.oiue.service.osgi;version="[1.0,2)",org.oiue.tools.exception,org.oiue.tools,org.oiue.service.system.analyzer;version="[1.0,2)",org.oiue.tools.map;version="[1.0,2)"</project.import>
+		<project.import>org.oiue.service.event.etl,com.lingtu.services.user.task.data,org.oiue.service.event.entity,org.oiue.service.odp.structure.api,org.oiue.service.odp.event.api,org.oiue.service.odp.dmo,org.oiue.tools.string,org.oiue.tools.json,org.oiue.tools.list,org.w3c.dom,org.xml.sax,javax.xml.parsers,javax.net,javax.xml.transform,javax.naming,org.oiue.service.cache;version="[1.0,2)",org.oiue.service.event.execute;version="[1.0,2)",org.oiue.service.log;version="[1.0,2)",org.oiue.service.odp.base;version="[1.0,2)",org.oiue.service.odp.res.api;version="[1.0,2)",org.oiue.service.online;version="[1.0,2)",org.oiue.service.osgi;version="[1.0,2)",org.oiue.tools.exception,org.oiue.tools,org.oiue.service.system.analyzer;version="[1.0,2)",org.oiue.tools.map;version="[1.0,2)"</project.import>
 		<project.export>
 			org.oiue.service.event.etl.impl,org.oiue.service.event.etl.utils,
 			org.xml.sax,com.fasterxml.jackson.databind,javax.xml.parsers,org.codehaus.jackson.map,

@@ -1,14 +1,10 @@
 package org.oiue.service.dataconvert.impl;
 
 import java.io.Serializable;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 import org.oiue.service.dataconvert.ConvertService;
 import org.oiue.service.dataconvert.ConvertServiceManager;
@@ -17,8 +13,6 @@ import org.oiue.service.http.client.HttpClientService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.odp.base.FactoryService;
-import org.oiue.service.odp.dmo.CallBack;
-import org.oiue.service.odp.res.api.IResource;
 import org.oiue.service.threadpool.ThreadPoolService;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.OIUEException;
@@ -149,6 +143,26 @@ public class ConvertServiceManagerImpl implements ConvertServiceManager, Seriali
 		return null;
 	}
 	
-
-	
+	@Override
+	public Object entityConvert(Map data, Map event, String tokenid) {
+		
+		return null;
+	}
+	class Convert implements Runnable{
+		@Override
+		public void run() {
+			
+		}
+	}
+	class ConvertTask implements Callable<StatusResult>{
+		Map data;String type;
+		public ConvertTask(Map data,String type) {
+			this.data=data;
+			this.type=type;
+		}
+		@Override
+		public StatusResult call() throws Exception {
+			return converts.get(type).convert(data);
+		}
+	}
 }
