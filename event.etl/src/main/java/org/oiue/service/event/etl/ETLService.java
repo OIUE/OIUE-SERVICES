@@ -49,4 +49,14 @@ public interface ETLService extends Serializable {
 	Object getCountValue(Map data, Map event, String tokenid) throws Throwable;
 	
 	Object getCount(Map data, Map event, String tokenid) throws Throwable;
+	
+	Object convertToGeometry(Map paramMap1, Map paramMap2, String paramString) throws SQLException;
+
+	Object convertColumnType(Map paramMap1, Map paramMap2, String paramString) throws Throwable;
+	
+	void userDefinedEntity(Map paramMap1, Map paramMap2, String paramString) throws Throwable;
+	  
+	void createEntity(Map paramMap1, Map paramMap2, String paramString) throws Throwable;
+	  
+	void insertEntity(Map paramMap1, Map paramMap2, String paramString) throws Throwable;
 }

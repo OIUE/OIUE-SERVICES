@@ -1,9 +1,12 @@
 package org.oiue.service.event.etl.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.charset.Charset;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +40,7 @@ import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.json.JSONUtil;
 import org.oiue.tools.list.ListUtil;
 import org.oiue.tools.map.MapUtil;
+import org.oiue.tools.string.StringReplace;
 import org.oiue.tools.string.StringUtil;
 import org.pentaho.di.base.AbstractMeta;
 import org.pentaho.di.core.Const;
@@ -962,7 +966,7 @@ public class EventETLServiceImpl implements ETLService {
 				field.put("user_id", data.get("user_id"));
 				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
 				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-				Map<String, Object> rf = (Map) iresource.callEvent("478925a7-3ce3-42dc-ae11-653e61a2a14c",data_source_name, field);// insert entity column
+				Map<String, Object> rf = (Map) iresource.callEvent("478925a7-3ce3-42dc-ae11-653e61a2a14c", data_source_name, field);// insert entity column
 
 				rf = ((List<Map>) rf.get("root")).get(0);
 				String fname = MapUtil.getString(rf, "remark", old_entity_column_id);
@@ -987,7 +991,7 @@ public class EventETLServiceImpl implements ETLService {
 					Map<String, Object> dp = new HashMap<>();
 					dp.put("entity_column_id", relation_entity_column_id);
 					iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// query entity column
-					dp = (Map<String, Object>) iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27",data_source_name, dp);
+					dp = (Map<String, Object>) iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27", data_source_name, dp);
 					whereStr.add("r." + fname + " = l." + MapUtil.getString(dp, "name", relation_entity_column_id));
 					rtnField.add("l." + MapUtil.getString(dp, "name", relation_entity_column_id) + " as " + n_field_name);
 				} else {
@@ -1653,6 +1657,289 @@ public class EventETLServiceImpl implements ETLService {
 		eventm.put("EVENT_TYPE", "query");
 		iresource = factoryService.getBmo(IResource.class.getName());
 		return iresource.executeEvent(eventm, data_source_name, data, null);
+	}
+
+	@Override
+	public Object convertToGeometry(Map data, Map paramMap2, String paramString) throws SQLException {
+		String type = MapUtil.getString(data, "operation_type");
+
+		int geo_type = 100;
+		IResource iresource;
+		IServicesEvent se;
+		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
+		try {
+			switch (type) {
+			case "changeToGeometry":
+				try {
+					geo_type = MapUtil.getInt(data, "geo_type");
+				} catch (Throwable e) {
+					data.put("geo_type", Integer.valueOf(geo_type));
+				}
+				iresource = (IResource) factoryService.getBmo(IResource.class.getName());
+				Object ro = iresource.callEvent("c901e524-4c44-4525-ab87-5ef0328261bb", data_source_name, data);
+				if ((ro instanceof Map)) {
+					int status = MapUtil.getInt((Map) ro, "status");
+					if (status < -120) {
+						return ro;
+					}
+				}
+				se = (IServicesEvent) factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+				se.updateServiceEvent(data);
+				factoryService.CommitByProcess(processKey);
+				return ro;
+			case "createCeometry":
+				try {
+					geo_type = MapUtil.getInt(data, "geo_type");
+				} catch (Throwable e) {
+					data.put("geo_type", Integer.valueOf(geo_type));
+				}
+				if (geo_type != 10) {
+					throw new RuntimeException("目前暂只支持转点空间！");
+				}
+				iresource = (IResource) factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+				Object roa = iresource.callEvent("bc13c8d3-29af-4420-b5bb-00f007a7ccd5", data_source_name, data);
+				se = (IServicesEvent) factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+				se.updateServiceEvent(data);
+				factoryService.CommitByProcess(processKey);
+				return roa;
+			case "convertToGeometry":
+				break;
+			}
+
+			return null;
+		} catch (OIUEException e) {
+			factoryService.RollbackByProcess(processKey);
+			throw e;
+		} catch (Throwable e) {
+			factoryService.RollbackByProcess(processKey);
+			if ((e instanceof InvocationTargetException)) {
+				e = ((InvocationTargetException) e).getTargetException();
+			}
+			if ((e instanceof UndeclaredThrowableException)) {
+				e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
+			}
+			if ((e instanceof InvocationTargetException)) {
+				e = ((InvocationTargetException) e).getTargetException();
+			}
+			if ((e instanceof UndeclaredThrowableException)) {
+				e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
+			}
+			if ((e instanceof OIUEException)) {
+				throw ((OIUEException) e);
+			}
+			throw new OIUEException(65346, "", e);
+		}
+	}
+
+	@Override
+	public Object convertColumnType(Map data, Map event, String paramString) throws Throwable {
+		// String entity_column_id = MapUtil.getString(data, "entity_column_id");
+		IResource iresource = factoryService.getBmo(IResource.class.getName());
+		Map data_type = iresource.callEvent("559d4daf-f7db-4d44-9f39-417f37488c85", data_source_name, data);
+		Map entity_column = iresource.callEvent("997d62df-5735-4245-a2a8-e6b6a35eae2b", data_source_name, data);
+		data.put("column_type", MapUtil.getString(data_type, "name"));
+		data.putAll(entity_column);
+		String eventsstr = MapUtil.getString(event, "events");
+		List<Map> events = null;
+		if (!StringUtil.isEmptys(eventsstr)) {
+			events = (List<Map>) JSONUtil.parserStrToList(eventsstr, false);
+		}
+		String sql = null;
+		if (events.size() == 1) {
+			sql = MapUtil.getString(events.get(0), "content",
+					"alter table [table_name] alter [column_name] type [column_type] using [column_name]::[column_type]");
+		}
+
+		if (!StringUtil.isEmptys(sql)) {
+			Collection<String> per = StringUtil.analyzeStringPer(sql, "[", "]");
+			for (String key : per) {
+				sql = StringReplace.replace(sql, "[" + key + "]", MapUtil.getString(data, key, ""), false);
+			}
+
+			try {
+				iresource = factoryService.getBmo(IResource.class.getName());
+				return iresource.callEvent("0aa268b6-b04a-45dc-80f1-d17e93a03c3a", data_source_name, data);
+			} catch (OIUEException e) {
+				throw e;
+			} catch (Throwable e) {
+				throw new OIUEException(StatusResult._conn_error, data, e);
+			} finally {
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void userDefinedEntity(Map data, Map event, String tokenid) throws Throwable {
+		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
+		try {
+			data.put("processKey", processKey);
+			createEntity(data, event, tokenid);
+			insertEntity(data, event, tokenid);
+			IServicesEvent se = (IServicesEvent) factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+			data.put("addOperstion", Boolean.valueOf(false));
+			se.insertServiceEvent(data);
+			factoryService.CommitByProcess(processKey);
+		} catch (Throwable e) {
+			factoryService.RollbackByProcess(processKey);
+			throw e;
+		}
+	}
+
+	@Override
+	public void createEntity(Map data, Map event, String tokenid) {
+		List<Map> fields = (List) data.get("fields");
+
+		String user_id = MapUtil.getString(data, "user_id");
+		Long update_time = Long.valueOf(MapUtil.getLong(data, "update_time", Long.valueOf(System.currentTimeMillis() / 1000L)));
+		String processKey = MapUtil.getString(data, "processKey");
+		data.put("update_time", update_time);
+		try {
+			String n_table_name = MapUtil.getString(data, "table_name", "t_" + UUID.randomUUID().toString().replace("-", ""));
+			String n_table_catalog = MapUtil.getString(data, "table_catalog", "ltmap");
+			String n_table_schema = MapUtil.getString(data, "table_schema", "public");
+			if (MapUtil.getBoolean(data, "add_system_column", Boolean.valueOf(true))) {
+				Map field = new HashMap();
+				String n_field_name = MapUtil.getString(field, "column_name", "f_" + UUID.randomUUID().toString().replace("-", ""));
+				field.put("entity_column_id", n_field_name);
+				field.put("column_name", _system_colnum);
+				field.put("null_able", Integer.valueOf(0));
+				field.put("status", Integer.valueOf(1));
+				field.put("precision", Integer.valueOf(36));
+				field.put("scale", Integer.valueOf(0));
+				field.put("type", "postgres_character_varying");
+				field.put("user_id", user_id);
+				field.put("update_time", update_time);
+				fields.add(0, field);
+			}
+			data.put("entity_class_id", MapUtil.getString(data, "entity_class_id", "Sm@rtMapX_system"));
+			data.put("entity_id", n_table_name);
+			data.put("table_name", n_table_name);
+			data.put("table_catalog", n_table_catalog);
+			data.put("table_schema", n_table_schema);
+			data.put("table_type", MapUtil.getString(data, "table_type", "user"));
+			data.put("data_source_id", MapUtil.getString(data, "data_source_id", "fm_data_source_postgresql"));
+			data.put("remark", MapUtil.getString(data, "remark"));
+			data.put("short_code", MapUtil.getString(data, "short_code", null));
+			data.put("islevel", Integer.valueOf(MapUtil.getInt(data, "islevel", Integer.valueOf(0))));
+			String entity_desc = MapUtil.getString(data, "entity_desc");
+
+			StringBuilder ctsb = new StringBuilder("CREATE TABLE IF NOT EXISTS ").append(n_table_schema).append(".").append(n_table_name).append(" ( ");
+			StringBuilder ctcsb = new StringBuilder("COMMENT ON TABLE ").append(n_table_schema).append(".").append(n_table_name).append(" IS '").append(entity_desc).append("';");
+			int sort = 0;
+			for (Map field : fields) {
+				String n_field_name = MapUtil.getString(field, "column_name", "f_" + UUID.randomUUID().toString().replace("-", ""));
+				field.put("entity_id", n_table_name);
+				field.put("entity_column_id", n_field_name);
+				field.put("column_name", n_field_name);
+				field.put("null_able", Integer.valueOf(MapUtil.getInt(field, "null_able", Integer.valueOf(1))));
+				field.put("status", Integer.valueOf(MapUtil.getInt(field, "status", Integer.valueOf(1))));
+				field.put("precision", Integer.valueOf(MapUtil.getInt(field, "precision", Integer.valueOf(36))));
+				field.put("scale", Integer.valueOf(MapUtil.getInt(field, "scale", Integer.valueOf(0))));
+				field.put("type", MapUtil.getString(field, "type", "postgres_character_varying"));
+				field.put("user_id", user_id);
+				field.put("update_time", update_time);
+				field.put("sort", Integer.valueOf(sort++));
+				field.put("encrypt_type", Integer.valueOf(MapUtil.getInt(field, "encrypt_type", Integer.valueOf(0))));
+				ctsb.append(convert2Column(field)).append(",");
+				String comments = MapUtil.getString(field, "column_desc");
+				if ((comments != null) && (comments.length() != 0)) {
+					ctcsb.append("COMMENT ON COLUMN ").append(n_table_schema).append(".").append(n_table_name).append(".").append(n_field_name).append(" is '").append(comments).append("';");
+				}
+			}
+			if (MapUtil.getBoolean(data, "add_system_column", Boolean.valueOf(true))) {
+				ctsb.append("CONSTRAINT ").append(n_table_name).append("_pkey PRIMARY KEY (").append(_system_colnum).append(")");
+			} else {
+				ctsb.deleteCharAt(ctsb.length() - 1);
+			}
+			ctsb.append(");");
+			ctsb.append(ctcsb);
+			logger.debug("sql:{}", new Object[] { ctsb });
+			Object events = null;
+			String eventsstr = MapUtil.getString(event, "events");
+			if (!StringUtil.isEmptys(eventsstr)) {
+				events = JSONUtil.parserStrToList(eventsstr, false);
+			}
+			((Map) ((List) events).get(0)).put("content", ctsb.toString());
+			event.put("EVENTS", JSONUtil.parserToStr((List) events));
+			event.put("EVENT_TYPE", "update");
+			IResource iresource = (IResource) factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+			iresource.executeEvent(event, data_source_name, data, null);
+		} catch (OIUEException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new OIUEException(65284, data, e);
+		}
+	}
+
+	private String convert2Column(Map field) {
+		StringBuilder csb = new StringBuilder(MapUtil.getString(field, "column_name"));
+		csb.append(" ");
+		String type = MapUtil.getString(field, "type");
+		int length = MapUtil.getInt(field, "precision", Integer.valueOf(36));
+		String default_v = "";
+		switch (type) {
+		case "postgres_integer":
+			csb.append("int4 ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::int4 " : "";
+			break;
+		case "postgres_bigint":
+			csb.append("int8 ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::int8 " : "";
+			break;
+		case "postgres_double_precision":
+			csb.append("float8 ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::float8 " : "";
+			break;
+		case "postgres_character_varying":
+			csb.append("varchar(").append(length).append(") ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::character varying " : "";
+			break;
+		case "postgres_date":
+			csb.append("date ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::date " : "";
+			break;
+		case "postgres_timestamp":
+			csb.append("timestamp ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::timestamp " : "";
+			break;
+		case "postgres_inet":
+			csb.append("inet ");
+			default_v = MapUtil.get(field, "default") != null ? "default '" + MapUtil.get(field, "default") + "'::inet " : "";
+			break;
+		case "postgres_point":
+			csb.append("geometry(Point,4326) ");
+			break;
+		case "postgres_line":
+			csb.append("geometry(LineString,4326) ");
+			break;
+		case "postgres_polygon":
+			csb.append("geometry(Polygon,4326) ");
+		}
+		csb.append(MapUtil.getInt(field, "null_able", Integer.valueOf(1)) == 1 ? "" : "not null ");
+		csb.append(default_v);
+
+		return csb.toString();
+	}
+
+	@Override
+	public void insertEntity(Map data, Map event, String tokenid) {
+		IResource iresource;
+		List<Map> fields = (List) data.get("fields");
+
+		String processKey = MapUtil.getString(data, "processKey");
+		try {
+			iresource = (IResource) factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+			iresource.callEvent("b046a610-48c7-46da-a472-2eed60f0f026", data_source_name, data);
+			for (Map field : fields) {
+				iresource = (IResource) factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+				iresource.callEvent("a6f0ad85-1c18-4f2f-a6f4-a83b7ac8cb52", data_source_name, field);
+			}
+		} catch (OIUEException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new OIUEException(65284, data, e);
+		}
 	}
 
 }

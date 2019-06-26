@@ -327,7 +327,6 @@ public class EntityServiceImpl implements EntityService {
 			}
 
 			try {
-
 				iresource = factoryService.getBmo(IResource.class.getName());
 				return iresource.callEvent("0aa268b6-b04a-45dc-80f1-d17e93a03c3a", data_source_name, data);
 			} catch (OIUEException e) {
