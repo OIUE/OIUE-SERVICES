@@ -782,7 +782,7 @@ public class EventETLServiceImpl implements ETLService {
 			field.put("column_name", _system_colnum);
 			field.put("name", _system_colnum);
 			field.put("alias", _system_colnum);
-			field.put("column_desc", _system_colnum);
+			field.put("field_desc", _system_colnum);
 			field.put("sort", i++);
 			field.put("null_able", 1);
 			field.put("scale", 0);
@@ -874,7 +874,7 @@ public class EventETLServiceImpl implements ETLService {
 			field.put("column_name", _system_colnum);
 			field.put("name", _system_colnum);
 			field.put("alias", _system_colnum);
-			field.put("column_desc", _system_colnum);
+			field.put("field_desc", _system_colnum);
 			field.put("sort", i++);
 			field.put("null_able", 1);
 			field.put("scale", 0);
@@ -951,7 +951,7 @@ public class EventETLServiceImpl implements ETLService {
 			int i = 0;
 			for (Map<String, Object> field : fields) {// entity_id,entity_column_id,entity_column_id,column_desc,primary_key,sort,user_id,o_entity_column_id
 
-				String old_entity_column_id = MapUtil.getString(field, "entity_column_id");
+				String old_entity_column_id = MapUtil.getString(field, "entity_column_id", MapUtil.getString(field, "name"));
 				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
 				field.put("entity_id", n_table_name);
 
@@ -1117,7 +1117,7 @@ public class EventETLServiceImpl implements ETLService {
 					column.put("alias", field.getName());
 					column.put("entity_id", n_table_name);
 					column.put("type", getfield.contains(field.getName()) ? typecode == 10 ? 21 : typecode == 20 ? 22 : 23 : field.getType() + "");
-					column.put("column_desc", field.getComments());
+					column.put("field_desc", field.getComments());
 					column.put("precision", field.getLength());
 					column.put("scale", field.getPrecision());
 					column.put("sort", i);
