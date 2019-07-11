@@ -5,4 +5,5 @@ import java.util.Map;
 
 public interface SmsCodeService extends Serializable {
 	Object sendSmsCode(Map data,Map event,String token);
+	Object verifySmsCode(Map data,Map event,String token);
 }

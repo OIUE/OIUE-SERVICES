@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,7 +32,14 @@ public class ThreadPoolServiceImpl implements ThreadPoolService, Serializable {
 			throw new RuntimeException("");
 		tpe.execute(task);
 	}
-	
+
+	@Override
+	public <T> Future<T> addTask(String name, Callable<T> task) {
+		ThreadPoolExecutor tpe = threadPool.get(name);
+		if (tpe == null)
+			throw new RuntimeException("");
+		return tpe.submit(task);
+	}
 	@Override
 	public void registerThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
 		ThreadPoolExecutor tpe = threadPool.get(name);
@@ -122,4 +131,5 @@ public class ThreadPoolServiceImpl implements ThreadPoolService, Serializable {
 		}
 		throw new RuntimeException("cont found Tread pool by name=" + name);
 	}
+
 }

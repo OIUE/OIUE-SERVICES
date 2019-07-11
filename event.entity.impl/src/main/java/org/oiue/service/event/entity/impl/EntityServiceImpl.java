@@ -52,6 +52,7 @@ public class EntityServiceImpl implements EntityService {
 	private int corePoolSize=5;
 	private int maximumPoolSize=50;
 	private long keepAliveTime=30;
+	private String dbName = "postgis";
 	
 	public void userDefinedEntity(Map data, Map event, String tokenid) throws Throwable {
 		long startutc = System.currentTimeMillis();
@@ -79,106 +80,130 @@ public class EntityServiceImpl implements EntityService {
 	}
 
 	
-	public void createEntityView(Map data, Map oevent, String tokenid) {
-		IResource iresource;
-		String relation_service_event_id = MapUtil.getString(data, "relation_service_event_id");
-		String service_event_id = MapUtil.getString(data, "service_event_id");
+	public void createEntityView(Map data, Map oevent, String tokenid) throws SQLException {
+		String entity_id = MapUtil.getString(data, "entity_id");
+		String relation_entity_id = MapUtil.getString(data, "relation_entity_id");
 		String processKey = MapUtil.getString(data, "processKey");
+		boolean iscommit=false;
+		if(StringUtil.isEmpty(processKey)) {
+			processKey=UUID.randomUUID().toString();
+			iscommit=true;
+		}
 
+		IResource iresource;
 		Map relation_entity = null;
 		String relation_entity_name = null;
-		if (!StringUtil.isEmptys(relation_service_event_id)) {
-			Map<String, Object> dp = new HashMap<>();
-			dp.put("service_event_id", relation_service_event_id);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
-			relation_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
-			relation_entity_name = MapUtil.getString(relation_entity, "name");
-		}
-
-		Map source_entity = null;
-		String source_entity_name = null;
-		if (!StringUtil.isEmptys(service_event_id)) {
-			Map<String, Object> dp = new HashMap<>();
-			dp.put("service_event_id", service_event_id);
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
-			source_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
-			source_entity_name = MapUtil.getString(source_entity, "name");
-		}
-
-		List<Map> fields;
-		fields = (List) data.get("fields");
 		try {
-			String n_table_name = "v_" + UUID.randomUUID().toString().replace("-", "");
-			data.put("entity_id", n_table_name);
-			data.put("table_type", "view");
-			data.put("table_name", n_table_name);
-			data.put("typecode", 0);
-
-			List<String> rtnField = new ArrayList<>();
-			List<String> whereStr = new ArrayList<>();
-			int i = 0;
-			for (Map<String, Object> field : fields) {// entity_id,entity_column_id,entity_column_id,column_desc,primary_key,sort,user_id,o_entity_column_id
-
-				String old_field_name = MapUtil.getString(field, "name");
-				String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
-				field.put("entity_id", n_table_name);
-
-				field.put("o_entity_column_id", old_field_name);
-				field.put("entity_column_id", n_field_name);
-				field.put("column_name", n_field_name);
-				field.put("sort", i++);
-				field.put("user_id", data.get("user_id"));
-				field.put("primary_key", MapUtil.getBoolean(field, "ispk", false) ? 1 : 0);
-				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+			if (!StringUtil.isEmptys(relation_entity_id)) {
+				Map<String, Object> dp = new HashMap<>();
+				dp.put("entity_id", relation_entity_id);
+				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
+				relation_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
+				relation_entity_name = MapUtil.getString(relation_entity, "table_name");
 			}
-			data.put("relation", JSONUtil.parserToStr(fields));
-
-			StringBuffer sql = new StringBuffer("select ").append(ListUtil.ListJoin(rtnField, ",")).append(" from ");
-			if (relation_entity_name != null) {
-				sql.append(relation_entity_name).append(" as l left join ").append(source_entity_name)
-						.append(" as r on ").append(ListUtil.ListJoin(whereStr, " and "));
-			} else {
-				sql.append(source_entity_name);
+			
+			Map source_entity = null;
+			String source_entity_name = null;
+			if (!StringUtil.isEmptys(entity_id)) {
+				Map<String, Object> dp = new HashMap<>();
+				dp.put("entity_id", entity_id);
+				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);// select relation entity
+				source_entity = (Map) iresource.callEvent("8d2cc15f-9e0c-4d5e-8208-56727863a5d3", data_source_name, dp);
+				source_entity_name = MapUtil.getString(source_entity, "table_name");
 			}
-			String createView = null;
-			EventConvertService convert = null;
+			
+			List<Map> fields;
 			try {
-				convert = factoryService.getDmo(EventConvertService.class.getName(),MapUtil.getString(source_entity, "dbtype"));
-				Map event = new HashMap<>();
-				event.put("content", sql.toString());
-				event.put("event_type", "select");
-				event.put("rule", "_intelligent");
-				List<Map<?, ?>> events = convert.convert(event, data);
-				createView = events.get(0).get(EventField.content) + "";
-				PreparedStatement pstmt = convert.getConn().prepareStatement(createView);
-				convert.getIdmo().setPstmt(pstmt);
-				List pers = (List) events.get(0).get(EventField.contentList);
-				convert.getIdmo().setQueryParams(pers);
-
-				createView = "CREATE OR REPLACE VIEW " + n_table_name + " as " + pstmt.toString();
+				fields = (List) data.get("fields");
+				String schema = MapUtil.getString(data, "schema","public");
+				String n_table_name = "v_" + UUID.randomUUID().toString().replace("-", "");
+				data.put("entity_id", n_table_name);
+				data.put("table_type", "view");
+				data.put("table_schema", "public");
+				data.put("data_source_id", "fm_data_type_postgresql");
+				data.put("table_name", n_table_name);
+				data.put("typecode", 0);
+				
+				List<String> rtnField = new ArrayList<>();
+				List<String> whereStr = new ArrayList<>();
+				List<String> comments = new ArrayList();
+				for (Map<String, Object> field : fields) {
+					String old_field_name = MapUtil.getString(field, "name");
+					String old_relation_field_name = MapUtil.getString(field, "relation_name");
+					String n_field_name = "f_" + UUID.randomUUID().toString().replace("-", "");
+					comments.add("COMMENT ON COLUMN \""+schema+"\".\""+n_table_name+"\".\""+n_field_name+"\"IS '"+ MapUtil.getString(field, "column_desc")+"'");
+					if (!StringUtil.isEmptys(old_relation_field_name)) {
+						if(!StringUtil.isEmptys(old_field_name))
+							whereStr.add("r." + old_field_name + " = l." + old_relation_field_name);
+						rtnField.add("l." + old_relation_field_name + " as " + n_field_name);
+					} else {
+						rtnField.add("r." + old_field_name + " as " + n_field_name);
+					}
+				}
+				data.put("relation", JSONUtil.parserToStr(fields));
+				
+				StringBuffer sql = new StringBuffer("select ").append(ListUtil.ListJoin(rtnField, ",")).append(" from ");
+				if (relation_entity_id != null) {
+					sql.append(relation_entity_name).append(" as l left join ").append(source_entity_name)
+					.append(" as r on ").append(ListUtil.ListJoin(whereStr, " and "));
+				} else {
+					sql.append(source_entity_name).append(" as r ");
+				}
+				String createView = null;
+				EventConvertService convert = null;
+				try {
+					convert = factoryService.getDmo(EventConvertService.class.getName(),MapUtil.getString(source_entity, "dbtype"));
+					Map event = new HashMap<>();
+					logger.debug("sql:{}",sql.toString() );
+					event.put("content", sql.toString());
+					event.put("event_type", "select");
+					event.put("rule", "_intelligent");
+					convert.setConn(factoryService.getProxyFactory().getOp().getDs().getConn(dbName));
+					List<Map<?, ?>> events = convert.convert(event, data);
+					createView = events.get(0).get(EventField.content) + "";
+					PreparedStatement pstmt = convert.getConn().prepareStatement(createView);
+					convert.getIdmo().setPstmt(pstmt);
+					List pers = (List) events.get(0).get(EventField.contentList);
+					convert.getIdmo().setQueryParams(pers);
+					
+					createView = "CREATE OR REPLACE VIEW \""+schema+"\".\""+n_table_name+"\" as " + pstmt.toString();
+				} finally {
+					if (convert != null)
+						convert.close();
+				}
+				logger.debug("sql:{}",createView );
+				List<Map> events = null;
+				String eventsstr = MapUtil.getString(oevent, "events");
+				if (!StringUtil.isEmptys(eventsstr)) {
+					events = (List<Map>) JSONUtil.parserStrToList(eventsstr, false);
+				}
+				createView=createView+";"+ListUtil.ListJoin(comments, ";")+";COMMENT ON VIEW \"public\".\""+n_table_name+"\" IS '"+MapUtil.getString(data, "entity_desc")+"';";
+				events.get(0).put("content",createView);
+				oevent.put("EVENTS", JSONUtil.parserToStr(events));
+				oevent.put("EVENT_TYPE", "update");
+				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+				iresource.executeEvent(oevent, data_source_name, new HashMap(),null);// insert entity
+				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+				List<Map> rtn = iresource.callEvent("5a664dec-2cd9-4caf-8cdf-29b5308e7e68", null, data);
+//			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
+//			data.put("addOperation", false);
+//			se.insertServiceEvent(data);
+			} catch (OIUEException e) {
+				throw e;
+			} catch (Throwable e) {
+				throw new OIUEException(StatusResult._conn_error, data, e);
 			} finally {
-				if (convert != null)
-					convert.close();
 			}
-			logger.debug("sql:{}",createView );
-			List<Map> events = null;
-			String eventsstr = MapUtil.getString(oevent, "events");
-			if (!StringUtil.isEmptys(eventsstr)) {
-				events = (List<Map>) JSONUtil.parserStrToList(eventsstr, false);
-			}
-			events.get(0).put("content", createView);
-			oevent.put("EVENTS", JSONUtil.parserToStr(events));
-			oevent.put("EVENT_TYPE", "update");
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			iresource.executeEvent(oevent, data_source_name, data,null);// insert entity
-			IServicesEvent se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
-			data.put("addOperation", false);
-			se.insertServiceEvent(data);
+			if(iscommit)
+				factoryService.CommitByProcess(processKey);
 		} catch (OIUEException e) {
+			if(iscommit)
+			factoryService.RollbackByProcess(processKey);
 			throw e;
-		} catch (Throwable e) {
+		}catch(Throwable e) {
+			if(iscommit)
+			factoryService.RollbackByProcess(processKey);
 			throw new OIUEException(StatusResult._conn_error, data, e);
-		} finally {
 		}
 	}
 	
@@ -201,8 +226,9 @@ public class EntityServiceImpl implements EntityService {
 		params.put("component_instance_event_id",MapUtil.get(event,"component_instance_event_id"));
 		Map content = new HashMap();
 		content.put("entity_column_id", data.get("entity_column_id"));
+		content.put("entity_id", data.get("entity_id"));
 		params.put("content", content);
-		params.putAll(this.taskDataService.addTask(params, event, tokenid));
+		params.putAll(taskDataService.addTask(params, event, tokenid));
 		try {
 			switch (type) {
 			case "changeToGeometry":
@@ -219,8 +245,6 @@ public class EntityServiceImpl implements EntityService {
 						return ro;
 					}
 				}
-				se = factoryService.getBmoByProcess(IServicesEvent.class.getName(), processKey);
-				se.updateServiceEvent(data);
 				factoryService.CommitByProcess(processKey);
 				return ro;
 
@@ -317,7 +341,6 @@ public class EntityServiceImpl implements EntityService {
 	@Override
 	public void geo(Map data, Map event, String tokenid) throws SQLException {
 		IResource iresource;
-		IServicesEvent se;
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
 		
 		try {
@@ -372,7 +395,7 @@ public class EntityServiceImpl implements EntityService {
 			content.put("entity_id", entity_id);
 			content.put("table_desc", MapUtil.getString(entity_column, "table_desc"));
 			params.put("content", content);
-			params.putAll(this.taskDataService.addTask(params, event, tokenid));
+			params.putAll(taskDataService.addTask(params, event, tokenid));
 			
 			Map taskConfig = new HashMap();
 			taskConfig.putAll(data);
@@ -428,6 +451,7 @@ public class EntityServiceImpl implements EntityService {
 			this.query_event_id=MapUtil.getString(taskConfig, "query_event_id");
 			this.logger=logger;
 		}
+		@SuppressWarnings("static-access")
 		@Override
 		public void run() {
 			BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50000);
@@ -437,6 +461,8 @@ public class EntityServiceImpl implements EntityService {
 				taskService.registerThreadPool(entity_id, corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
 				IResource iresource = factoryService.getBmo(IResource.class.getName());
 				CallBack cb = new CallBack() {
+					private static final long serialVersionUID = -7983694577768487061L;
+
 					@Override
 					public boolean callBack(Map paramMap) {
 						taskService.addTask(entity_id, new ConvetTask(paramMap,gc_url,taskConfig,logger));
@@ -631,6 +657,7 @@ public class EntityServiceImpl implements EntityService {
 			this.query_event_id=MapUtil.getString(taskConfig, "query_event_id");
 			this.logger=logger;
 		}
+		@SuppressWarnings("static-access")
 		@Override
 		public void run() {
 			BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50000);
@@ -640,6 +667,8 @@ public class EntityServiceImpl implements EntityService {
 				taskService.registerThreadPool(entity_id, corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
 				IResource iresource = factoryService.getBmo(IResource.class.getName());
 				CallBack cb = new CallBack() {
+					private static final long serialVersionUID = 8676257347203059354L;
+
 					@Override
 					public boolean callBack(Map paramMap) {
 						taskService.addTask(entity_id, new ReGEOTask(paramMap,regc_url,taskConfig,logger));
@@ -658,7 +687,6 @@ public class EntityServiceImpl implements EntityService {
 //				if(MapUtil.getInt(rto, "count",0)==0) {
 //					throw new OIUEException(StatusResult._data_locked,"数据源处于锁定状态，无法执行此操作！");
 //				}
-				
 			}catch(Throwable e) {
 				taskConfig.put("status", -1);
 				MapUtil.put(taskConfig, "content.error",e.getMessage());
@@ -684,6 +712,7 @@ public class EntityServiceImpl implements EntityService {
 			this.url=url;
 		}
 		
+		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
 			Map rtn=null;

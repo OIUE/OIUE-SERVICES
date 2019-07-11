@@ -14,7 +14,7 @@ public interface EntityService extends Serializable {
 	 * @throws Throwable
 	 */
 	void userDefinedEntity(Map data, Map event, String tokenid)throws Throwable;
-	void createEntityView(Map data, Map event, String tokenid);
+	void createEntityView(Map data, Map event, String tokenid) throws SQLException;
 	void loadEntity(Map data, Map event, String tokenid);
 	
 	void geo(Map data, Map event, String tokenid) throws SQLException;

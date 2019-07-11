@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.oiue.service.dataconvert.ConvertService;
 import org.oiue.service.dataconvert.ConvertServiceManager;
@@ -13,11 +18,15 @@ import org.oiue.service.http.client.HttpClientService;
 import org.oiue.service.log.LogService;
 import org.oiue.service.log.Logger;
 import org.oiue.service.odp.base.FactoryService;
+import org.oiue.service.odp.dmo.CallBack;
+import org.oiue.service.odp.res.api.IResource;
 import org.oiue.service.threadpool.ThreadPoolService;
 import org.oiue.tools.StatusResult;
 import org.oiue.tools.exception.OIUEException;
 import org.oiue.tools.map.MapUtil;
 import org.oiue.tools.string.StringUtil;
+
+import com.lingtu.services.user.task.data.ITaskDataService;
 
 /**
  * 数据转换服务
@@ -32,7 +41,9 @@ public class ConvertServiceManagerImpl implements ConvertServiceManager, Seriali
 	private FactoryService factoryService;
 	private LogService logService;
 	private HttpClientService httpClientService;
+	private ITaskDataService taskDataService;
 	private ThreadPoolService taskService;
+	private static String data_source_name = null;
 	private Map<String, ConvertService> converts = new HashMap<>();
 	
 	public ConvertServiceManagerImpl(LogService logService, FactoryService factoryService, HttpClientService httpClientService, ThreadPoolService taskService) {
@@ -145,13 +156,61 @@ public class ConvertServiceManagerImpl implements ConvertServiceManager, Seriali
 	
 	@Override
 	public Object entityConvert(Map data, Map event, String tokenid) {
-		
+		IResource iresource;
+		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
+		iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
+		Map rto = iresource.callEvent("5597bbf0-9550-46ce-9163-0dbb1e6a7048", data_source_name, data); // locked entity by entity_column_id
+		if(MapUtil.getInt(rto, "count",0)==0) {
+			throw new OIUEException(StatusResult._data_locked,"数据源处于锁定状态，无法执行此操作！");
+		}
 		return null;
 	}
+	private int corePoolSize=5;
+	private int maximumPoolSize=50;
+	private long keepAliveTime=30;
 	class Convert implements Runnable{
+		private Map taskConfig;
+		private String type;
+		private Logger logger;
+		private String entity_id="";
+		private String query_event_id="";
+		public Convert(Map taskConfig, Logger logger) {
+			this.taskConfig=taskConfig;
+			this.entity_id=MapUtil.getString(taskConfig, "entity_id");
+			this.query_event_id=MapUtil.getString(taskConfig, "query_event_id");
+			this.logger=logger;
+		}
+		
 		@Override
 		public void run() {
-			
+			BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50000);
+			try {
+				taskService.registerThreadPool(entity_id, corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
+				IResource iresource = factoryService.getBmo(IResource.class.getName());
+				CallBack cb = new CallBack() {
+					private static final long serialVersionUID = -7983694577768487061L;
+					@Override
+					public boolean callBack(Map paramMap) {
+						Future<StatusResult> f = taskService.addTask(entity_id, new ConvertTask(paramMap,type));
+						return true;
+					}
+				};
+				iresource.callEvent(query_event_id, null,taskConfig , cb);
+				while(workQueue.size()>0) {
+					logger.debug("workQueue.size={} ,workQueue:{}",workQueue.size(), workQueue);
+					Thread.currentThread().sleep(500);
+				}
+				taskConfig.put("status", 100);
+				taskDataService.updateTaskInfo(taskConfig, null,  MapUtil.getString(taskConfig, "tokenid"));
+				iresource = factoryService.getBmo(IResource.class.getName());
+				iresource.callEvent("7b198480-d215-48d7-b2f3-ea35141083b3", data_source_name, taskConfig); // unlocked entity by entity_id
+			}catch(Throwable e) {
+				taskConfig.put("status", -1);
+				MapUtil.put(taskConfig, "content.error",e.getMessage());
+				taskDataService.updateTaskInfo(taskConfig, null,  MapUtil.getString(taskConfig, "tokenid"));
+				logger.error("taskConfig:{} ,error:{}", taskConfig,e.getMessage());
+				logger.error(e.getMessage(), e);
+			}finally{}
 		}
 	}
 	class ConvertTask implements Callable<StatusResult>{

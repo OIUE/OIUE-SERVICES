@@ -74,8 +74,6 @@ import com.lingtu.services.user.task.data.ITaskDataService;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class EventETLServiceImpl implements ETLService {
-	public EventETLServiceImpl() {
-	}
 
 	public static KettleDatabaseRepository repository;
 	static DatabaseMeta localDatabaseMeta;
@@ -1142,7 +1140,9 @@ public class EventETLServiceImpl implements ETLService {
 	public Object split(Map data, Map event, String tokenid) throws Throwable {
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
 		try {
+			data.put("processKey", processKey);
 //			insertAndCreateView(data, processKey);
+			entityService.createEntityView(data, event, tokenid);
 			factoryService.CommitByProcess(processKey);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
@@ -1155,7 +1155,9 @@ public class EventETLServiceImpl implements ETLService {
 	public Object unite(Map data, Map event, String tokenid) throws Throwable {
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
 		try {
+			data.put("processKey", processKey);
 //			insertAndCreateView(data, processKey);
+			entityService.createEntityView(data, event, tokenid);
 			factoryService.CommitByProcess(processKey);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
@@ -1169,12 +1171,11 @@ public class EventETLServiceImpl implements ETLService {
 		Map event_t = new HashMap<>();
 		event_t.put(EventField.service_event_id, "0b118c69-a2f9-400e-8e10-30247314244a");
 		this.testServiceEvent(data, event_t, tokenid);
-		IResource iresource = factoryService.getBmo(IResource.class.getName());// service_id,name,desc,remark,type
-																				// ,rule,content
-																				// ,expression,user_id,service_event_id
+		
+		// service_id,name,desc,remark,type,rule,content,expression,user_id,service_event_id
+		IResource iresource = factoryService.getBmo(IResource.class.getName());
 		data.put("service_id", MapUtil.getString(data, "service_id", "fm_system_service_execute"));
-		return iresource.callEvent("1dd2d9b0-d88f-4826-a371-8ef2dfb008e8", data_source_name, data);// insert
-																									// service_event
+		return iresource.callEvent("1dd2d9b0-d88f-4826-a371-8ef2dfb008e8", data_source_name, data);// insert service_event
 	}
 
 	@Override

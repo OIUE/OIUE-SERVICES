@@ -22,6 +22,7 @@ public class CsvInputStepMeta implements InputStepMeta {
 	private static final long serialVersionUID = 1L;
 	protected static Logger logger;
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public StepMeta ConvertToStepMeta(Map data, TransMeta transMeta) {
 		String instepid = "CsvInput";

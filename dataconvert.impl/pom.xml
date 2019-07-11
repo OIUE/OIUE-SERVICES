@@ -45,5 +45,10 @@
 			<artifactId>org.oiue.service.cache</artifactId>
 			<version>${cache.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.lingtu.services</groupId>
+			<artifactId>user.tasks</artifactId>
+			<version>${odp.structure.api.version}</version>
+		</dependency>
 	</dependencies>
 </project>

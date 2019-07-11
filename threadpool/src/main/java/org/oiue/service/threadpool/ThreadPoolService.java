@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +48,14 @@ public interface ThreadPoolService extends Serializable {
 	 * @param task 任务
 	 */
 	public void addTask(String name, Runnable task);
+	
+	/**
+	 * 
+	 * @param <T>
+	 * @param name 线程池名称
+	 * @param task 任务
+	 */
+	public <T> Future<T> addTask(String name,Callable<T> task);
 	
 	/**
 	 * 

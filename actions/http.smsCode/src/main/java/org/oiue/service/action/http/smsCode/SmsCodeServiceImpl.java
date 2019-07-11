@@ -77,6 +77,20 @@ public class SmsCodeServiceImpl implements SmsCodeService {
 		return driverService.send(data);
 	}
 
+	@Override
+	public Object verifySmsCode(Map data, Map event, String token) {
+		String tel = MapUtil.getString(data, "phoneNo");
+		String code = MapUtil.getString(data, "code");
+		if(code!=null)
+			code=code.toLowerCase();
+		
+		Object smscode = _cacheServiceManager.get("_system_phone_code_", tel);
+		if (smscode != null && smscode.equals(code)) {
+			return 1;
+		}else {
+			return 0;
+		}
+	}
 	private String getRandomChar() {
 		int rand = (int) Math.round(Math.random() * 2);
 		long itmp = 0;
@@ -96,4 +110,5 @@ public class SmsCodeServiceImpl implements SmsCodeService {
 		int rand = (int) Math.round(Math.random() * 9);
 		return String.valueOf(rand);
 	}
+
 }

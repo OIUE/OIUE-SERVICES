@@ -62,63 +62,6 @@ public class StorageServiceImpl implements CacheService, Runnable {
 		}
 	}
 	
-	public void storage(Map event, Collection<Collection<Object>> paramslist) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Storage [{}] [{}]", event, paramslist);
-		}
-		Connection conn = sqlService.getConnection(MapUtil.getString(event, "ds_name"));
-		if (conn == null) {
-			logger.error("can't get connect from sqlService, event = " + event);
-			return;
-		}
-		PreparedStatement pstmt = null;
-		try {
-			pstmt = conn.prepareStatement(MapUtil.getString(event, "content"));
-			String expression = MapUtil.getString(event, "expression");
-			for (Collection<Object> params : paramslist) {
-				try {
-					if(params.size()==1){
-						Object v = params.iterator().next();
-						if(v instanceof Map){
-							if (expression != null && !StringUtil.isEmptys(expression)) {
-								String[] expressions = expression.split(",");
-								Collection per=new ArrayList<>(expressions.length);
-								for (String ep : expressions) {
-									if (ep != null)
-										ep = ep.trim();
-									per.add(MapUtil.get((Map)v, ep));
-								}
-								params=per;
-							}
-						}
-					}
-					
-					this.setQueryParams(pstmt, params);
-					pstmt.addBatch();
-				} catch (Exception e) {
-					logger.error("event:{} params:{} msg:{}", event,params,e.getMessage());
-				}
-			}
-			pstmt.executeBatch();
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			paramslist.clear();
-		} finally {
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-			} catch (Exception ex) {
-				logger.error(ex.getMessage(), ex);
-			}
-			
-			try {
-				conn.close();
-			} catch (Exception ex) {
-				logger.error(ex.getMessage(), ex);
-			}
-		}
-	}
 	
 	@Override
 	public void put(String name, String key, Object object, Type type) {
@@ -227,11 +170,66 @@ public class StorageServiceImpl implements CacheService, Runnable {
 			i++;
 		}
 	}
-	
+
+	public void storage(Map event, Collection<Collection<Object>> paramslist) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Storage [{}] [{}]", event, paramslist);
+		}
+		Connection conn = sqlService.getConnection(MapUtil.getString(event, "ds_name"));
+		if (conn == null) {
+			logger.error("can't get connect from sqlService, event = " + event);
+			return;
+		}
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement(MapUtil.getString(event, "content"));
+			String expression = MapUtil.getString(event, "expression");
+			for (Collection<Object> params : paramslist) {
+				try {
+					if(params.size()==1){
+						Object v = params.iterator().next();
+						if(v instanceof Map){
+							if (expression != null && !StringUtil.isEmptys(expression)) {
+								String[] expressions = expression.split(",");
+								Collection per=new ArrayList<>(expressions.length);
+								for (String ep : expressions) {
+									if (ep != null)
+										ep = ep.trim();
+									per.add(MapUtil.get((Map)v, ep));
+								}
+								params=per;
+							}
+						}
+					}
+					
+					this.setQueryParams(pstmt, params);
+					pstmt.addBatch();
+				} catch (Exception e) {
+					logger.error("event:{} params:{} msg:{}", event,params,e.getMessage());
+				}
+			}
+			pstmt.executeBatch();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			paramslist.clear();
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
+			}
+			
+			try {
+				conn.close();
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
+			}
+		}
+	}
 	@Override
 	public void run() {
-//		String alias = "postgis";
-//		String selectEvent = "select se.service_event_id,sep.rule as ds_name,sep.content,sep.expression from oiue.fm_service_event se,oiue.fm_service_event_parameters sep where se.service_event_id=? and se.service_event_id=sep.service_event_id and se.type='storage' ";
 		Map<String, Map> events = new HashMap<>();
 		while (true) {
 			Set<String> tmk = new HashSet();
@@ -243,19 +241,6 @@ public class StorageServiceImpl implements CacheService, Runnable {
 				try {
 					if (event == null) {
 						List params = new ArrayList();
-//						params.add(key);
-//						SqlServiceResult sr = sqlService.selectMap(alias, selectEvent, params);
-//						if (sr.getData() instanceof List) {
-//							List datas = (List) sr.getData();
-//							if (datas.size() == 1)
-//								event = (Map) datas.get(0);
-//							else {
-//								logger.error("query event is error:" + datas+"|event:"+key);
-//								synchronized (storageParamsMap) {
-//									storageParamsMap.remove(key);
-//								}
-//							}
-//						}
 						event=(Map) cacheServiceManager.get("system_storage_jdbc",key);
 						if (event != null) {
 							LinkedList<Collection<Object>> list = null;
