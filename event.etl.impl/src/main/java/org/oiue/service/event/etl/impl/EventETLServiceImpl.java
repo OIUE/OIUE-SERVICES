@@ -617,7 +617,6 @@ public class EventETLServiceImpl implements ETLService {
 		String type = MapUtil.getString(data, "operation_type");
 		long startutc = System.currentTimeMillis();
 
-
 		params.putAll(data);
 		params.put("task_name", "数据迁移");
 		params.put("status", 0);
@@ -737,6 +736,7 @@ public class EventETLServiceImpl implements ETLService {
 		case "create_entity_csv":
 			try {
 				data.put("type", 100);
+				data.put("hasSystemId", true);
 //				insertAndCreateFileEntity(data, processKey);
 				entityService.userDefinedEntity(data, event, tokenid);
 				iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
@@ -885,7 +885,13 @@ public class EventETLServiceImpl implements ETLService {
 			}
 
 			PluginRegistry registry = PluginRegistry.getInstance();
-
+			String type = MapUtil.getString(data, "operation_type");
+			if("entity_csv".equals(type)||"entity_table".equals(type)||"entity_sql".equals(type)) {
+				Map field = new HashMap();
+				field.put("column_name", "system_id");
+				field.put("name", "system_id");
+				fields.add(field);
+			}
 			RandomValueMeta addSequenceMeta = new RandomValueMeta();
 			String addSequencePluginId = registry.getPluginId(StepPluginType.class, "RandomValueMeta");
 			addSequenceMeta.setDefault();
@@ -898,7 +904,7 @@ public class EventETLServiceImpl implements ETLService {
 			if (addSequenceStepMeta.isMissing()) {
 				transMeta.addMissingTrans((MissingTrans) addSequenceStepMeta.getStepMetaInterface());
 			}
-
+			
 			check = transMeta.findStep(addSequenceStepMeta.getName());
 			if (check != null) {
 				if (!check.isShared()) {
@@ -944,6 +950,7 @@ public class EventETLServiceImpl implements ETLService {
 
 			List<String> fieldDatabase = new ArrayList<>();
 			List<String> fieldStream = new ArrayList<>();
+			logger.debug("fields:{}", fields);
 			for (Map field : fields) {// type,entity_id,entity_column_id,entity_column_id,column_desc,column_desc,precision,scale,ispk,sort,user_id
 				// if(_system_colnum.equals(MapUtil.getString(field, "column_name")))
 				// continue;
@@ -975,7 +982,7 @@ public class EventETLServiceImpl implements ETLService {
 			// 添加HOP把合并和数据同步的步骤关联
 			transMeta.addTransHop(new TransHopMeta(addSequenceStepMeta, outStepMeta));
 
-			repository.save(transMeta, versionComment);
+//			repository.save(transMeta, versionComment);
 			String executionConfiguration = "{\"exec_local\":\"Y\",\"exec_remote\":\"N\",\"pass_export\":\"N\",\"exec_cluster\":\"N\",\"cluster_post\":\"Y\",\"cluster_prepare\":\"Y\",\"cluster_start\":\"Y\",\"cluster_show_trans\":\"N\",\"parameters\":[],"
 					+ "\"variables\":[{\"name\":\"Internal.Entry.Current.Directory\",\"value\":\"/\"},{\"name\":\"Internal.Job.Filename.Directory\",\"value\":\"Parent Job File Directory\"},{\"name\":\"Internal.Job.Filename.Name\",\"value\":\"Parent Job Filename\"},"
 					+ "{\"name\":\"Internal.Job.Name\",\"value\":\"Parent Job Name\"},{\"name\":\"Internal.Job.Repository.Directory\",\"value\":\"Parent Job Repository Directory\"}],\"arguments\":[],\"safe_mode\":\"N\",\"log_level\":\"Basic\",\"clear_log\":\"Y\","
@@ -1013,6 +1020,14 @@ public class EventETLServiceImpl implements ETLService {
 		DatabaseMeta databaseMeta;
 		IResource iresource;
 
+		params.putAll(data);
+		params.put("task_name", "数据迁移");
+		params.put("status", 0);
+		params.put("tokenid",tokenid);
+		params.put("component_instance_event_id",MapUtil.get(event,"component_instance_event_id"));
+		params.put("content", data);
+		params .putAll(this.taskDataService.addTask(params, event, tokenid));
+		
 		switch (type) {
 		case "entity_table":
 			data.put("type", 1);
@@ -1020,25 +1035,31 @@ public class EventETLServiceImpl implements ETLService {
 			if (fields != null) {
 				List tf = new ArrayList<>();
 				for (Map field : fields) {
-					field.put("column_name", MapUtil.get(field, "entity_column_id"));
+					field.put("column_name", MapUtil.getString(field, "column_name",MapUtil.getString(field,"entity_column_id")));
 					tf.add(localDatabaseMeta.quoteField(MapUtil.getString(field, "name")));
 				}
 				if (tf.size() > 0)
-					data.put("sql", "select " + ListUtil.ArrayJoin(tf.toArray(), ",") + " from " + table);
+					data.put("sql", "select " + ("\""+ListUtil.ArrayJoin(tf.toArray(), "\",\"")+"\"").replace("\"\"", "\"") + " from " + table);
 			}
 			data.put("transName", "transformation_" + table + "_to_" + MapUtil.getString(data, "entity_id"));
 
 			iresource = factoryService.getBmo(IResource.class.getName());
-			databaseMeta = DatabaseCodec
-					.decode((Map) iresource.callEvent("148bfb77-35ae-408f-915e-291c7a83f279", data_source_name, data));
+			databaseMeta = DatabaseCodec.decode((Map) iresource.callEvent("148bfb77-35ae-408f-915e-291c7a83f279", data_source_name, data));
 			data.put("etl_database_name", databaseMeta.getName());
+			iresource = factoryService.getBmo(IResource.class.getName());
+			Map entity =iresource.callEvent("55a2a347-dcb8-4d6a-b25f-0f60282cefaa", data_source_name, data);
+			data.put("table_name", entity.get("table_name"));
 			break;
 		case "entity_sql":
 			data.put("type", 100);
 			break;
 		case "entity_csv":
 			data.put("id_database", MapUtil.getInt(data, "id_database", 0));
+			data.put("input_type", "csv");
 			data.put("type", 100);
+			for(Map field:fields) {
+				field.put("type", 2);
+			}
 			break;
 
 		default:
@@ -1086,8 +1107,7 @@ public class EventETLServiceImpl implements ETLService {
 		String repositoryId = previousMeta.getName();
 		String metaStoreId = MapUtil.getString(data, "metaStore_id");
 		TransExecutionConfiguration executionConfiguration = new TransExecutionConfiguration();
-		TransExecutor transExecutor = TransExecutor.initExecutor(executionConfiguration, (TransMeta) getTrans(transId),
-				getRepository(repositoryId), getMetaStore(metaStoreId), logService);
+		TransExecutor transExecutor = TransExecutor.initExecutor(executionConfiguration, (TransMeta) getTrans(transId),getRepository(repositoryId), getMetaStore(metaStoreId), logService);
 		Thread tr = new Thread(transExecutor, "TransExecutor_" + transExecutor.getExecutionId());
 		tr.start();
 		executions.put(transExecutor.getExecutionId(), transExecutor);
@@ -1119,7 +1139,7 @@ public class EventETLServiceImpl implements ETLService {
 			jsonObject.put("finished", transExecutor.isFinished());
 			if (transExecutor.isFinished()) {
 				executions.remove(executionId);
-				params.put("status", 100);
+				params.put("status", transExecutor.getErrCount()>0?-1:100);
 				taskDataService.updateTaskInfo(params, null,  MapUtil.getString(params, "tokenid"));
 				jsonObject.put("stepMeasure", transExecutor.getStepMeasure());
 				jsonObject.put("log", transExecutor.getExecutionLog());

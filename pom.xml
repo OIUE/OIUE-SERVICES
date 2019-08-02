@@ -3,17 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<distributionManagement>
-        <repository>
-            <id>maven-releases</id>
-            <url>http://172.17.60.53:8081/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven-snapshots</id>
-            <url>172.17.60.53:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-	
 	<parent>
 		<groupId>org.oiue</groupId>
 		<artifactId>oiue</artifactId>
@@ -91,10 +80,7 @@
 		<module>io.netty</module>
 
 		<module>threadpool.impl</module>
-		<module>mq</module>
-		<module>mq.impl</module>
-		<module>mq.kafka</module>
-		<module>mq.mqtt</module>
+		<module>mqs</module>
 
 		<module>debug.httpclient</module>
 		<module>debug.insertmodule</module>

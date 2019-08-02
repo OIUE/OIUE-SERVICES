@@ -49,8 +49,8 @@ public class EntityServiceImpl implements EntityService {
 	protected static HttpClientService httpClientService;
 	protected static ThreadPoolService taskService;
 
-	private int corePoolSize=5;
-	private int maximumPoolSize=50;
+	private int corePoolSize=1;
+	private int maximumPoolSize=3;
 	private long keepAliveTime=30;
 	private String dbName = "postgis";
 	
@@ -136,7 +136,9 @@ public class EntityServiceImpl implements EntityService {
 						if(!StringUtil.isEmptys(old_field_name))
 							whereStr.add("r." + old_field_name + " = l." + old_relation_field_name);
 						rtnField.add("l." + old_relation_field_name + " as " + n_field_name);
-					} else {
+					} else if(MapUtil.getString(field, "entity_id","entity_id").equals(relation_entity_id)){
+						rtnField.add("l." + old_field_name + " as " + n_field_name);
+					}else {
 						rtnField.add("r." + old_field_name + " as " + n_field_name);
 					}
 				}
@@ -395,8 +397,9 @@ public class EntityServiceImpl implements EntityService {
 			content.put("entity_id", entity_id);
 			content.put("table_desc", MapUtil.getString(entity_column, "table_desc"));
 			params.put("content", content);
+			logger.debug("add task start");
 			params.putAll(taskDataService.addTask(params, event, tokenid));
-			
+			logger.debug("add task over");
 			Map taskConfig = new HashMap();
 			taskConfig.putAll(data);
 			taskConfig.put("user_task_id", MapUtil.get(params,"user_task_id"));
@@ -456,6 +459,7 @@ public class EntityServiceImpl implements EntityService {
 		public void run() {
 			BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50000);
 			try {
+				logger.debug("start convert ...");
 				taskConfig.put("status", 1);
 				taskDataService.updateTaskInfo(taskConfig, null, MapUtil.getString(taskConfig, "tokenid"));
 				taskService.registerThreadPool(entity_id, corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
@@ -465,6 +469,7 @@ public class EntityServiceImpl implements EntityService {
 
 					@Override
 					public boolean callBack(Map paramMap) {
+						logger.debug("addTask ...");
 						taskService.addTask(entity_id, new ConvetTask(paramMap,gc_url,taskConfig,logger));
 						return true;
 					}

@@ -27,6 +27,7 @@ public class CsvInputStepMeta implements InputStepMeta {
 	public StepMeta ConvertToStepMeta(Map data, TransMeta transMeta) {
 		String instepid = "CsvInput";
 		String instepname = MapUtil.getString(data, "table", "CvsInput" + System.currentTimeMillis());
+		boolean hasSystemId = MapUtil.getBoolean(data, "hasSystemId",false);
 		PluginRegistry registry = PluginRegistry.getInstance();
 		PluginInterface sp = registry.findPluginWithId(StepPluginType.class, instepid);
 		StepMetaInterface stepMetaInterface;
@@ -44,9 +45,9 @@ public class CsvInputStepMeta implements InputStepMeta {
 			
 			List<Map> fields;
 			fields = (List) data.get("fields");
-			
+			logger.debug("fields:{}", fields);
 			int nrNonEmptyFields = fields.size();
-			inputMeta.allocate(nrNonEmptyFields);
+			inputMeta.allocate(nrNonEmptyFields-(hasSystemId?1:0));
 			int i = 0;
 			for (Map field : fields) {
 				if (EventETLServiceImpl._system_colnum.equals(MapUtil.getString(field, "column_name"))) {} else {

@@ -285,10 +285,10 @@ public class ActionServiceImpl implements ActionService {
 					}else if(status==StatusResult._sql_error) {
 						Map de = (Map) ((OIUEException) e).getRtnObject();
 						String sqlstate=MapUtil.getString(de, "sqlstate");
-						per.put("msg",sqlstate==null?"操作失败":sqlstate.startsWith("02")?"没有数据": sqlstate.startsWith("03")?"SQL语句尚未结束": sqlstate.startsWith("08000")?"连接异常": sqlstate.startsWith("08003")?"连接不存在":
+						per.put("msg",sqlstate==null?"操作失败":sqlstate.startsWith("25006")?"只读数据禁止操作！":sqlstate.startsWith("02")?"没有数据": sqlstate.startsWith("03")?"SQL语句尚未结束": sqlstate.startsWith("08000")?"连接异常": sqlstate.startsWith("08003")?"连接不存在":
 							sqlstate.startsWith("08006")?"连接失败": sqlstate.startsWith("08")?"连接异常": sqlstate.startsWith("09")?"触发器动作异常": sqlstate.startsWith("22")?"数据异常":
 								sqlstate.startsWith("23")?"违反完成性约束": sqlstate.startsWith("26")?"非法SQL语句名": sqlstate.startsWith("2F")?"SQL过程异常": sqlstate.startsWith("3D")?"非法数据库名":
-									sqlstate.startsWith("42")?"语法错误或者违反访问规则": sqlstate.startsWith("P0")?"语法错误或者违反访问规则": sqlstate.startsWith("53")?"资源不够":"操作失败");
+									sqlstate.startsWith("42")?"语法错误或者违反访问规则": sqlstate.startsWith("P0001")?"别名不可以重复！":sqlstate.startsWith("P0")?"语法错误或者违反访问规则": sqlstate.startsWith("53")?"资源不够":"操作失败");
 						per.put("exception", ex);
 						run = false;
 						break anchor;

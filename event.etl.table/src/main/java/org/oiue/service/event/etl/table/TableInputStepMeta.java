@@ -31,7 +31,7 @@ public class TableInputStepMeta implements InputStepMeta {
 	@Override
 	public StepMeta ConvertToStepMeta(Map data, TransMeta transMeta) {
 		String instepid = "TableInput";
-		String instepname = MapUtil.getString(data, "table");
+		String instepname = MapUtil.getString(data, "table", "CvsInput" + System.currentTimeMillis());
 		PluginRegistry registry = PluginRegistry.getInstance();
 		PluginInterface sp = registry.findPluginWithId(StepPluginType.class, instepid);
 		StepMetaInterface stepMetaInterface;
