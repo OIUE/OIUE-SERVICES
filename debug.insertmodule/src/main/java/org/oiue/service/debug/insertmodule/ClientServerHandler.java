@@ -38,13 +38,13 @@ public class ClientServerHandler implements Handler {
 		
 		try {
 			if (line.startsWith("c")) {
-				String sql1 = "INSERT INTO `fm_bundle` (`bundle_id`, `name`, `version`, `desc`, `status`, `md5`, `remark`, `update_time`, `bundle_class_id`, `update_user_id`) " + "VALUES ([bundle_id],[name],[version],[desc],1,[md5],[remark],0,[bundle_class_id],[update_user_id])";
-				String sql2 = "INSERT INTO `fm_bundle_service` (`bundle_id`, `bundle_service_class_id`, `bundle_service_id`, `name`, `desc`, `remark`, `short_code`, `status`, `sort`, `update_time`, `update_user_id`) " + "VALUES ([bundle_id],[bundle_service_class_id],[bundle_service_id],[service_name],[desc],[remark],NULL,1,0,0,[update_user_id])";
-				String sql3 = "INSERT INTO `fm_service` (`service_id`, `service_class_id`, `bundle_service_id`, `name`, `desc`, `status`, `update_user_id`, `update_time`) " + "VALUES ([service_id],[service_class_id],[bundle_service_id],[desc],NULL,1,[update_user_id],0)";
-				String sql4 = "INSERT INTO `fm_service_event` (`service_event_id`, `service_id`, `name`, `desc`, `remark`, `type`, `adapter`, `update_time`, `update_user_id`) " + "VALUES ([service_event_id],[service_id],[service_event_name],[desc],[remark],[event_type],[adapter],0,[update_user_id])";
-				String sql5 = "INSERT INTO `fm_service_event_parameters` (`service_event_id`, `service_id`, `desc`, `remark`, `rule`, `content`, `expression`, `update_time`, `service_event_parameters_id`, `data_type_class_id`, `update_user_id`) " + "VALUES ([service_event_id],[service_id],[desc],[remark],'',[content],[expression],0,uuid(),[data_type_class_id],[update_user_id])";
-				String sql6 = "INSERT INTO `fm_component` (`component_id`, `component_class_id`, `name`, `desc`, `remark`, `path`, `short_code`, `status`, `sort`, `update_time`, `update_user_id`) " + "VALUES ([component_id],[component_class_id],[component_name],'',NULL,NULL,NULL,1,0,0,[update_user_id])";
-				String sql7 = "INSERT INTO `fm_component_event` (`component_event_id`, `component_id`, `name`, `desc`, `remark`, `short_code`, `status`, `sort`, `event_type_id`, `update_time`, `update_user_id`) " + "VALUES ([component_event_id],[component_id],[component_event_name],'',NULL,NULL,1,0,NULL,0,[update_user_id])";
+				String sql1 = "INSERT INTO `fm_bundle` (`bundle_id`, `name`, `version`, `description`, `status`, `md5`, `remark`, `update_time`, `bundle_class_id`, `update_user_id`) " + "VALUES ([bundle_id],[name],[version],[description],1,[md5],[remark],0,[bundle_class_id],[update_user_id])";
+				String sql2 = "INSERT INTO `fm_bundle_service` (`bundle_id`, `bundle_service_class_id`, `bundle_service_id`, `name`, `description`, `remark`, `short_code`, `status`, `sort`, `update_time`, `update_user_id`) " + "VALUES ([bundle_id],[bundle_service_class_id],[bundle_service_id],[service_name],[description],[remark],NULL,1,0,0,[update_user_id])";
+				String sql3 = "INSERT INTO `fm_service` (`service_id`, `service_class_id`, `bundle_service_id`, `name`, `description`, `status`, `update_user_id`, `update_time`) " + "VALUES ([service_id],[service_class_id],[bundle_service_id],[description],NULL,1,[update_user_id],0)";
+				String sql4 = "INSERT INTO `fm_service_event` (`service_event_id`, `service_id`, `name`, `description`, `remark`, `type`, `adapter`, `update_time`, `update_user_id`) " + "VALUES ([service_event_id],[service_id],[service_event_name],[description],[remark],[event_type],[adapter],0,[update_user_id])";
+				String sql5 = "INSERT INTO `fm_service_event_parameters` (`service_event_id`, `service_id`, `description`, `remark`, `rule`, `content`, `expression`, `update_time`, `service_event_parameters_id`, `data_type_class_id`, `update_user_id`) " + "VALUES ([service_event_id],[service_id],[description],[remark],'',[content],[expression],0,uuid(),[data_type_class_id],[update_user_id])";
+				String sql6 = "INSERT INTO `fm_component` (`component_id`, `component_class_id`, `name`, `description`, `remark`, `path`, `short_code`, `status`, `sort`, `update_time`, `update_user_id`) " + "VALUES ([component_id],[component_class_id],[component_name],'',NULL,NULL,NULL,1,0,0,[update_user_id])";
+				String sql7 = "INSERT INTO `fm_component_event` (`component_event_id`, `component_id`, `name`, `description`, `remark`, `short_code`, `status`, `sort`, `event_type_id`, `update_time`, `update_user_id`) " + "VALUES ([component_event_id],[component_id],[component_event_name],'',NULL,NULL,1,0,NULL,0,[update_user_id])";
 				String sql8 = "INSERT INTO `fm_component_instance` (`component_instance_id`, `component_id`, `component_instance_name`, `component_instance_desc`, `parent_component_id`, `service_config_id`, `model`, `service_id`, `update_time`, `update_user_id`) " + "VALUES ([component_instance_id],[component_id],[component_instance_name],NULL,0,NULL,NULL,NULL,0,[update_user_id])";
 				String sql9 = "INSERT INTO `fm_component_instance_event` (`component_instance_event_id`, `component_instance_id`, `component_id`, `component_event_id`, `event_code`, `update_time`, `update_user_id`) " + "VALUES ([component_instance_event_id],[component_instance_id],[component_id],[component_event_id],'',0,[update_user_id])";
 				String sql10 = "INSERT INTO `fm_event_component_service` (`event_component_service_id`, `component_instance_event_id`, `service_event_id`, `update_time`, `update_user_id`) " + "VALUES ([event_component_service_id],[component_instance_event_id],[service_event_id],0,[update_user_id])";
@@ -67,7 +67,7 @@ public class ClientServerHandler implements Handler {
 				data.put("component_instance_id", id);// leliao_chat_config
 				data.put("component_instance_event_id", id);// leliao_cie_chat_config_ucq
 				data.put("event_component_service_id", id);// leliao_cie_chat_config_ucq
-				data.put("desc", "获取服务器时间");
+				data.put("description", "获取服务器时间");
 				data.put("content", "");
 				data.put("expression", "");
 				data.put("event_type", "query");

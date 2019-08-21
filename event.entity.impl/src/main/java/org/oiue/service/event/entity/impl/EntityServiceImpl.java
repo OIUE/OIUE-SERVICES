@@ -80,7 +80,7 @@ public class EntityServiceImpl implements EntityService {
 	}
 
 	
-	public void createEntityView(Map data, Map oevent, String tokenid) throws SQLException {
+	public void createEntityView(Map data, Map oevent, String tokenid) throws Throwable {
 		String entity_id = MapUtil.getString(data, "entity_id");
 		String relation_entity_id = MapUtil.getString(data, "relation_entity_id");
 		String processKey = MapUtil.getString(data, "processKey");
@@ -215,7 +215,7 @@ public class EntityServiceImpl implements EntityService {
 	}
 
 	@Override
-	public Object convertToGeometry(Map data, Map event, String tokenid) throws SQLException {
+	public Object convertToGeometry(Map data, Map event, String tokenid) throws Throwable {
 		String type = MapUtil.getString(data, "operation_type");
 		IResource iresource;
 		IServicesEvent se;
@@ -341,16 +341,20 @@ public class EntityServiceImpl implements EntityService {
 	}
 
 	@Override
-	public void geo(Map data, Map event, String tokenid) throws SQLException {
+	public void geo(Map data, Map event, String tokenid) throws Throwable {
 		IResource iresource;
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
+
+		String query_event_id ="" ;
+		String update_event_id ="";
+		String update_column_name= "";
 		
+		String column_address =MapUtil.getString(data, "column_address");
+		String column_province =MapUtil.getString(data, "column_province");
+		String column_city =MapUtil.getString(data, "column_city");
+		String column_district =MapUtil.getString(data, "column_district");
 		try {
 			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			String column_address =MapUtil.getString(data, "column_address");
-			String column_province =MapUtil.getString(data, "column_province");
-			String column_city =MapUtil.getString(data, "column_city");
-			String column_district =MapUtil.getString(data, "column_district");
 			data.put("entity_column_id", column_address);
 			data.put("geo_type", 10);
 			Map rto = iresource.callEvent("5597bbf0-9550-46ce-9163-0dbb1e6a7048", data_source_name, data); // locked entity by entity_column_id
@@ -360,86 +364,67 @@ public class EntityServiceImpl implements EntityService {
 			
 			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
 			rto = iresource.callEvent("85e4edc8-dcad-4af5-aa69-f64128c520a5", data_source_name, data); // add geo column
-			String column_name=MapUtil.getString(rto, "entity_column_id");
-			
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			Map entity_column = iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27", data_source_name, data); //query by  entity_column_id
-			
-			String entity_id = MapUtil.getString(entity_column, "entity_id");
-			String table_name =  MapUtil.getString(entity_column, "table_name");
-			data.put("entity_id", entity_id);
-			data.put("table_name", table_name);
-
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			Map columns = iresource.callEvent("00525d76-8d02-467e-969b-c87cc3df6c74", data_source_name, data); //query entity columns by  entity_id
-			columns=(Map) columns.get("columns");
-			
-			String update_event_id ="";
-			String query_event_id ="" ;
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			List<Map> operation = iresource.callEvent("54d3cc4d-28ba-45aa-899a-3b0016ddb55d", data_source_name, entity_column); //query entity event
-			
-			for(Map d:operation) {
-				if("query".equals(MapUtil.getString(d, "operation_type"))) {
-					query_event_id = MapUtil.getString(d, "id");
-				}else if("update".equals(MapUtil.getString(d, "operation_type"))) {
-					update_event_id= MapUtil.getString(d, "id");
-				}
-			}
-			
-			Map params = new HashMap();
-			params.putAll(data);
-			params.put("task_name", "地址匹配");
-			params.put("status", 0);
-			params.put("component_instance_event_id",MapUtil.get(event,"component_instance_event_id"));
-			Map content = new HashMap();
-			content.put("service_event_id", query_event_id);
-			content.put("entity_id", entity_id);
-			content.put("table_desc", MapUtil.getString(entity_column, "table_desc"));
-			params.put("content", content);
-			logger.debug("add task start");
-			params.putAll(taskDataService.addTask(params, event, tokenid));
-			logger.debug("add task over");
-			Map taskConfig = new HashMap();
-			taskConfig.putAll(data);
-			taskConfig.put("user_task_id", MapUtil.get(params,"user_task_id"));
-			taskConfig.put("entity_id", entity_id);
-			taskConfig.put("user_id", MapUtil.getString(data, "user_id"));
-			taskConfig.put("limit", -1);
-			taskConfig.put("table_name", table_name);
-			taskConfig.put("geo_column_name", MapUtil.get(columns,column_name));
-			taskConfig.put("query_event_id", query_event_id);
-			taskConfig.put("update_event_id", update_event_id);
-			taskConfig.put("column_address", MapUtil.get(columns,column_address));
-			taskConfig.put("column_province", column_province==null?null:MapUtil.get(columns,column_province));
-			taskConfig.put("column_city", column_city==null?null:MapUtil.get(columns,column_city));
-			taskConfig.put("column_district", column_district==null?null:MapUtil.get(columns,column_district));
-			taskConfig.put("tokenid", tokenid);
-			taskConfig.put("content", content);
-			new Thread(new ConvetMTask(taskConfig,logger)).start();
-			
+			update_column_name=MapUtil.getString(rto, "entity_column_id");
 			factoryService.CommitByProcess(processKey);
-		} catch (OIUEException e) {
-			logger.error(e.getMessage(), e);
-			factoryService.RollbackByProcess(processKey);
-			throw e;
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 			factoryService.RollbackByProcess(processKey);
-			if (e instanceof InvocationTargetException)
-				e = ((InvocationTargetException) e).getTargetException();
-			if (e instanceof UndeclaredThrowableException)
-				e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
-			if (e instanceof InvocationTargetException)
-				e = ((InvocationTargetException) e).getTargetException();
-			if (e instanceof UndeclaredThrowableException)
-				e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
-			
-			if (e instanceof OIUEException) {
-				throw (OIUEException)e;
-			}else
-				throw new OIUEException(StatusResult._data_error, "", e);
+			throw e;
 		}
+
+		iresource = factoryService.getBmo(IResource.class.getName());
+		Map entity_column = iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27", data_source_name, data); //query by  entity_column_id
+		
+		String entity_id = MapUtil.getString(entity_column, "entity_id");
+		String table_name =  MapUtil.getString(entity_column, "table_name");
+		data.put("entity_id", entity_id);
+		data.put("table_name", table_name);
+
+		iresource = factoryService.getBmo(IResource.class.getName());
+		Map columns = iresource.callEvent("00525d76-8d02-467e-969b-c87cc3df6c74", data_source_name, data); //query entity columns by  entity_id
+		columns=(Map) columns.get("columns");
+		
+		iresource = factoryService.getBmo(IResource.class.getName());
+		List<Map> operation = iresource.callEvent("54d3cc4d-28ba-45aa-899a-3b0016ddb55d", data_source_name, entity_column); //query entity event
+		
+		for(Map d:operation) {
+			if("query".equals(MapUtil.getString(d, "operation_type"))) {
+				query_event_id = MapUtil.getString(d, "id");
+			}else if("update".equals(MapUtil.getString(d, "operation_type"))) {
+				update_event_id= MapUtil.getString(d, "id");
+			}
+		}
+		Map params = new HashMap();
+		params.putAll(data);
+		params.put("task_name", "地址匹配");
+		params.put("status", 0);
+		params.put("component_instance_event_id",MapUtil.get(event,"component_instance_event_id"));
+		Map content = new HashMap();
+		content.put("service_event_id", query_event_id);
+		content.put("entity_id", entity_id);
+		content.put("table_desc", MapUtil.getString(entity_column, "table_desc"));
+		params.put("content", content);
+		logger.debug("add task start");
+		params.putAll(taskDataService.addTask(params, event, tokenid));
+		logger.debug("add task over");
+		Map taskConfig = new HashMap();
+		taskConfig.putAll(data);
+		taskConfig.put("user_task_id", MapUtil.get(params,"user_task_id"));
+		taskConfig.put("entity_id", entity_id);
+		taskConfig.put("user_id", MapUtil.getString(data, "user_id"));
+		taskConfig.put("limit", -1);
+		taskConfig.put("table_name", table_name);
+		taskConfig.put("geo_column_name", MapUtil.get(columns,update_column_name));
+		taskConfig.put("query_event_id", query_event_id);
+		taskConfig.put("update_event_id", update_event_id);
+		taskConfig.put("column_address", MapUtil.get(columns,column_address));
+		taskConfig.put("column_province", column_province==null?null:MapUtil.get(columns,column_province));
+		taskConfig.put("column_city", column_city==null?null:MapUtil.get(columns,column_city));
+		taskConfig.put("column_district", column_district==null?null:MapUtil.get(columns,column_district));
+		taskConfig.put("tokenid", tokenid);
+		taskConfig.put("content", content);
+		new Thread(new ConvetMTask(taskConfig,logger)).start();
+		
 	}
 	
 	
@@ -522,21 +507,24 @@ public class EntityServiceImpl implements EntityService {
 						+ (StringUtil.isEmptys(column_district)?"":URLEncoder.encode(MapUtil.getString(paramMap, column_district)))
 						+URLEncoder.encode(MapUtil.getString(paramMap, column_address)));
 				if (200 == MapUtil.getInt(rtn, "status")) {
-					Map datajson = JSONUtil.parserStrToMap(rtn.get("data")+"");
-					if( "OK".equals(MapUtil.getString(datajson,"status"))){
-					Map value = new HashMap();
-					List coordinates = new ArrayList();
-					coordinates.add(MapUtil.getDouble(datajson, "result.longitude"));
-					coordinates.add(MapUtil.getDouble(datajson, "result.latitude"));
-					value.put("coordinates", coordinates);
-					value.put("type", "Point");
-					paramMap.put(column_name, value);
-					logger.debug("convert access:{}", paramMap);
-					IResource iresource = factoryService.getBmo(IResource.class.getName());
-					iresource.callEvent(update_event_id, null, paramMap);
+					Map datajson = JSONUtil.parserStrToMap(rtn.get("data") + "");
+					if ("OK".equals(MapUtil.getString(datajson, "status"))) {
+						Map value = new HashMap();
+						List coordinates = new ArrayList();
+						coordinates.add(MapUtil.getDouble(datajson, "result.longitude"));
+						coordinates.add(MapUtil.getDouble(datajson, "result.latitude"));
+						value.put("coordinates", coordinates);
+						value.put("type", "Point");
+						paramMap.put(column_name, value);
+						logger.debug("convert access:{}", paramMap);
+						IResource iresource = factoryService.getBmo(IResource.class.getName());
+						iresource.callEvent(update_event_id, null, paramMap);
+					} else {
+						logger.error("data convert error row:{} convert:{}", paramMap, rtn);
+					}
 				} else {
 					logger.error("data convert error row:{} convert:{}", paramMap, rtn);
-				}}
+				}
 			} catch (Throwable e) {
 				logger.error(e.getMessage()+" row:{} convert:{} taskConfig:{}", paramMap, rtn,taskConfig);
 				logger.error(e.getMessage(), e);
@@ -552,104 +540,88 @@ public class EntityServiceImpl implements EntityService {
 		IServicesEvent se;
 		String processKey = UUID.randomUUID().toString().replaceAll("-", "");
 
+		String column_address = MapUtil.getString(data, "column_address");
+		String column_province = MapUtil.getString(data, "column_province");
+		String column_city = MapUtil.getString(data, "column_city");
+		String column_district = MapUtil.getString(data, "column_district");
+		String column_street = MapUtil.getString(data, "column_street");
+		String column_poi = MapUtil.getString(data, "column_poi");
 		try {
 			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			String column_address =MapUtil.getString(data, "column_address");
-			String column_province =MapUtil.getString(data, "column_province");
-			String column_city =MapUtil.getString(data, "column_city");
-			String column_district =MapUtil.getString(data, "column_district");
-			String column_street =MapUtil.getString(data, "column_street");
-			String column_poi =MapUtil.getString(data, "column_poi");
 			data.put("entity_column_id", column_address);
 			data.put("geo_type", 10);
-			
+
 			Map rto = iresource.callEvent("5597bbf0-9550-46ce-9163-0dbb1e6a7048", data_source_name, data); // locked entity by entity_column_id
-			if(MapUtil.getInt(rto, "count",0)==0) {
-				throw new OIUEException(StatusResult._data_locked,"数据源处于锁定状态，无法执行此操作！");
-			}
-			
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			Map entity_column = iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27", data_source_name, data); //query entity info by  entity_column_id
-			String entity_id = MapUtil.getString(entity_column, "entity_id");
-			String table_name =  MapUtil.getString(entity_column, "table_name");
-			data.put("entity_id", entity_id);
-			data.put("table_name", table_name);
-
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			Map columns = iresource.callEvent("00525d76-8d02-467e-969b-c87cc3df6c74", data_source_name, data); //query entity columns by  entity_id
-			columns=(Map) columns.get("columns");
-			
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			rto = iresource.callEvent("12dfe04c-d125-4c95-a038-9c6cf471bd40", data_source_name, data); // query geo column
-			String column_name=MapUtil.getString(rto, "entity_column_id");
-			
-			String update_event_id ="";
-			String query_event_id ="" ;
-			iresource = factoryService.getBmoByProcess(IResource.class.getName(), processKey);
-			List<Map> operation = iresource.callEvent("54d3cc4d-28ba-45aa-899a-3b0016ddb55d", data_source_name, entity_column); //query entity event
-			
-			for(Map d:operation) {
-				if("query".equals(MapUtil.getString(d, "operation_type"))) {
-					query_event_id = MapUtil.getString(d, "id");
-				}else if("update".equals(MapUtil.getString(d, "operation_type"))) {
-					update_event_id= MapUtil.getString(d, "id");
-				}
+			if (MapUtil.getInt(rto, "count", 0) == 0) {
+				throw new OIUEException(StatusResult._data_locked, "数据源处于锁定状态，无法执行此操作！");
 			}
 
-			Map params = new HashMap();
-			params.putAll(data);
-			params.put("task_name", "逆地理编码");
-			params.put("status", 0);
-			params.put("component_instance_event_id",MapUtil.get(event,"component_instance_event_id"));
-			Map content = new HashMap();
-			content.put("service_event_id", query_event_id);
-			content.put("entity_id", entity_id);
-			content.put("table_desc", MapUtil.getString(entity_column, "table_desc"));
-			params.put("content", content);
-			params.putAll(this.taskDataService.addTask(params, event, tokenid));
-			
-			Map taskConfig = new HashMap();
-			taskConfig.putAll(data);
-			taskConfig.put("user_task_id", MapUtil.get(params,"user_task_id"));
-			taskConfig.put("entity_id", entity_id);
-			taskConfig.put("user_id", MapUtil.getString(data, "user_id"));
-			taskConfig.put("limit", -1);
-			taskConfig.put("table_name", table_name);
-			taskConfig.put("geo_column_name", MapUtil.get(columns,column_name));
-			taskConfig.put("query_event_id", query_event_id);
-			taskConfig.put("update_event_id", update_event_id);
-			taskConfig.put("column_address", MapUtil.get(columns,column_address));
-			taskConfig.put("column_province", column_province==null?null:MapUtil.get(columns,column_province));
-			taskConfig.put("column_city", column_city==null?null:MapUtil.get(columns,column_city));
-			taskConfig.put("column_district", column_district==null?null:MapUtil.get(columns,column_district));
-			taskConfig.put("column_street", column_street==null?null:MapUtil.get(columns,column_street));
-			taskConfig.put("column_poi", column_poi==null?null:MapUtil.get(columns,column_poi));
-			taskConfig.put("tokenid", tokenid);
-			taskConfig.put("content", content);
-			new Thread(new ConvetRMTask(taskConfig,logger)).start();
-			
 			factoryService.CommitByProcess(processKey);
-		} catch (OIUEException e) {
-			logger.error(e.getMessage(), e);
-			factoryService.RollbackByProcess(processKey);
-			throw e;
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 			factoryService.RollbackByProcess(processKey);
-			if (e instanceof InvocationTargetException)
-				e = ((InvocationTargetException) e).getTargetException();
-			if (e instanceof UndeclaredThrowableException)
-				e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
-			if (e instanceof InvocationTargetException)
-				e = ((InvocationTargetException) e).getTargetException();
-			if (e instanceof UndeclaredThrowableException)
-				e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
-			
-			if (e instanceof OIUEException) {
-				throw (OIUEException)e;
-			}else
-				throw new OIUEException(StatusResult._data_error, "", e);
+			throw e;
 		}
+		iresource = factoryService.getBmo(IResource.class.getName());
+		Map entity_column = iresource.callEvent("04ebc4b3-7368-4b20-a8fe-7c6613742c27", data_source_name, data); // query entity info by entity_column_id
+		String entity_id = MapUtil.getString(entity_column, "entity_id");
+		String table_name = MapUtil.getString(entity_column, "table_name");
+		data.put("entity_id", entity_id);
+		data.put("table_name", table_name);
+
+		iresource = factoryService.getBmo(IResource.class.getName());
+		Map columns = iresource.callEvent("00525d76-8d02-467e-969b-c87cc3df6c74", data_source_name, data); // query entity columns by entity_id
+		columns = (Map) columns.get("columns");
+
+		iresource = factoryService.getBmo(IResource.class.getName());
+		Map rto = iresource.callEvent("12dfe04c-d125-4c95-a038-9c6cf471bd40", data_source_name, data); // query geo column
+		String column_name = MapUtil.getString(rto, "entity_column_id");
+
+		String update_event_id = "";
+		String query_event_id = "";
+		iresource = factoryService.getBmo(IResource.class.getName());
+		List<Map> operation = iresource.callEvent("54d3cc4d-28ba-45aa-899a-3b0016ddb55d", data_source_name, entity_column); // query entity event
+
+		for (Map d : operation) {
+			if ("query".equals(MapUtil.getString(d, "operation_type"))) {
+				query_event_id = MapUtil.getString(d, "id");
+			} else if ("update".equals(MapUtil.getString(d, "operation_type"))) {
+				update_event_id = MapUtil.getString(d, "id");
+			}
+		}
+
+		Map params = new HashMap();
+		params.putAll(data);
+		params.put("task_name", "逆地理编码");
+		params.put("status", 0);
+		params.put("component_instance_event_id", MapUtil.get(event, "component_instance_event_id"));
+		Map content = new HashMap();
+		content.put("service_event_id", query_event_id);
+		content.put("entity_id", entity_id);
+		content.put("table_desc", MapUtil.getString(entity_column, "table_desc"));
+		params.put("content", content);
+		params.putAll(this.taskDataService.addTask(params, event, tokenid));
+
+		Map taskConfig = new HashMap();
+		taskConfig.putAll(data);
+		taskConfig.put("user_task_id", MapUtil.get(params, "user_task_id"));
+		taskConfig.put("entity_id", entity_id);
+		taskConfig.put("user_id", MapUtil.getString(data, "user_id"));
+		taskConfig.put("limit", -1);
+		taskConfig.put("table_name", table_name);
+		taskConfig.put("geo_column_name", MapUtil.get(columns, column_name));
+		taskConfig.put("query_event_id", query_event_id);
+		taskConfig.put("update_event_id", update_event_id);
+		taskConfig.put("column_address", MapUtil.get(columns, column_address));
+		taskConfig.put("column_province", column_province == null ? null : MapUtil.get(columns, column_province));
+		taskConfig.put("column_city", column_city == null ? null : MapUtil.get(columns, column_city));
+		taskConfig.put("column_district", column_district == null ? null : MapUtil.get(columns, column_district));
+		taskConfig.put("column_street", column_street == null ? null : MapUtil.get(columns, column_street));
+		taskConfig.put("column_poi", column_poi == null ? null : MapUtil.get(columns, column_poi));
+		taskConfig.put("tokenid", tokenid);
+		taskConfig.put("content", content);
+		new Thread(new ConvetRMTask(taskConfig, logger)).start();
+
 	}
 	class ConvetRMTask implements Runnable {
 		private Map taskConfig;
@@ -733,10 +705,10 @@ public class EntityServiceImpl implements EntityService {
 				logger.debug("taskConfig:{}", taskConfig);
 				String location = MapUtil.getString(paramMap, column_name);
 				location=location.substring(location.indexOf("[")+1, location.indexOf("]"));
-				rtn = httpClientService.getGetData(url + (StringUtil.isEmptys(column_province)?"":URLEncoder.encode(location)));
+				rtn = httpClientService.getGetData(url + (StringUtil.isEmptys(location)?"":URLEncoder.encode(location)));
 				if (200 == MapUtil.getInt(rtn, "status")) {
-					Map datajson = JSONUtil.parserStrToMap(rtn.get("data")+"");
-					if( "OK".equals(MapUtil.getString(datajson,"status"))){
+					Map datajson = JSONUtil.parserStrToMap(rtn.get("data") + "");
+					if ("OK".equals(MapUtil.getString(datajson, "status"))) {
 						paramMap.put(column_address, MapUtil.getString(datajson, "result.points.0.address"));
 						if (column_poi != null)
 							paramMap.put(column_poi, MapUtil.getString(datajson, "result.points.0.name"));
@@ -748,12 +720,15 @@ public class EntityServiceImpl implements EntityService {
 							paramMap.put(column_district, MapUtil.getString(datajson, "result.district"));
 						if (column_street != null)
 							paramMap.put(column_street, MapUtil.getString(datajson, "result.roads.0.name"));
-						logger.debug("convert access:{}", paramMap);
+						logger.debug("convert access:{} convert:{}", paramMap, rtn);
 						IResource iresource = factoryService.getBmo(IResource.class.getName());
 						iresource.callEvent(update_event_id, null, paramMap);
 					} else {
 						logger.error("data convert error row:{} convert:{}", paramMap, rtn);
-					}}
+					}
+				} else {
+					logger.error("data convert error row:{} convert:{}", paramMap, rtn);
+				}
 			} catch (Throwable e) {
 				logger.error(e.getMessage()+" row:{} convert:{} taskConfig:{}", paramMap, rtn,taskConfig);
 				logger.error(e.getMessage(), e);

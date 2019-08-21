@@ -49,7 +49,7 @@ public class EventExecuteServiceImpl implements EventExecuteService {
 						List desc = new ArrayList<>();
 						List alias = new ArrayList<>();
 						for (Map result : results) {
-							desc.add(MapUtil.get(result, "desc"));
+							desc.add(MapUtil.get(result, "description"));
 							alias.add(MapUtil.get(result, "alias"));
 						}
 						// wr.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF }));

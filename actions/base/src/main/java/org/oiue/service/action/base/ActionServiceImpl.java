@@ -67,12 +67,6 @@ public class ActionServiceImpl implements ActionService {
 	public void updated(Map props) {
 		String errorStr = props.get("action.msg") + "";
 		try {
-			// defaultErrorMap = new TreeMap();
-			// List list = JSONUtil.parserStrToList(errorStr);
-			// for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-			// Map msg = (Map) iterator.next();
-			// defaultErrorMap.put(msg.get("key"), msg);
-			// }
 			defaultErrorMap = JSONUtil.parserStrToMap(errorStr);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -90,19 +84,6 @@ public class ActionServiceImpl implements ActionService {
 	public Map request(Map per) {
 		PrintWriter writer = null;
 		OutputStream stream = null;
-//		int a=1;
-//		while (true) {
-//			if(a==2)
-//				break;
-//			logger.debug("执行action业务。。。。。。。。。");
-//			try {
-//				Thread.sleep(300);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			
-//		}
-		
 		try {
 			writer = (PrintWriter) per.remove("PrintWriter");
 		} catch (Exception e) {}
@@ -216,7 +197,7 @@ public class ActionServiceImpl implements ActionService {
 					Map para_tmp = new HashMap();
 					para_tmp.put("startTime", startbfTime);
 					para_tmp.put("endTime", System.currentTimeMillis());
-					para_tmp.put("desc", "Action [" + serviceName + "." + methodName + "([Map/List/String,]Map,String)]");
+					para_tmp.put("description", "Action [" + serviceName + "." + methodName + "([Map/List/String,]Map,String)]");
 					para_tmp.put("para", JSONUtil.parserToStr(per));
 					tLogger.debug(para_tmp);
 				}
@@ -236,108 +217,10 @@ public class ActionServiceImpl implements ActionService {
 					logger.info("action gateway >>>" + (System.currentTimeMillis() - starttime) + "：" + (pers.length() > 1024 ? "too long response data." : pers));
 				}
 				per.put("status", StatusResult._SUCCESS);
-			} catch (OIUEException e) {
-				logger.error(e.getMessage(), e);
-				String ex = ExceptionUtil.getCausedBySrcMsg(e);
-				int status = ((OIUEException) e).getStatus().getResult();
-				per.put("rtn", ((OIUEException) e).getRtnObject());
-				per.put("status", status);
-				if (defaultErrorMap!=null&&defaultErrorMap.containsKey(status + "")) {
-					per.put("msg", defaultErrorMap.get(status + ""));
-					per.put("exception", ex);
-					run = false;
-					break anchor;
-				}else if(status==StatusResult._sql_error) {
-					per.put("msg", "操作失败");
-					per.put("exception", ex);
-					run = false;
-					break anchor;
-					
-				}else {
-					per.put("msg", "操作失败");
-					per.put("exception", ex);
-					run = false;
-					break anchor;
-				}
 			} catch (Throwable e) {
-//				logger.error(e.getMessage(), e);
-				if (e instanceof InvocationTargetException)
-					e = ((InvocationTargetException) e).getTargetException();
-				if (e instanceof UndeclaredThrowableException)
-					e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
-				if (e instanceof InvocationTargetException)
-					e = ((InvocationTargetException) e).getTargetException();
-				if (e instanceof UndeclaredThrowableException)
-					e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
-				
-				String ex = ExceptionUtil.getCausedBySrcMsg(e);
-				
-				if (e instanceof OIUEException) {
-					int status = ((OIUEException) e).getStatus().getResult();
-					per.put("rtn", ((OIUEException) e).getRtnObject());
-					per.put("status", status);
-					logger.error(per+"",e);
-					if (defaultErrorMap!=null&&defaultErrorMap.containsKey(status + "")) {
-						per.put("msg", defaultErrorMap.get(status + ""));
-						per.put("exception", ex);
-						run = false;
-						break anchor;
-					}else if(status==StatusResult._sql_error) {
-						Map de = (Map) ((OIUEException) e).getRtnObject();
-						String sqlstate=MapUtil.getString(de, "sqlstate");
-						per.put("msg",sqlstate==null?"操作失败":sqlstate.startsWith("25006")?"只读数据禁止操作！":sqlstate.startsWith("02")?"没有数据": sqlstate.startsWith("03")?"SQL语句尚未结束": sqlstate.startsWith("08000")?"连接异常": sqlstate.startsWith("08003")?"连接不存在":
-							sqlstate.startsWith("08006")?"连接失败": sqlstate.startsWith("08")?"连接异常": sqlstate.startsWith("09")?"触发器动作异常": sqlstate.startsWith("22")?"数据异常":
-								sqlstate.startsWith("23")?"违反完成性约束": sqlstate.startsWith("26")?"非法SQL语句名": sqlstate.startsWith("2F")?"SQL过程异常": sqlstate.startsWith("3D")?"非法数据库名":
-									sqlstate.startsWith("42")?"语法错误或者违反访问规则": sqlstate.startsWith("P0001")?"别名不可以重复！":sqlstate.startsWith("P0")?"语法错误或者违反访问规则": sqlstate.startsWith("53")?"资源不够":"操作失败");
-						per.put("exception", ex);
-						run = false;
-						break anchor;
-					}else {
-						per.put("msg", "操作失败");
-						per.put("exception", ex);
-						run = false;
-						break anchor;
-					}
-						
-				}
-
-				logger.error(ex, e);
-				if (defaultErrorMap != null && ex != null) {
-					for (Iterator iterator = defaultErrorMap.keySet().iterator(); iterator.hasNext();) {
-						String key = (String) iterator.next();
-						if (ex.indexOf(key) > 0) {
-							Object msg = defaultErrorMap.get(key);
-							if (msg instanceof Map) {
-								Map msgm = (Map) msg;
-								try {
-									Map msgn = (Map) msgm.get(modulename);
-									per.put("status", MapUtil.getInt(msgn, "status", -1));
-									per.put("msg", MapUtil.getString(msgn, "msg",ex));
-									per.put("exception", ex);
-									
-									run = false;
-									break anchor;
-								} catch (Exception e2) {}
-								
-								per.put("status", MapUtil.getInt(msgm, "status", -1));
-								per.put("msg", MapUtil.getString(msgm, "msg",ex));
-								per.put("exception", ex);
-								
-								run = false;
-								break anchor;
-							} else if (msg instanceof String) {
-								per.put("status", key);
-								per.put("msg", msg);
-								per.put("exception", ex);
-							}
-							run = false;
-							break anchor;
-						}
-					}
-				}
-				per.put("status", (e instanceof OIUEException) ? ((OIUEException) e).getStatus().getResult() : StatusResult._ncriticalAbnormal);
-				per.put("msg", "操作错误，不允许的操作！");
-				per.put("exception", ex);
+				per.putAll(this.convert2Result(e,modulename,operation));
+				run = false;
+				break anchor;
 			}
 			run = false;
 		}
@@ -348,7 +231,7 @@ public class ActionServiceImpl implements ActionService {
 			para.put("user_id", online != null ? online.getUser_id() : null);
 			para.put("component_instance_event_id", component_instance_event_id == null ? "fm_managed_global" : component_instance_event_id);
 			para.put("source", data_source);
-			para.put("desc", modulename + "/" + operation);
+			para.put("description", modulename + "/" + operation);
 			req_per.remove("token");
 			para.put("para", req_per);
 			para.put("status", MapUtil.getInt(per, "status", -1));
@@ -361,7 +244,82 @@ public class ActionServiceImpl implements ActionService {
 		}
 		return per;
 	}
-	
+	public Map convert2Result(Throwable e, String modulename, String operation) {
+		Map per = new HashMap();
+		if (e instanceof InvocationTargetException)
+			e = ((InvocationTargetException) e).getTargetException();
+		if (e instanceof UndeclaredThrowableException)
+			e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
+		if (e instanceof InvocationTargetException)
+			e = ((InvocationTargetException) e).getTargetException();
+		if (e instanceof UndeclaredThrowableException)
+			e = ((UndeclaredThrowableException) e).getUndeclaredThrowable();
+		
+		String ex = ExceptionUtil.getCausedBySrcMsg(e);
+
+		logger.error(ex, e);
+		if (defaultErrorMap != null && ex != null) {
+			for (Iterator iterator = defaultErrorMap.keySet().iterator(); iterator.hasNext();) {
+				String key = (String) iterator.next();
+				if (ex.indexOf(key) > 0) {
+					Object msg = defaultErrorMap.get(key);
+					if (msg instanceof Map) {
+						Map msgm = (Map) msg;
+						try {
+							if(msgm.containsKey(modulename))
+							msgm = (Map) msgm.get(modulename);
+							per.put("status", MapUtil.getInt(msgm, "status", -1));
+							per.put("msg", MapUtil.getString(msgm, "msg",ex));
+							per.put("exception", ex);
+
+							return per;
+						} catch (Exception e2) {}
+						
+						per.put("status", MapUtil.getInt(msgm, "status", -1));
+						per.put("msg", MapUtil.getString(msgm, "msg",ex));
+						per.put("exception", ex);
+
+						return per;
+					} else if (msg instanceof String) {
+						per.put("status", key);
+						per.put("msg", msg);
+						per.put("exception", ex);
+					}
+					return per;
+				}
+			}
+		}
+		if (e instanceof OIUEException) {
+			int status = ((OIUEException) e).getStatus().getResult();
+			per.put("rtn", ((OIUEException) e).getRtnObject());
+			per.put("status", status);
+			logger.error(per+"",e);
+			if (defaultErrorMap!=null&&defaultErrorMap.containsKey(status + "")) {
+				per.put("msg", defaultErrorMap.get(status + ""));
+				per.put("exception", ex);
+				return per;
+			}else if(status==StatusResult._sql_error) {
+				Map de = (Map) ((OIUEException) e).getRtnObject();
+				String sqlstate=MapUtil.getString(de, "sqlstate");
+				per.put("msg",sqlstate==null?"操作失败":sqlstate.equals("25006")?"只读数据禁止操作！":sqlstate.equals("23505")?"数据重复！":sqlstate.startsWith("02")?"没有数据": sqlstate.startsWith("03")?"SQL语句尚未结束": sqlstate.startsWith("08000")?"连接异常": sqlstate.startsWith("08003")?"连接不存在":
+					sqlstate.startsWith("08006")?"连接失败": sqlstate.startsWith("08")?"连接异常": sqlstate.startsWith("09")?"触发器动作异常": sqlstate.startsWith("22")?"数据异常":
+						sqlstate.startsWith("23")?"违反完成性约束": sqlstate.startsWith("26")?"非法SQL语句名": sqlstate.startsWith("2F")?"SQL过程异常": sqlstate.startsWith("3D")?"非法数据库名":
+							sqlstate.startsWith("42")?"语法错误或者违反访问规则": sqlstate.startsWith("P0001")?"别名不可以重复！":sqlstate.startsWith("P0")?"语法错误或者违反访问规则": sqlstate.startsWith("53")?"资源不够":"操作失败");
+				per.put("exception", ex);
+				return per;
+			}else {
+				per.put("msg", "操作失败");
+				per.put("exception", ex);
+				return per;
+			}
+				
+		}
+
+		per.put("status", (e instanceof OIUEException) ? ((OIUEException) e).getStatus().getResult() : StatusResult._ncriticalAbnormal);
+		per.put("msg", "操作错误，不允许的操作！");
+		per.put("exception", ex);
+		return per;
+	}
 	@Override
 	public String request(String perStr) {
 		return JSONUtil.parserToStr(request(MapUtil.fromString(perStr)));
@@ -389,7 +347,7 @@ public class ActionServiceImpl implements ActionService {
 				Map para = new HashMap();
 				para.put("startTime", startTime);
 				para.put("endTime", System.currentTimeMillis());
-				para.put("desc", "ActionFilter[" + afilter.getClass().getName() + "]" + afr);
+				para.put("description", "ActionFilter[" + afilter.getClass().getName() + "]" + afr);
 				para.put("para", JSONUtil.parserToStr(per));
 				this.tLogger.debug(para);
 			}
@@ -414,7 +372,7 @@ public class ActionServiceImpl implements ActionService {
 			Map para = new HashMap();
 			para.put("startTime", startbfTime);
 			para.put("endTime", System.currentTimeMillis());
-			para.put("desc", "Before ActionFilters [" + beforeActionFilter + "]");
+			para.put("description", "Before ActionFilters [" + beforeActionFilter + "]");
 			para.put("para", JSONUtil.parserToStr(per));
 			this.tLogger.debug(para);
 		}
@@ -445,7 +403,7 @@ public class ActionServiceImpl implements ActionService {
 				Map para = new HashMap();
 				para.put("startTime", startTime);
 				para.put("endTime", System.currentTimeMillis());
-				para.put("desc", "after ActionFilter[" + afilter.getClass().getName() + "]" + afr);
+				para.put("description", "after ActionFilter[" + afilter.getClass().getName() + "]" + afr);
 				para.put("para", JSONUtil.parserToStr(per));
 				tLogger.debug(para);
 			}
@@ -467,7 +425,7 @@ public class ActionServiceImpl implements ActionService {
 			Map para = new HashMap();
 			para.put("startTime", startbfTime);
 			para.put("endTime", System.currentTimeMillis());
-			para.put("desc", "After ActionFilters [" + afterActionFilter + "]");
+			para.put("description", "After ActionFilters [" + afterActionFilter + "]");
 			para.put("para", JSONUtil.parserToStr(per));
 			tLogger.debug(para);
 		}

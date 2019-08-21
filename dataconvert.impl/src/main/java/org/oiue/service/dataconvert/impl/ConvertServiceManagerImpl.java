@@ -33,7 +33,7 @@ import com.lingtu.services.user.task.data.ITaskDataService;
  * @author every
  *
  */
-@SuppressWarnings({ "serial", "rawtypes", "unused" })
+@SuppressWarnings({ "serial", "rawtypes", "unused" ,"unchecked", "static-access"})
 public class ConvertServiceManagerImpl implements ConvertServiceManager, Serializable {
 	private Logger logger;
 	private String convert_type = "rectificationType";
@@ -195,7 +195,10 @@ public class ConvertServiceManagerImpl implements ConvertServiceManager, Seriali
 						return true;
 					}
 				};
-				iresource.callEvent(query_event_id, null,taskConfig , cb);
+				Map eventMap = iresource.getEventByIDName(query_event_id, data_source_name);
+				String query_data_source_name = MapUtil.getString(taskConfig, "data_source_name");
+				iresource.executeEvent(eventMap, StringUtil.isEmptys(query_data_source_name) ? data_source_name : query_data_source_name, taskConfig, cb);
+//				iresource.callEvent(query_event_id, null,taskConfig , cb);
 				while(workQueue.size()>0) {
 					logger.debug("workQueue.size={} ,workQueue:{}",workQueue.size(), workQueue);
 					Thread.currentThread().sleep(500);
