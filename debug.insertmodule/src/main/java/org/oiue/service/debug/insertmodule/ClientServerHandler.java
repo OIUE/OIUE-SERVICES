@@ -167,9 +167,9 @@ public class ClientServerHandler implements Handler {
 	/**
 	 * 通过反射 将字段属性替换到Sql语句中(注意大小写)
 	 * 
-	 * @param sourceStr
-	 * @param tb
-	 * @return
+	 * @param sourceStr 源sql
+	 * @param tb 表
+	 * @return  处理后的sql
 	 */
 	@SuppressWarnings("rawtypes")
 	public SQL AnalyzeSql(String sourceStr, Map tb) {
@@ -200,7 +200,7 @@ public class ClientServerHandler implements Handler {
 	 * 
 	 * @param column 参数的标号
 	 * @param obj Object obj是参数值
-	 * @throws SQLException
+	 * @param pstmt PreparedStatement
 	 */
 	public void setParameter(int column, Object obj, PreparedStatement pstmt) {
 		try {
@@ -240,8 +240,8 @@ public class ClientServerHandler implements Handler {
 	
 	/**
 	 * 根据参数值queryParams集合
-	 * 
-	 * @param queryParams @
+	 * @param queryParams 查询参数
+	 * @param pstmt PreparedStatement
 	 */
 	@SuppressWarnings("rawtypes")
 	public void setQueryParams(Collection queryParams, PreparedStatement pstmt) {

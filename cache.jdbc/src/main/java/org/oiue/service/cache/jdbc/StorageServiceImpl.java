@@ -121,9 +121,9 @@ public class StorageServiceImpl implements CacheService, Runnable {
 	/**
 	 * 参JDBCUtil实现 设置prepared的参数
 	 *
+	 * @param pstmt PreparedStatement对象
 	 * @param column 参数的标号
 	 * @param obj Object obj是参数值
-	 * @throws SQLException sql异常
 	 */
 	public void setParameter(PreparedStatement pstmt, int column, Object obj) {
 		try {
